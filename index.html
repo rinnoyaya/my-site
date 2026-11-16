@@ -52,7 +52,7 @@ header{border-bottom:1px solid var(--line);background:var(--card)}
 .bar{max-width:1040px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
 .logo{font-family:var(--f-display);font-size:22px;color:var(--ink);display:flex;align-items:center;gap:8px}
 .logo:hover{text-decoration:none}
-.logo i{width:10px;height:10px;border-radius:50%;background:var(--lamp);box-shadow:0 0 12px var(--lamp)}
+.logo img{width:32px;height:32px;border-radius:50%;object-fit:cover;flex:none;box-shadow:0 0 0 1px var(--line)}
 nav{display:flex;gap:4px;flex-wrap:wrap;margin-left:auto}
 nav a{color:var(--muted);padding:6px 10px;border-radius:6px;font-size:15px}
 nav a.on{color:var(--ink);background:var(--paper);font-weight:500}
@@ -325,7 +325,6 @@ footer{border-top:1px solid var(--line);color:var(--muted);font-size:13px;text-a
   nav{order:3;width:calc(100% + 32px);margin:0 -16px;padding:0 12px 2px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
   nav::-webkit-scrollbar{display:none}
   nav a{white-space:nowrap;flex:none}
-  #themeBtn{margin-left:auto}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
@@ -336,7 +335,7 @@ footer{border-top:1px solid var(--line);color:var(--muted);font-size:13px;text-a
 <div class="demo" id="demoBanner" hidden>這是範例網站，內容都是示意，可以在後台換成你的作品；「網站設定」裡可以關掉這條提示</div>
 <header>
   <div class="bar">
-    <a class="logo" href="#home"><i></i><span id="siteName">　</span></a>
+    <a class="logo" href="#home"><img src="favicon.png?v=2" alt="" width="32" height="32"><span id="siteName">　</span></a>
     <nav id="nav">
       <a href="#home">首頁</a>
       <a href="#stories">故事</a>
@@ -347,7 +346,6 @@ footer{border-top:1px solid var(--line);color:var(--muted);font-size:13px;text-a
       <a href="#notes">文章</a>
       <a href="#about">關於</a>
     </nav>
-    <button class="tbtn" id="themeBtn" type="button">切換深淺色</button>
   </div>
 </header>
 
@@ -593,7 +591,7 @@ const commOf=n=>COMM.filter(m=>(m.characters||[]).includes(n));
 const notesOf=n=>NOTES.filter(x=>(x.characters||[]).includes(n));
 const charLink=n=>charOf(n)?`<a class="tag story" href="#char-${enc(n)}">${esc(n)}</a>`:`<span class="tag">${esc(n)}</span>`;
 
-const SITE_VERSION="2026-11-16 v19";
+const SITE_VERSION="2026-11-16 v20";
 const BROKEN=[];
 async function load(){
   const files=["site.json","series.json","chapters.json","side-stories.json","characters.json","commissions.json","gallery.json","notes.json","history.json"];
@@ -895,7 +893,6 @@ document.addEventListener("click",e=>{
 });$("#lb").onclick=e=>{if(e.target.id==="lb")closeLb();};
 document.addEventListener("keydown",e=>{if(e.key==="Escape"){closeLb();$("#gate").classList.remove("on");gateCb=null;}});
 
-$("#themeBtn").onclick=()=>{const r=document.documentElement,cur=r.dataset.theme||(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light");r.dataset.theme=cur==="dark"?"light":"dark";r.dataset.userTheme="1";};
 
 /* ---------- 編輯按鈕：只在打開過寫作小幫手的裝置上出現 ---------- */
 let OWNER=false;try{OWNER=localStorage.getItem("owner-mode")==="1";}catch(e){}
