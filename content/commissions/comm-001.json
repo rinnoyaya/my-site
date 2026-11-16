@@ -1,12 +1,12 @@
 {
   "title": "玄城凜夜設定圖",
   "adult": false,
-  "image": "",
-  "artist": "ai",
+  "imageUrl": "https://img.obsidianfirelight.com/commissions/img-4638-20261116-210924-53.png",
+  "imageSize": "一般",
+  "artist": "魚魚",
   "date": "2026-11-10",
   "type": "全身",
   "characters": [
     "玄城凜夜"
-  ],
-  "description": "測試用的委託圖"
+  ]
 }
