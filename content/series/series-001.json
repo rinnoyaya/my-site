@@ -1,7 +1,9 @@
 {
   "title": "大咒術師與小龍妻",
+  "order": 1,
   "genre": "奇幻",
   "status": "連載中",
   "description": "關於龍與咒術師的一些日常生活小故事",
-  "order": 1
+  "coverUrl": "https://img.obsidianfirelight.com/commissions/29f4609b6be9f3a07c6efe826cd43554-20261116-210927-75.png",
+  "coverSize": "自動"
 }
