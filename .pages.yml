@@ -108,6 +108,15 @@ content:
     label: 外觀設定
     type: object
     fields:
+    - name: indent
+      label: 段落縮排
+      type: select
+      options:
+        values:
+        - 不縮排
+        - 每一行都縮排
+        - 只有段落第一行縮排
+      description: 故事和文章的排版。不縮排：每行都貼齊左邊（預設，適合短句換行的寫法）
     - name: defaultTheme
       label: 預設顯示模式
       type: select
