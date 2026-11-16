@@ -101,7 +101,12 @@ main{max-width:1040px;margin:0 auto;padding:28px 20px 64px}
 .reader h1{font-size:clamp(26px,4.5vw,34px);margin-bottom:6px}
 .rtools{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;color:var(--muted);font-size:14px;padding-bottom:14px;border-bottom:1px solid var(--line);margin-bottom:26px}
 .prose{font-family:var(--f-read);font-size:var(--read-size);line-height:2;letter-spacing:.02em}
-.prose p{margin:0 0 1.2em;text-indent:2em}
+.prose p{margin:0 0 1.2em;text-indent:0}
+/* 段落縮排（後台：外觀設定 › 段落縮排）；每一行是一個 .ln */
+.rich p .ln{display:block}
+:root.ind-all .prose p .ln,:root.ind-all .notebody p .ln{text-indent:2em}
+:root.ind-first .prose p .ln:first-child,:root.ind-first .notebody p .ln:first-child{text-indent:2em}
+.rich p .ln .inline-fig{text-indent:0}
 .prose figure{margin:2em 0}
 .prose figure .art{border-radius:10px;overflow:hidden;aspect-ratio:16/10}
 .prose figcaption{font-family:var(--f-body);font-size:13px;color:var(--muted);text-align:center;margin-top:8px}
@@ -566,7 +571,8 @@ function blocks(text){
     const lines=p.split("\n").map(l=>l.trim()).filter(Boolean);
     if(lines.length&&lines.every(l=>IMG_LINE.test(l)))return lines.map(l=>{const m=l.match(IMG_LINE);return figHtml(m[2],m[1]);}).join("");
     if(/^[-・] /.test(p))return `<ul>${p.split("\n").map(l=>`<li>${inline(l.replace(/^[-・]\s?/,""))}</li>`).join("")}</ul>`;
-    return `<p>${inline(p)}</p>`;
+    /* 每一行各自成一行，縮排才會整齊 */
+    return `<p>${p.split("\n").map(l=>`<span class="ln">${inline(l)||"&nbsp;"}</span>`).join("")}</p>`;
   });
 }
 /* 列表摘要用：去掉格式符號 */
@@ -612,7 +618,7 @@ const commOf=n=>COMM.filter(m=>(m.characters||[]).includes(n));
 const notesOf=n=>NOTES.filter(x=>(x.characters||[]).includes(n));
 const charLink=n=>charOf(n)?`<a class="tag story" href="#char-${enc(n)}">${esc(n)}</a>`:`<span class="tag">${esc(n)}</span>`;
 
-const SITE_VERSION="2026-11-16 v21";
+const SITE_VERSION="2026-11-16 v22";
 const BROKEN=[];
 async function load(){
   const files=["site.json","series.json","chapters.json","side-stories.json","characters.json","commissions.json","gallery.json","notes.json","history.json"];
@@ -669,6 +675,8 @@ function applyTheme(t){
     bg.style.setProperty("--bg-veil",({"無":"0%","淡":"35%","中":"60%","濃":"82%"})[t.bgOverlay]||"60%");
     bg.style.display="block";document.body.classList.add("has-bg");
   }else{bg.style.display="none";document.body.classList.remove("has-bg");}
+  const ind=({"每一行都縮排":"ind-all","只有段落第一行縮排":"ind-first"})[t.indent]||"";
+  document.documentElement.classList.remove("ind-all","ind-first");if(ind)document.documentElement.classList.add(ind);
   if(!document.documentElement.dataset.userTheme){
     if(t.defaultTheme==="固定深色")document.documentElement.dataset.theme="dark";
     else if(t.defaultTheme==="固定淺色")document.documentElement.dataset.theme="light";

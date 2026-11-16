@@ -105,7 +105,12 @@ main{max-width:1040px;margin:0 auto;padding:28px 20px 64px}
 .reader h1{font-size:clamp(26px,4.5vw,34px);margin-bottom:6px}
 .rtools{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;color:var(--muted);font-size:14px;padding-bottom:14px;border-bottom:1px solid var(--line);margin-bottom:26px}
 .prose{font-family:var(--f-read);font-size:var(--read-size);line-height:2;letter-spacing:.02em}
-.prose p{margin:0 0 1.2em;text-indent:2em}
+.prose p{margin:0 0 1.2em;text-indent:0}
+/* 段落縮排（後台：外觀設定 › 段落縮排）；每一行是一個 .ln */
+.rich p .ln{display:block}
+:root.ind-all .prose p .ln,:root.ind-all .notebody p .ln{text-indent:2em}
+:root.ind-first .prose p .ln:first-child,:root.ind-first .notebody p .ln:first-child{text-indent:2em}
+.rich p .ln .inline-fig{text-indent:0}
 .prose figure{margin:2em 0}
 .prose figure .art{border-radius:10px;overflow:hidden;aspect-ratio:16/10}
 .prose figcaption{font-family:var(--f-body);font-size:13px;color:var(--muted);text-align:center;margin-top:8px}
@@ -296,6 +301,7 @@ body.has-bg{background:var(--paper)}
 .char-hero.av-s{grid-template-columns:100px 1fr}.char-hero.av-s .art{width:100px;height:100px}
 .char-hero.av-l{grid-template-columns:220px 1fr}.char-hero.av-l .art{width:220px;height:220px}
 @media (min-width:640px){.grid .piece.wide{grid-column:span 2}}
+.grid{align-items:start}
 @media (max-width:720px){.hero.hs-s,.hero.hs-l{grid-template-columns:1fr}.series.cs-s,.series.cs-l{grid-template-columns:1fr}}
 @media (max-width:560px){.char-hero.av-s,.char-hero.av-l{grid-template-columns:1fr}.char-hero.av-l .art{width:160px;height:160px}}
 /* 內文插圖 */
