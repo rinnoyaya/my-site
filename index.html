@@ -282,6 +282,19 @@ body:has(.owner:not([hidden])) footer{padding-bottom:76px}
 .bg-layer{display:none;position:fixed;inset:0;z-index:-1;background-position:center;background-size:cover;background-repeat:no-repeat;pointer-events:none}
 .bg-layer::after{content:"";position:absolute;inset:0;background:color-mix(in srgb,var(--paper) var(--bg-veil,60%),transparent)}
 body.has-bg{background:var(--paper)}
+/* 圖片顯示大小（後台「顯示大小」與內文 ![說明|小](網址)） */
+.sz-s{max-width:42%!important;margin-left:auto!important;margin-right:auto!important}
+.sz-m{max-width:66%!important;margin-left:auto!important;margin-right:auto!important}
+.sz-l{max-width:100%!important}
+@media (max-width:560px){.sz-s{max-width:70%!important}.sz-m{max-width:90%!important}}
+.hero.hs-s{grid-template-columns:1.7fr .8fr}.hero.hs-l{grid-template-columns:.85fr 1.35fr}
+.series.cs-s{grid-template-columns:150px 1fr}.series.cs-l{grid-template-columns:320px 1fr}
+.char-hero.av-s{grid-template-columns:100px 1fr}.char-hero.av-s .art{width:100px;height:100px}
+.char-hero.av-l{grid-template-columns:220px 1fr}.char-hero.av-l .art{width:220px;height:220px}
+@media (min-width:640px){.grid .piece.wide{grid-column:span 2}}
+.grid{align-items:start}
+@media (max-width:720px){.hero.hs-s,.hero.hs-l{grid-template-columns:1fr}.series.cs-s,.series.cs-l{grid-template-columns:1fr}}
+@media (max-width:560px){.char-hero.av-s,.char-hero.av-l{grid-template-columns:1fr}.char-hero.av-l .art{width:160px;height:160px}}
 /* 內文插圖 */
 .rich .body-fig{margin:1.8em 0;text-indent:0}
 .rich .body-fig .art{border-radius:10px;overflow:hidden;cursor:zoom-in}
@@ -510,17 +523,25 @@ function linkHtml(u,text){
   return `<a href="${u}"${internal?"":' target="_blank" rel="noopener"'}>${text}</a>`;
 }
 function shortUrl(u){let d=u.replace(/^https?:\/\//i,"").replace(/^www\./i,"").replace(/\/$/,"");return d.length>42?d.slice(0,40)+"…":d;}
-/* 內文插圖：![說明](圖片網址)，網址要 https:// 開頭或站內 / 開頭 */
+/* 「顯示大小」選項 → class */
+const SZ={"小":"s","中":"m","大":"l","滿版":"l"};
+const szOf=v=>SZ[String(v||"").trim()]||"";
+/* 內文插圖：![說明](圖片網址)，網址要 https:// 開頭或站內 / 開頭；指定大小：![說明|小](圖片網址)，可用 小、中、大 */
 const IMG_RE=/!\[([^\]\n]*)\]\(\s*((?:https?:\/\/|\/)[^)\s]*)\s*\)/;
 const IMG_LINE=new RegExp("^"+IMG_RE.source+"$");
-function figHtml(url,cap){
+function splitCap(raw){
+  const m=String(raw||"").match(/^(.*?)\s*[|｜]\s*(小|中|大|滿版)\s*$/);
+  return m?[m[1],szOf(m[2])]:[String(raw||""),""];
+}
+function figHtml(url,rawCap){
+  const [cap,sz]=splitCap(rawCap);
   const u=esc(url),c=esc(cap||"");
-  return `<figure class="body-fig"><div class="art full" data-zoom="${u}" data-cap="${c}">${`<img src="${u}" alt="${c}" loading="lazy">`}</div>${c?`<figcaption>${inline(cap)}</figcaption>`:""}</figure>`;
+  return `<figure class="body-fig${sz?" sz-"+sz:""}"><div class="art full" data-zoom="${u}" data-cap="${c}">${`<img src="${u}" alt="${c}" loading="lazy">`}</div>${c?`<figcaption>${inline(cap)}</figcaption>`:""}</figure>`;
 }
 function inline(t){
   const L=[],tok=html=>(L.push(html),`\u0000${L.length-1}\u0000`);
   let h=esc(t);
-  h=h.replace(new RegExp(IMG_RE.source,"g"),(m,a,u)=>tok(`<span class="inline-fig" data-zoom="${u}" data-cap="${a}"><img src="${u}" alt="${a}" loading="lazy"></span>`));
+  h=h.replace(new RegExp(IMG_RE.source,"g"),(m,a,u)=>{const [cap,sz]=splitCap(a);return tok(`<span class="inline-fig${sz?" sz-"+sz:""}" data-zoom="${u}" data-cap="${cap}"><img src="${u}" alt="${cap}" loading="lazy"></span>`);});
   h=h.replace(/\[([^\]\n]+)\]\(\s*((?:https?:\/\/|www\.|#|\/)[^)\s]*)\s*\)/gi,(m,a,u)=>tok(linkHtml(u,a)));
   h=h.replace(/(?:https?:\/\/|www\.)[^\s<>"'\u0000　-〿㐀-鿿＀-￯{}|]+/gi,m=>{
     let rest="";const cut=m.search(/&(?:quot|#39|lt|gt);/);if(cut>=0){rest=m.slice(cut);m=m.slice(0,cut);}
@@ -591,7 +612,7 @@ const commOf=n=>COMM.filter(m=>(m.characters||[]).includes(n));
 const notesOf=n=>NOTES.filter(x=>(x.characters||[]).includes(n));
 const charLink=n=>charOf(n)?`<a class="tag story" href="#char-${enc(n)}">${esc(n)}</a>`:`<span class="tag">${esc(n)}</span>`;
 
-const SITE_VERSION="2026-11-16 v20";
+const SITE_VERSION="2026-11-16 v21";
 const BROKEN=[];
 async function load(){
   const files=["site.json","series.json","chapters.json","side-stories.json","characters.json","commissions.json","gallery.json","notes.json","history.json"];
@@ -678,6 +699,7 @@ function renderSite(){
   $("#heroTitle").textContent=SITE.heroTitle||"";
   $("#heroText").innerHTML=inline(SITE.heroText||"");
   $("#heroArt").innerHTML=pic(imgOf(SITE,"heroImage"),"hero","");
+  const hs=szOf(SITE.heroImageSize);document.querySelector(".hero").className="hero"+(hs&&hs!=="m"?" hs-"+hs:"");
   if(CHAPTERS[0])$("#heroRead").href="#read-"+enc(chId(CHAPTERS[0]));
   $("#aboutText").innerHTML=blocks(SITE.about).join("");
   $("#contact").innerHTML=inline(SITE.contact||"");
@@ -743,7 +765,7 @@ function renderHistory(){
 /* ---------- 故事系列 ---------- */
 function renderSeries(){
   $("#seriesList").innerHTML=SERIES.length?"":`<p style="color:var(--muted)">還沒有故事系列。</p>`;
-  if(SERIES.length)$("#seriesList").innerHTML=SERIES.map(s=>{const list=chaptersOf(s.title);return `<div class="series"><div class="art">${pic(imgOf(s,"cover"),"series-"+s.title,s.title)}</div><div>
+  if(SERIES.length)$("#seriesList").innerHTML=SERIES.map(s=>{const list=chaptersOf(s.title);const cs=szOf(s.coverSize);return `<div class="series${cs&&cs!=="m"?" cs-"+cs:""}"><div class="art">${pic(imgOf(s,"cover"),"series-"+s.title,s.title)}</div><div>
   <div class="eyebrow">${esc(s.genre)}</div><h2>${esc(s.title)}</h2><p class="desc">${inline(s.description)}</p>
   <div class="meta">${s.status?`<span class="tag story">${esc(s.status)}</span>`:""}<span class="tag">${list.length} 篇</span></div>
   <ul class="chlist">${list.map(c=>`<li><a href="#read-${enc(chId(c))}"><span>${esc(c.title)}${badge(c)}</span><small>${esc(c.date)}</small></a></li>`).join("")}</ul></div></div>`}).join("");
@@ -763,7 +785,8 @@ function renderReader(id,side){
   const ps=blocks(c.body);
   /* 封面圖：有圖才顯示，放在標題下方、內文之前 */
   const coverSrc=imgOf(c,"image");
-  const cover=coverSrc?`<figure class="cover-fig"><div class="art full" data-zoom="${esc(coverSrc)}" data-cap="${esc(c.caption||"")}" style="cursor:zoom-in">${pic(coverSrc,"ch-"+chId(c),c.caption)}</div>${c.caption?`<figcaption>${inline(c.caption)}</figcaption>`:""}</figure>`:"";
+  const csz=szOf(c.imageSize);
+  const cover=coverSrc?`<figure class="cover-fig${csz?" sz-"+csz:""}"><div class="art full" data-zoom="${esc(coverSrc)}" data-cap="${esc(c.caption||"")}" style="cursor:zoom-in">${pic(coverSrc,"ch-"+chId(c),c.caption)}</div>${c.caption?`<figcaption>${inline(c.caption)}</figcaption>`:""}</figure>`:"";
   $("#reader").innerHTML=`<div class="crumb">${crumb}</div>
     <h1>${esc(c.title)}${badge(c)}</h1>
     <div class="rtools"><span class="row">${esc(c.date)}　${who.map(charLink).join("")}</span>
@@ -800,11 +823,13 @@ function renderChars(){
 function renderCharPage(n){
   const h=charOf(n); if(!h){location.hash="characters";return;}
   const cm=commOf(n),sd=sideOf(n),nt=notesOf(n),ap=CHAPTERS.filter(c=>(c.characters||[]).includes(n));
+  const refs=(h.refs||[]).map(r=>({src:imgOf(r,"image"),caption:r.caption||"",size:r.size||""})).filter(r=>r.src);
   $("#charPage").innerHTML=`<div class="crumb"><a href="#characters">角色</a> ／ ${esc(n)}</div>
-    <div class="char-hero"><div class="art">${avatarOf(n)}</div><div>
+    <div class="char-hero${(()=>{const a=szOf(h.avatarSize);return a&&a!=="m"?" av-"+a:"";})()}"><div class="art">${avatarOf(n)}</div><div>
       <div style="color:var(--lamp);font-size:14px">${esc(h.role)}</div><h1>${esc(n)}</h1>
       <dl class="profile">${(h.profile||[]).map(p=>`<dt>${esc(p.label)}</dt><dd>${inline(p.value)}</dd>`).join("")}</dl></div></div>
     <div class="bio rich">${blocks(h.bio).join("")}</div>
+    ${refs.length?`<div class="sec"><h2>設定圖</h2></div><div class="grid" id="charRefs">${refs.map((r,i)=>`<button type="button" class="piece${r.size==="加大"?" wide":""}" data-ref="${i}"><div class="art">${pic(r.src,"ref-"+n+i,r.caption)}</div>${r.caption?`<div class="cap"><b>${esc(r.caption)}</b></div>`:""}</button>`).join("")}</div>`:""}
     <div class="sec"><h2>委託圖</h2><a href="#commissions">全部委託圖</a></div>
     ${cm.length?`<div class="grid" id="charComm">${cm.map(commCard).join("")}</div>`:`<p style="color:var(--muted)">還沒有這個角色的委託圖。</p>`}
     <div class="sec"><h2>角色故事</h2><a href="#side">全部角色故事</a></div>
@@ -812,12 +837,13 @@ function renderCharPage(n){
     ${ap.length?`<div class="sec"><h2>主線出場章節</h2></div><ul class="chlist">${ap.map(c=>`<li><a href="#read-${enc(chId(c))}"><span>${esc(c.series)}・${esc(c.title)}${badge(c)}</span><small>${esc(c.date)}</small></a></li>`).join("")}</ul>`:""}
     ${nt.length?`<div class="sec"><h2>相關設定與筆記</h2></div><div class="nlist">${nt.map(noteCard).join("")}</div>`:""}`;
   const g=$("#charComm"); if(g)bindComm(g);
+  const rg=$("#charRefs"); if(rg)rg.querySelectorAll("[data-ref]").forEach(b=>b.onclick=()=>{const r=refs[+b.dataset.ref];openLb(pic(r.src,"ref",r.caption),r.caption||h.name+" 設定圖","",`<span class="tag story">${esc(h.name)}</span>`);});
 }
 
 /* ---------- 委託圖 ---------- */
 let curChar="all";
 function commCard(m){
-  return `<button type="button" class="piece" data-c="${COMM.indexOf(m)}"><div class="artwrap"><div class="art">${locked(m)?lockedThumb(imgOf(m,"image"),"comm-"+m.title,m.title):pic(imgOf(m,"image"),"comm-"+m.title,m.title)}</div>${m.type?`<span class="ctype">${esc(m.type)}</span>`:""}</div>
+  return `<button type="button" class="piece${m.imageSize==="加大"?" wide":""}" data-c="${COMM.indexOf(m)}"><div class="artwrap"><div class="art">${locked(m)?lockedThumb(imgOf(m,"image"),"comm-"+m.title,m.title):pic(imgOf(m,"image"),"comm-"+m.title,m.title)}</div>${m.type?`<span class="ctype">${esc(m.type)}</span>`:""}</div>
   <div class="cap"><b>${esc(m.title)}${badge(m)}</b><small>繪師：${esc(m.artist)}　${esc(m.date)}</small>
   <div class="who">${(m.characters||[]).map(n=>`<span class="tag story">${esc(n)}</span>`).join("")}</div></div></button>`;
 }
@@ -847,7 +873,7 @@ function renderGallery(){
   $("#filters").innerHTML=tags.map(t=>`<button type="button" class="chip${t===curTag?" on":""}" data-t="${esc(t)}">${esc(t)}</button>`).join("");
   $("#filters").querySelectorAll(".chip").forEach(b=>b.onclick=()=>{curTag=b.dataset.t;renderGallery();});
   const items=ART.filter(a=>curTag==="全部"||(a.tags||[]).includes(curTag)).sort(byDateDesc);
-  $("#grid").innerHTML=items.map(a=>`<button type="button" class="piece" data-i="${ART.indexOf(a)}"><div class="art">${locked(a)?lockedThumb(imgOf(a,"image"),"art-"+a.title,a.title):pic(imgOf(a,"image"),"art-"+a.title,a.title)}</div><div class="cap"><b>${esc(a.title)}${badge(a)}</b><small>${esc(a.date)}</small></div></button>`).join("");
+  $("#grid").innerHTML=items.map(a=>`<button type="button" class="piece${a.imageSize==="加大"?" wide":""}" data-i="${ART.indexOf(a)}"><div class="art">${locked(a)?lockedThumb(imgOf(a,"image"),"art-"+a.title,a.title):pic(imgOf(a,"image"),"art-"+a.title,a.title)}</div><div class="cap"><b>${esc(a.title)}${badge(a)}</b><small>${esc(a.date)}</small></div></button>`).join("");
   $("#grid").querySelectorAll(".piece").forEach(b=>b.onclick=()=>{const a=ART[+b.dataset.i];
     if(locked(a)){const i=b.dataset.i;openGate(()=>{setTimeout(()=>{const t=document.querySelector(`#grid [data-i="${i}"]`);if(t)t.click();},50);});return;}
     openLb(pic(imgOf(a,"image"),"art-"+a.title,a.title),a.title,a.description,`<span class="tag">${esc(a.date)}</span>`+(a.tags||[]).map(t=>`<span class="tag story">${esc(t)}</span>`).join(""));});

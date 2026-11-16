@@ -57,7 +57,7 @@ header{border-bottom:1px solid var(--line);background:var(--card)}
 .bar{max-width:1040px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
 .logo{font-family:var(--f-display);font-size:22px;color:var(--ink);display:flex;align-items:center;gap:8px}
 .logo:hover{text-decoration:none}
-.logo i{width:10px;height:10px;border-radius:50%;background:var(--lamp);box-shadow:0 0 12px var(--lamp)}
+.logo img{width:32px;height:32px;border-radius:50%;object-fit:cover;flex:none;box-shadow:0 0 0 1px var(--line)}
 nav{display:flex;gap:4px;flex-wrap:wrap;margin-left:auto}
 nav a{color:var(--muted);padding:6px 10px;border-radius:6px;font-size:15px}
 nav a.on{color:var(--ink);background:var(--paper);font-weight:500}
@@ -287,6 +287,18 @@ body:has(.owner:not([hidden])) footer{padding-bottom:76px}
 .bg-layer{display:none;position:fixed;inset:0;z-index:-1;background-position:center;background-size:cover;background-repeat:no-repeat;pointer-events:none}
 .bg-layer::after{content:"";position:absolute;inset:0;background:color-mix(in srgb,var(--paper) var(--bg-veil,60%),transparent)}
 body.has-bg{background:var(--paper)}
+/* 圖片顯示大小（後台「顯示大小」與內文 ![說明|小](網址)） */
+.sz-s{max-width:42%!important;margin-left:auto!important;margin-right:auto!important}
+.sz-m{max-width:66%!important;margin-left:auto!important;margin-right:auto!important}
+.sz-l{max-width:100%!important}
+@media (max-width:560px){.sz-s{max-width:70%!important}.sz-m{max-width:90%!important}}
+.hero.hs-s{grid-template-columns:1.7fr .8fr}.hero.hs-l{grid-template-columns:.85fr 1.35fr}
+.series.cs-s{grid-template-columns:150px 1fr}.series.cs-l{grid-template-columns:320px 1fr}
+.char-hero.av-s{grid-template-columns:100px 1fr}.char-hero.av-s .art{width:100px;height:100px}
+.char-hero.av-l{grid-template-columns:220px 1fr}.char-hero.av-l .art{width:220px;height:220px}
+@media (min-width:640px){.grid .piece.wide{grid-column:span 2}}
+@media (max-width:720px){.hero.hs-s,.hero.hs-l{grid-template-columns:1fr}.series.cs-s,.series.cs-l{grid-template-columns:1fr}}
+@media (max-width:560px){.char-hero.av-s,.char-hero.av-l{grid-template-columns:1fr}.char-hero.av-l .art{width:160px;height:160px}}
 /* 內文插圖 */
 .rich .body-fig{margin:1.8em 0;text-indent:0}
 .rich .body-fig .art{border-radius:10px;overflow:hidden;cursor:zoom-in}
@@ -330,7 +342,6 @@ footer{border-top:1px solid var(--line);color:var(--muted);font-size:13px;text-a
   nav{order:3;width:calc(100% + 32px);margin:0 -16px;padding:0 12px 2px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
   nav::-webkit-scrollbar{display:none}
   nav a{white-space:nowrap;flex:none}
-  #themeBtn{margin-left:auto}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 
@@ -456,6 +467,7 @@ body{display:flex;flex-direction:column}
   <div class="pop" id="popImg" style="width:min(560px,calc(100vw - 32px))">
     <label for="imUrl" style="margin-top:0;flex-direction:column;align-items:stretch;gap:4px">圖片網址<input id="imUrl" class="lk" placeholder="https://img.obsidianfirelight.com/…"></label>
     <label for="imCap" style="flex-direction:column;align-items:stretch;gap:4px">圖片說明（可留空，會顯示在圖片下方）<input id="imCap" class="lk" placeholder="例如：艾蕾諾雅的設定圖"></label>
+    <label for="imSize" style="flex-direction:column;align-items:stretch;gap:4px">顯示大小<select id="imSize" class="lk"><option value="">自動（和內文同寬）</option><option>小</option><option>中</option><option>大</option></select></label>
     <div class="row" style="margin-top:10px;gap:6px"><button class="tb on" type="button" id="imOk">插入圖片</button><button class="tb" type="button" id="imCancel">取消</button><a class="tb" href="upload.html" target="_blank" rel="noopener" style="text-decoration:none">上傳新圖 ↗</a></div>
     <div style="border-top:1px solid var(--line);margin-top:12px;padding-top:10px">
       <div class="row" style="gap:6px;margin-bottom:8px"><b style="font-size:13px;color:var(--muted);margin-right:auto">從圖庫選</b>
@@ -526,6 +538,7 @@ body{display:flex;flex-direction:column}
       <tr><td><code>{楷體|文字}</code></td><td>字型：明體、黑體、楷體</td></tr>
       <tr><td><code>{藍,大|文字}</code></td><td>用逗號合併多種樣式</td></tr>
       <tr><td><code>![說明](圖片網址)</code></td><td>插入圖片，單獨放一段；說明可留空。按工具列的「圖片」可以直接從圖庫選</td></tr>
+      <tr><td><code>![說明|小](圖片網址)</code></td><td>指定圖片大小：小、中、大</td></tr>
       <tr><td><code>[文字](網址)</code></td><td>自訂文字的連結；直接貼上網址也會自動變成連結。網址填 <code>#char-角色名</code> 可以連到網站內的頁面</td></tr>
       <tr><td><code>## 標題</code></td><td>段落開頭：小標題</td></tr>
       <tr><td><code>&gt; 文字</code></td><td>段落開頭：引言</td></tr>
@@ -572,17 +585,25 @@ function linkHtml(u,text){
   return `<a href="${u}"${internal?"":' target="_blank" rel="noopener"'}>${text}</a>`;
 }
 function shortUrl(u){let d=u.replace(/^https?:\/\//i,"").replace(/^www\./i,"").replace(/\/$/,"");return d.length>42?d.slice(0,40)+"…":d;}
-/* 內文插圖：![說明](圖片網址)，網址要 https:// 開頭或站內 / 開頭 */
+/* 「顯示大小」選項 → class */
+const SZ={"小":"s","中":"m","大":"l","滿版":"l"};
+const szOf=v=>SZ[String(v||"").trim()]||"";
+/* 內文插圖：![說明](圖片網址)，網址要 https:// 開頭或站內 / 開頭；指定大小：![說明|小](圖片網址)，可用 小、中、大 */
 const IMG_RE=/!\[([^\]\n]*)\]\(\s*((?:https?:\/\/|\/)[^)\s]*)\s*\)/;
 const IMG_LINE=new RegExp("^"+IMG_RE.source+"$");
-function figHtml(url,cap){
+function splitCap(raw){
+  const m=String(raw||"").match(/^(.*?)\s*[|｜]\s*(小|中|大|滿版)\s*$/);
+  return m?[m[1],szOf(m[2])]:[String(raw||""),""];
+}
+function figHtml(url,rawCap){
+  const [cap,sz]=splitCap(rawCap);
   const u=esc(url),c=esc(cap||"");
-  return `<figure class="body-fig"><div class="art full" data-zoom="${u}" data-cap="${c}">${`<img src="${u}" alt="${c}" loading="lazy">`}</div>${c?`<figcaption>${inline(cap)}</figcaption>`:""}</figure>`;
+  return `<figure class="body-fig${sz?" sz-"+sz:""}"><div class="art full" data-zoom="${u}" data-cap="${c}">${`<img src="${u}" alt="${c}" loading="lazy">`}</div>${c?`<figcaption>${inline(cap)}</figcaption>`:""}</figure>`;
 }
 function inline(t){
   const L=[],tok=html=>(L.push(html),`\u0000${L.length-1}\u0000`);
   let h=esc(t);
-  h=h.replace(new RegExp(IMG_RE.source,"g"),(m,a,u)=>tok(`<span class="inline-fig" data-zoom="${u}" data-cap="${a}"><img src="${u}" alt="${a}" loading="lazy"></span>`));
+  h=h.replace(new RegExp(IMG_RE.source,"g"),(m,a,u)=>{const [cap,sz]=splitCap(a);return tok(`<span class="inline-fig${sz?" sz-"+sz:""}" data-zoom="${u}" data-cap="${cap}"><img src="${u}" alt="${cap}" loading="lazy"></span>`);});
   h=h.replace(/\[([^\]\n]+)\]\(\s*((?:https?:\/\/|www\.|#|\/)[^)\s]*)\s*\)/gi,(m,a,u)=>tok(linkHtml(u,a)));
   h=h.replace(/(?:https?:\/\/|www\.)[^\s<>"'\u0000　-〿㐀-鿿＀-￯{}|]+/gi,m=>{
     let rest="";const cut=m.search(/&(?:quot|#39|lt|gt);/);if(cut>=0){rest=m.slice(cut);m=m.slice(0,cut);}
@@ -766,7 +787,7 @@ $("#imBtn").addEventListener("click",e=>{
   $("#imUrl").focus();if(!imLoaded)loadImLib();else renderImLib();
 },true);
 function insertImage(){
-  const u=$("#imUrl").value.trim(),cap=$("#imCap").value.trim().replace(/[\[\]]/g,"");
+  const u=$("#imUrl").value.trim(),sz=$("#imSize").value,cap=$("#imCap").value.trim().replace(/[\[\]|｜]/g,"")+(sz?"|"+sz:"");
   if(!/^(https?:\/\/|\/)\S+$/.test(u)){toast("請填 https:// 開頭的圖片網址，或從下面的圖庫選一張");$("#imUrl").focus();return;}
   src.focus();src.setSelectionRange(imRange[0],imRange[1]);
   const v=src.value,a=imRange[0],b=imRange[1],before=v.slice(0,a),after=v.slice(b);
