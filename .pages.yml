@@ -1,0 +1,700 @@
+# Pages CMS 後台設定
+# 網站歷程、故事系列、章節、角色故事、角色、委託圖、自繪插圖、文章 是「集合」：一筆一個檔案，存在 content/ 底下，可以搜尋和排序
+# 網站設定 是單一檔案，存在 data/ 底下
+media:
+  input: images
+  output: /images
+content:
+- name: site
+  label: 網站設定
+  type: file
+  path: data/site.json
+  format: json
+  fields:
+  - name: siteName
+    label: 網站名稱
+    type: string
+    required: true
+  - name: author
+    label: 作者名稱
+    type: string
+  - name: showDemoBanner
+    label: 顯示頂部「範例網站」提示
+    type: boolean
+  - name: heroEyebrow
+    label: 首頁小標
+    type: string
+  - name: heroTitle
+    label: 首頁大標題
+    type: string
+  - name: heroText
+    label: 首頁介紹文字
+    type: text
+  - name: heroImage
+    label: 首頁主圖
+    type: image
+  - name: heroImageUrl
+    label: 首頁主圖網址（外部圖庫）
+    type: string
+    description: 貼上 Cloudflare R2 等外部圖庫的圖片網址（https://…）。有填的話會優先使用，上面的上傳欄位可以留空
+  - name: about
+    label: 關於頁內容
+    type: text
+    description: '建議先到「你的網域/editor.html」用寫作小幫手編輯再貼過來。空一行是新段落。格式：插圖用 ![說明](圖片網址) 單獨放一段；**粗體**、*淺色*、~~刪除線~~、==螢光標記==、[文字](網址)；顏色字型大小用 {紅|文字}、{大|文字}、{楷體|文字}，可合併成 {藍,大|文字}，顏色也能填 #ff6699；「## 」小標題、「> 」引言、「- 」清單、單獨一行
+      --- 是分隔符號'
+  - name: contact
+    label: 聯絡方式
+    type: string
+  - name: footer
+    label: 頁尾文字
+    type: string
+  - name: adult
+    label: 成人內容設定
+    type: object
+    fields:
+    - name: notice
+      label: 年齡確認的提醒文字
+      type: text
+      description: 留空會顯示「以下內容僅限 18 歲以上閱覽…」
+    - name: preview
+      label: 鎖住時的圖片預覽
+      type: select
+      description: 霧化預覽會顯示模糊的圖；完全隱藏只顯示「18+」方塊
+      options:
+        values:
+        - 霧化預覽
+        - 完全隱藏
+    - name: passwordHash
+      label: 密碼代碼
+      type: string
+      description: 到寫作小幫手按「？」→「產生密碼代碼」，把代碼貼在這裡（不是直接填密碼）。留空就只需要確認年齡
+  - name: protect
+    label: 圖片保護
+    type: object
+    fields:
+    - name: enabled
+      label: 擋掉右鍵和長按另存圖片
+      type: boolean
+      default: true
+      description: 預設開啟；關掉後訪客可以直接另存
+    - name: hideOriginal
+      label: 隱藏「開啟原圖」連結
+      type: boolean
+      default: true
+      description: 預設開啟；關掉後點開大圖會出現「開啟原圖」
+    - name: watermark
+      label: 浮水印文字
+      type: string
+      description: 例如網站名稱或你的帳號，會斜斜地鋪滿網站上的圖片；留空就不顯示
+    - name: watermarkOpacity
+      label: 浮水印濃度
+      type: select
+      options:
+        values:
+        - 淡
+        - 中
+        - 明顯
+  - name: theme
+    label: 外觀設定
+    type: object
+    fields:
+    - name: defaultTheme
+      label: 預設顯示模式
+      type: select
+      options:
+        values:
+        - 跟隨裝置
+        - 固定淺色
+        - 固定深色
+    - name: bgImage
+      label: 背景圖
+      type: image
+      description: 留空就是純色背景
+    - name: bgImageUrl
+      label: 背景圖網址（外部圖庫）
+      type: string
+      description: 貼上 Cloudflare R2 等外部圖庫的圖片網址（https://…）。有填的話會優先使用，上面的上傳欄位可以留空
+    - name: bgFit
+      label: 背景圖顯示方式
+      type: select
+      options:
+        values:
+        - 填滿畫面
+        - 重複拼貼
+    - name: bgOverlay
+      label: 背景圖遮罩
+      type: select
+      description: 遮罩越濃，背景圖越淡、文字越清楚
+      options:
+        values:
+        - 無
+        - 淡
+        - 中
+        - 濃
+    - name: accentColor
+      label: 主題色（按鈕、連結）
+      type: string
+      description: '填色碼，例如 #8a5cf6；留空用預設'
+    - name: lightText
+      label: 淺色模式・文字顏色
+      type: string
+      description: '例如 #1c2133；留空用預設'
+    - name: lightBg
+      label: 淺色模式・背景顏色
+      type: string
+      description: '例如 #f3f4f8；留空用預設'
+    - name: darkText
+      label: 深色模式・文字顏色
+      type: string
+      description: '例如 #e5e8f1；留空用預設'
+    - name: darkBg
+      label: 深色模式・背景顏色
+      type: string
+      description: '例如 #11141d；留空用預設'
+- name: history
+  label: 網站歷程
+  type: collection
+  path: content/history
+  format: json
+  fields:
+  - name: date
+    label: 日期
+    type: date
+    required: true
+  - name: title
+    label: 標題
+    type: string
+    required: true
+    description: 例如：開站、新增角色故事區
+  - name: description
+    label: 說明
+    type: text
+    description: 一兩句話就好，可留空
+  - name: link
+    label: 連結
+    type: string
+    description: '點標題會跳到的地方，可留空；例如 #notes 或 https://…'
+  view:
+    fields:
+    - date
+    - title
+    primary: title
+    sort:
+    - date
+    - title
+    search:
+    - title
+    - description
+    default:
+      sort: date
+      order: desc
+  filename:
+    template: hist-{year}{month}{day}{hour}{minute}{second}.json
+    field: false
+- name: series
+  label: 故事系列
+  type: collection
+  path: content/series
+  format: json
+  fields:
+  - name: title
+    label: 系列名稱
+    type: string
+    required: true
+    description: 章節的「所屬系列」要填一模一樣的名字
+  - name: order
+    label: 排序
+    type: number
+    description: 系列在「故事」頁的順序，數字小的排前面
+  - name: genre
+    label: 類型
+    type: string
+  - name: status
+    label: 狀態
+    type: select
+    options:
+      values:
+      - 連載中
+      - 已完結
+      - 短篇集
+      - 暫停中
+  - name: description
+    label: 簡介
+    type: text
+  - name: cover
+    label: 封面圖
+    type: image
+  - name: coverUrl
+    label: 封面圖網址（外部圖庫）
+    type: string
+    description: 貼上 Cloudflare R2 等外部圖庫的圖片網址（https://…）。有填的話會優先使用，上面的上傳欄位可以留空
+  view:
+    fields:
+    - title
+    - genre
+    - status
+    - order
+    primary: title
+    sort:
+    - order
+    - title
+    search:
+    - title
+    - genre
+    - description
+    default:
+      sort: order
+      order: asc
+  filename:
+    template: series-{year}{month}{day}{hour}{minute}{second}.json
+    field: false
+- name: chapters
+  label: 故事章節
+  type: collection
+  path: content/chapters
+  format: json
+  fields:
+  - name: id
+    label: 網址代號
+    type: string
+    required: true
+    description: 用英文或數字，不能和其他章節重複，例如 lh-4
+  - name: series
+    label: 所屬系列
+    type: string
+    required: true
+    description: 填系列名稱，例如 燈塔守夜人
+  - name: order
+    label: 排序
+    type: number
+    description: 同一個系列裡的章節順序，例如 1、2、3；數字小的排前面
+  - name: title
+    label: 章節標題
+    type: string
+    required: true
+  - name: adult
+    label: 成人內容（18+）
+    type: boolean
+    description: 勾選後，訪客要確認年齡（和輸入密碼）才看得到
+  - name: date
+    label: 發布日期
+    type: date
+  - name: characters
+    label: 出場角色
+    type: string
+    list: true
+    description: 填角色名字，要和角色資料裡的名字一樣
+  - name: font
+    label: 整篇字型
+    type: select
+    options:
+      values:
+      - 預設
+      - 明體
+      - 黑體
+      - 楷體
+  - name: size
+    label: 整篇字體大小
+    type: select
+    options:
+      values:
+      - 預設
+      - 小
+      - 大
+      - 特大
+  - name: image
+    label: 章節封面圖
+    type: image
+  - name: imageUrl
+    label: 章節封面圖網址（外部圖庫）
+    type: string
+    description: 貼上 Cloudflare R2 等外部圖庫的圖片網址（https://…）。有填的話會優先使用，上面的上傳欄位可以留空
+  - name: caption
+    label: 封面圖說明
+    type: string
+  - name: body
+    label: 內文
+    type: text
+    description: '建議先到「你的網域/editor.html」用寫作小幫手編輯再貼過來。空一行是新段落。格式：插圖用 ![說明](圖片網址) 單獨放一段；**粗體**、*淺色*、~~刪除線~~、==螢光標記==、[文字](網址)；顏色字型大小用 {紅|文字}、{大|文字}、{楷體|文字}，可合併成 {藍,大|文字}，顏色也能填 #ff6699；「## 」小標題、「> 」引言、「- 」清單、單獨一行
+      --- 是分隔符號'
+  view:
+    fields:
+    - title
+    - series
+    - order
+    - date
+    - adult
+    primary: title
+    sort:
+    - order
+    - date
+    - title
+    - series
+    search:
+    - title
+    - series
+    - body
+    default:
+      sort: order
+      order: asc
+  filename:
+    template: '{id}.json'
+    field: false
+- name: side
+  label: 角色故事
+  type: collection
+  path: content/side-stories
+  format: json
+  fields:
+  - name: id
+    label: 網址代號
+    type: string
+    required: true
+    description: 用英文或數字，不能重複，例如 axi-3
+  - name: character
+    label: 主角
+    type: string
+    required: true
+    description: 填角色名字
+  - name: title
+    label: 標題
+    type: string
+    required: true
+  - name: adult
+    label: 成人內容（18+）
+    type: boolean
+    description: 勾選後，訪客要確認年齡（和輸入密碼）才看得到
+  - name: date
+    label: 發布日期
+    type: date
+  - name: font
+    label: 整篇字型
+    type: select
+    options:
+      values:
+      - 預設
+      - 明體
+      - 黑體
+      - 楷體
+  - name: size
+    label: 整篇字體大小
+    type: select
+    options:
+      values:
+      - 預設
+      - 小
+      - 大
+      - 特大
+  - name: image
+    label: 封面圖
+    type: image
+  - name: imageUrl
+    label: 封面圖網址（外部圖庫）
+    type: string
+    description: 貼上 Cloudflare R2 等外部圖庫的圖片網址（https://…）。有填的話會優先使用，上面的上傳欄位可以留空
+  - name: caption
+    label: 封面圖說明
+    type: string
+  - name: body
+    label: 內文
+    type: text
+    description: '建議先到「你的網域/editor.html」用寫作小幫手編輯再貼過來。空一行是新段落。格式：插圖用 ![說明](圖片網址) 單獨放一段；**粗體**、*淺色*、~~刪除線~~、==螢光標記==、[文字](網址)；顏色字型大小用 {紅|文字}、{大|文字}、{楷體|文字}，可合併成 {藍,大|文字}，顏色也能填 #ff6699；「## 」小標題、「> 」引言、「- 」清單、單獨一行
+      --- 是分隔符號'
+  view:
+    fields:
+    - title
+    - character
+    - date
+    - adult
+    primary: title
+    sort:
+    - date
+    - title
+    - character
+    search:
+    - title
+    - character
+    - body
+    default:
+      sort: date
+      order: desc
+  filename:
+    template: '{id}.json'
+    field: false
+- name: characters
+  label: 角色
+  type: collection
+  path: content/characters
+  format: json
+  fields:
+  - name: name
+    label: 名字
+    type: string
+    required: true
+    description: 其他地方提到這個角色時，要填一模一樣的名字
+  - name: role
+    label: 一句話身分
+    type: string
+    description: 例如《燈塔守夜人》主角
+  - name: order
+    label: 排序
+    type: number
+    description: 角色頁的排列順序，數字小的排前面
+  - name: avatar
+    label: 頭像
+    type: image
+  - name: avatarUrl
+    label: 頭像網址（外部圖庫）
+    type: string
+    description: 貼上 Cloudflare R2 等外部圖庫的圖片網址（https://…）。有填的話會優先使用，上面的上傳欄位可以留空
+  - name: summary
+    label: 簡短介紹
+    type: text
+  - name: profile
+    label: 基本資料
+    type: object
+    list: true
+    fields:
+    - name: label
+      label: 項目
+      type: string
+      description: 例如 年齡、身分、喜歡
+    - name: value
+      label: 內容
+      type: string
+  - name: bio
+    label: 詳細介紹
+    type: text
+    description: '建議先到「你的網域/editor.html」用寫作小幫手編輯再貼過來。空一行是新段落。格式：插圖用 ![說明](圖片網址) 單獨放一段；**粗體**、*淺色*、~~刪除線~~、==螢光標記==、[文字](網址)；顏色字型大小用 {紅|文字}、{大|文字}、{楷體|文字}，可合併成 {藍,大|文字}，顏色也能填 #ff6699；「## 」小標題、「> 」引言、「- 」清單、單獨一行
+      --- 是分隔符號'
+  view:
+    fields:
+    - name
+    - role
+    - order
+    primary: name
+    sort:
+    - order
+    - name
+    search:
+    - name
+    - role
+    - summary
+    - bio
+    default:
+      sort: order
+      order: asc
+  filename:
+    template: char-{year}{month}{day}{hour}{minute}{second}.json
+    field: false
+- name: commissions
+  label: 委託圖
+  type: collection
+  path: content/commissions
+  format: json
+  fields:
+  - name: title
+    label: 作品名稱
+    type: string
+    required: true
+  - name: adult
+    label: 成人內容（18+）
+    type: boolean
+    description: 勾選後，訪客要確認年齡（和輸入密碼）才看得到
+  - name: image
+    label: 圖片
+    type: image
+  - name: imageUrl
+    label: 圖片網址（外部圖庫）
+    type: string
+    description: 貼上 Cloudflare R2 等外部圖庫的圖片網址（https://…）。有填的話會優先使用，上面的上傳欄位可以留空
+  - name: artist
+    label: 繪師
+    type: string
+    required: true
+  - name: artistLink
+    label: 繪師連結
+    type: string
+    description: 繪師的社群或作品集網址，可留空
+  - name: date
+    label: 完成日期
+    type: date
+  - name: type
+    label: 類型
+    type: select
+    options:
+      values:
+      - 頭像
+      - 半身
+      - 全身
+      - 雙人
+      - 多人
+      - 場景
+      - Q版
+      - 其他
+  - name: characters
+    label: 畫了哪些角色
+    type: string
+    list: true
+    description: 填角色名字
+  - name: description
+    label: 說明
+    type: text
+  view:
+    fields:
+    - title
+    - artist
+    - type
+    - date
+    - adult
+    primary: title
+    sort:
+    - date
+    - title
+    - artist
+    - type
+    search:
+    - title
+    - artist
+    - characters
+    - description
+    default:
+      sort: date
+      order: desc
+  filename:
+    template: comm-{year}{month}{day}{hour}{minute}{second}.json
+    field: false
+- name: gallery
+  label: 自繪插圖
+  type: collection
+  path: content/gallery
+  format: json
+  fields:
+  - name: title
+    label: 作品名稱
+    type: string
+    required: true
+  - name: adult
+    label: 成人內容（18+）
+    type: boolean
+    description: 勾選後，訪客要確認年齡（和輸入密碼）才看得到
+  - name: image
+    label: 圖片
+    type: image
+  - name: imageUrl
+    label: 圖片網址（外部圖庫）
+    type: string
+    description: 貼上 Cloudflare R2 等外部圖庫的圖片網址（https://…）。有填的話會優先使用，上面的上傳欄位可以留空
+  - name: date
+    label: 日期
+    type: date
+  - name: tags
+    label: 標籤
+    type: string
+    list: true
+    description: 例如系列名稱、練習
+  - name: description
+    label: 說明
+    type: text
+  view:
+    fields:
+    - title
+    - date
+    - tags
+    - adult
+    primary: title
+    sort:
+    - date
+    - title
+    search:
+    - title
+    - tags
+    - description
+    default:
+      sort: date
+      order: desc
+  filename:
+    template: art-{year}{month}{day}{hour}{minute}{second}.json
+    field: false
+- name: notes
+  label: 文章
+  type: collection
+  path: content/notes
+  format: json
+  fields:
+  - name: id
+    label: 網址代號
+    type: string
+    required: true
+    description: 用英文或數字，不能重複
+  - name: category
+    label: 分類
+    type: select
+    options:
+      values:
+      - 創作心得
+      - 設定雜記
+  - name: title
+    label: 標題
+    type: string
+    required: true
+  - name: adult
+    label: 成人內容（18+）
+    type: boolean
+    description: 勾選後，訪客要確認年齡（和輸入密碼）才看得到
+  - name: date
+    label: 日期
+    type: date
+  - name: characters
+    label: 相關角色
+    type: string
+    list: true
+  - name: font
+    label: 整篇字型
+    type: select
+    options:
+      values:
+      - 預設
+      - 明體
+      - 黑體
+      - 楷體
+  - name: size
+    label: 整篇字體大小
+    type: select
+    options:
+      values:
+      - 預設
+      - 小
+      - 大
+      - 特大
+  - name: excerpt
+    label: 摘要
+    type: text
+    description: 顯示在文章列表上的一兩句話
+  - name: body
+    label: 內文
+    type: text
+    description: '建議先到「你的網域/editor.html」用寫作小幫手編輯再貼過來。空一行是新段落。格式：插圖用 ![說明](圖片網址) 單獨放一段；**粗體**、*淺色*、~~刪除線~~、==螢光標記==、[文字](網址)；顏色字型大小用 {紅|文字}、{大|文字}、{楷體|文字}，可合併成 {藍,大|文字}，顏色也能填 #ff6699；「## 」小標題、「> 」引言、「- 」清單、單獨一行
+      --- 是分隔符號'
+  view:
+    fields:
+    - title
+    - category
+    - date
+    - adult
+    primary: title
+    sort:
+    - date
+    - title
+    - category
+    search:
+    - title
+    - category
+    - excerpt
+    - body
+    default:
+      sort: date
+      order: desc
+  filename:
+    template: '{id}.json'
+    field: false
