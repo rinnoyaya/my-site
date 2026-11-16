@@ -37,11 +37,21 @@ content:
     label: 首頁主圖網址（外部圖庫）
     type: string
     description: 貼上 Cloudflare R2 等外部圖庫的圖片網址（https://…）。有填的話會優先使用，上面的上傳欄位可以留空
+  - name: heroImageSize
+    label: 首頁主圖顯示大小
+    type: select
+    options: &id001
+      values:
+      - 自動
+      - 小
+      - 中
+      - 大
+    description: 小：圖片佔比較少、文字比較多；大：圖片佔比較多
   - name: about
     label: 關於頁內容
     type: text
-    description: '建議先到「你的網域/editor.html」用寫作小幫手編輯再貼過來。空一行是新段落。格式：插圖用 ![說明](圖片網址) 單獨放一段；**粗體**、*淺色*、~~刪除線~~、==螢光標記==、[文字](網址)；顏色字型大小用 {紅|文字}、{大|文字}、{楷體|文字}，可合併成 {藍,大|文字}，顏色也能填 #ff6699；「## 」小標題、「> 」引言、「- 」清單、單獨一行
-      --- 是分隔符號'
+    description: '建議先到「你的網域/editor.html」用寫作小幫手編輯再貼過來。空一行是新段落。格式：插圖用 ![說明](圖片網址) 單獨放一段，要縮小寫 ![說明|小](圖片網址)（小／中／大）；**粗體**、*淺色*、~~刪除線~~、==螢光標記==、[文字](網址)；顏色字型大小用 {紅|文字}、{大|文字}、{楷體|文字}，可合併成 {藍,大|文字}，顏色也能填 #ff6699；「##
+      」小標題、「> 」引言、「- 」清單、單獨一行 --- 是分隔符號'
   - name: contact
     label: 聯絡方式
     type: string
@@ -228,6 +238,11 @@ content:
     label: 封面圖網址（外部圖庫）
     type: string
     description: 貼上 Cloudflare R2 等外部圖庫的圖片網址（https://…）。有填的話會優先使用，上面的上傳欄位可以留空
+  - name: coverSize
+    label: 封面顯示大小
+    type: select
+    options: *id001
+    description: 系列封面在「故事」頁的寬度
   view:
     fields:
     - title
@@ -309,14 +324,19 @@ content:
     label: 章節封面圖網址（外部圖庫）
     type: string
     description: 貼上 Cloudflare R2 等外部圖庫的圖片網址（https://…）。有填的話會優先使用，上面的上傳欄位可以留空
+  - name: imageSize
+    label: 封面圖顯示大小
+    type: select
+    options: *id001
+    description: 自動＝和內文同寬；小、中會置中縮小顯示
   - name: caption
     label: 封面圖說明
     type: string
   - name: body
     label: 內文
     type: text
-    description: '建議先到「你的網域/editor.html」用寫作小幫手編輯再貼過來。空一行是新段落。格式：插圖用 ![說明](圖片網址) 單獨放一段；**粗體**、*淺色*、~~刪除線~~、==螢光標記==、[文字](網址)；顏色字型大小用 {紅|文字}、{大|文字}、{楷體|文字}，可合併成 {藍,大|文字}，顏色也能填 #ff6699；「## 」小標題、「> 」引言、「- 」清單、單獨一行
-      --- 是分隔符號'
+    description: '建議先到「你的網域/editor.html」用寫作小幫手編輯再貼過來。空一行是新段落。格式：插圖用 ![說明](圖片網址) 單獨放一段，要縮小寫 ![說明|小](圖片網址)（小／中／大）；**粗體**、*淺色*、~~刪除線~~、==螢光標記==、[文字](網址)；顏色字型大小用 {紅|文字}、{大|文字}、{楷體|文字}，可合併成 {藍,大|文字}，顏色也能填 #ff6699；「##
+      」小標題、「> 」引言、「- 」清單、單獨一行 --- 是分隔符號'
   view:
     fields:
     - title
@@ -392,14 +412,19 @@ content:
     label: 封面圖網址（外部圖庫）
     type: string
     description: 貼上 Cloudflare R2 等外部圖庫的圖片網址（https://…）。有填的話會優先使用，上面的上傳欄位可以留空
+  - name: imageSize
+    label: 封面圖顯示大小
+    type: select
+    options: *id001
+    description: 自動＝和內文同寬；小、中會置中縮小顯示
   - name: caption
     label: 封面圖說明
     type: string
   - name: body
     label: 內文
     type: text
-    description: '建議先到「你的網域/editor.html」用寫作小幫手編輯再貼過來。空一行是新段落。格式：插圖用 ![說明](圖片網址) 單獨放一段；**粗體**、*淺色*、~~刪除線~~、==螢光標記==、[文字](網址)；顏色字型大小用 {紅|文字}、{大|文字}、{楷體|文字}，可合併成 {藍,大|文字}，顏色也能填 #ff6699；「## 」小標題、「> 」引言、「- 」清單、單獨一行
-      --- 是分隔符號'
+    description: '建議先到「你的網域/editor.html」用寫作小幫手編輯再貼過來。空一行是新段落。格式：插圖用 ![說明](圖片網址) 單獨放一段，要縮小寫 ![說明|小](圖片網址)（小／中／大）；**粗體**、*淺色*、~~刪除線~~、==螢光標記==、[文字](網址)；顏色字型大小用 {紅|文字}、{大|文字}、{楷體|文字}，可合併成 {藍,大|文字}，顏色也能填 #ff6699；「##
+      」小標題、「> 」引言、「- 」清單、單獨一行 --- 是分隔符號'
   view:
     fields:
     - title
@@ -447,6 +472,11 @@ content:
     label: 頭像網址（外部圖庫）
     type: string
     description: 貼上 Cloudflare R2 等外部圖庫的圖片網址（https://…）。有填的話會優先使用，上面的上傳欄位可以留空
+  - name: avatarSize
+    label: 頭像顯示大小
+    type: select
+    options: *id001
+    description: 角色個人頁上的頭像大小
   - name: summary
     label: 簡短介紹
     type: text
@@ -465,8 +495,32 @@ content:
   - name: bio
     label: 詳細介紹
     type: text
-    description: '建議先到「你的網域/editor.html」用寫作小幫手編輯再貼過來。空一行是新段落。格式：插圖用 ![說明](圖片網址) 單獨放一段；**粗體**、*淺色*、~~刪除線~~、==螢光標記==、[文字](網址)；顏色字型大小用 {紅|文字}、{大|文字}、{楷體|文字}，可合併成 {藍,大|文字}，顏色也能填 #ff6699；「## 」小標題、「> 」引言、「- 」清單、單獨一行
-      --- 是分隔符號'
+    description: '建議先到「你的網域/editor.html」用寫作小幫手編輯再貼過來。空一行是新段落。格式：插圖用 ![說明](圖片網址) 單獨放一段，要縮小寫 ![說明|小](圖片網址)（小／中／大）；**粗體**、*淺色*、~~刪除線~~、==螢光標記==、[文字](網址)；顏色字型大小用 {紅|文字}、{大|文字}、{楷體|文字}，可合併成 {藍,大|文字}，顏色也能填 #ff6699；「##
+      」小標題、「> 」引言、「- 」清單、單獨一行 --- 是分隔符號'
+  - name: refs
+    label: 設定圖
+    type: object
+    list: true
+    description: 角色的設定圖、參考圖，會顯示在角色頁的「設定圖」區塊
+    fields:
+    - name: image
+      label: 圖片
+      type: image
+    - name: imageUrl
+      label: 圖片網址（外部圖庫）
+      type: string
+      description: 貼上 R2 圖片網址，有填的話優先使用
+    - name: caption
+      label: 說明
+      type: string
+      description: 例如：正面設定、服裝細節
+    - name: size
+      label: 在列表中的大小
+      type: select
+      options: &id002
+        values:
+        - 一般
+        - 加大
   view:
     fields:
     - name
@@ -508,6 +562,11 @@ content:
     label: 圖片網址（外部圖庫）
     type: string
     description: 貼上 Cloudflare R2 等外部圖庫的圖片網址（https://…）。有填的話會優先使用，上面的上傳欄位可以留空
+  - name: imageSize
+    label: 在列表中的大小
+    type: select
+    options: *id002
+    description: 加大＝在電腦版佔兩格寬，適合想特別展示的作品
   - name: artist
     label: 繪師
     type: string
@@ -585,6 +644,11 @@ content:
     label: 圖片網址（外部圖庫）
     type: string
     description: 貼上 Cloudflare R2 等外部圖庫的圖片網址（https://…）。有填的話會優先使用，上面的上傳欄位可以留空
+  - name: imageSize
+    label: 在列表中的大小
+    type: select
+    options: *id002
+    description: 加大＝在電腦版佔兩格寬，適合想特別展示的作品
   - name: date
     label: 日期
     type: date
@@ -674,8 +738,8 @@ content:
   - name: body
     label: 內文
     type: text
-    description: '建議先到「你的網域/editor.html」用寫作小幫手編輯再貼過來。空一行是新段落。格式：插圖用 ![說明](圖片網址) 單獨放一段；**粗體**、*淺色*、~~刪除線~~、==螢光標記==、[文字](網址)；顏色字型大小用 {紅|文字}、{大|文字}、{楷體|文字}，可合併成 {藍,大|文字}，顏色也能填 #ff6699；「## 」小標題、「> 」引言、「- 」清單、單獨一行
-      --- 是分隔符號'
+    description: '建議先到「你的網域/editor.html」用寫作小幫手編輯再貼過來。空一行是新段落。格式：插圖用 ![說明](圖片網址) 單獨放一段，要縮小寫 ![說明|小](圖片網址)（小／中／大）；**粗體**、*淺色*、~~刪除線~~、==螢光標記==、[文字](網址)；顏色字型大小用 {紅|文字}、{大|文字}、{楷體|文字}，可合併成 {藍,大|文字}，顏色也能填 #ff6699；「##
+      」小標題、「> 」引言、「- 」清單、單獨一行 --- 是分隔符號'
   view:
     fields:
     - title
