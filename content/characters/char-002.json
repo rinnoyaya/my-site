@@ -1,7 +1,9 @@
 {
   "name": "艾蕾諾雅",
   "role": "有冰與火雙屬性的少女",
-  "avatar": "",
+  "order": 2,
+  "avatarUrl": "https://img.obsidianfirelight.com/commissions/s-130924570-20261116-230858-2.jpg",
+  "avatarSize": "自動",
   "summary": "一個擁有冰火雙屬性的半龍少女",
   "profile": [
     {
@@ -22,5 +24,11 @@
     }
   ],
   "bio": "艾蕾諾雅是實驗室出現的產物\n一開始跟凜夜相遇的時候\n諾雅非常不信任任何人類 對所有人都充滿了戒心",
-  "order": 2
+  "refs": [
+    {
+      "imageUrl": "https://img.obsidianfirelight.com/commissions/img-5878-20261116-210928-84.png",
+      "caption": "人物設定",
+      "size": "一般"
+    }
+  ]
 }
