@@ -632,63 +632,90 @@ content:
   filename:
     template: comm-{year}{month}{day}{hour}{minute}{second}.json
     field: false
-- name: gallery
-  label: 自繪插圖
+- name: tools
+  label: 小工具
   type: collection
-  path: content/gallery
+  path: content/tools
   format: json
-  fields:
-  - name: title
-    label: 作品名稱
-    type: string
-    required: true
-  - name: adult
-    label: 成人內容（18+）
-    type: boolean
-    description: 勾選後，訪客要確認年齡（和輸入密碼）才看得到
-  - name: image
-    label: 圖片
-    type: image
-  - name: imageUrl
-    label: 圖片網址（外部圖庫）
-    type: string
-    description: 貼上 Cloudflare R2 等外部圖庫的圖片網址（https://…）。有填的話會優先使用，上面的上傳欄位可以留空
-  - name: imageSize
-    label: 在列表中的大小
-    type: select
-    options: *id002
-    description: 加大＝在電腦版佔兩格寬，適合想特別展示的作品
-  - name: date
-    label: 日期
-    type: date
-  - name: tags
-    label: 標籤
-    type: string
-    list: true
-    description: 例如系列名稱、練習
-  - name: description
-    label: 說明
-    type: text
   view:
     fields:
     - title
+    - status
+    - order
     - date
-    - tags
-    - adult
     primary: title
     sort:
+    - order
     - date
     - title
     search:
     - title
-    - tags
-    - description
+    - summary
+    - body
     default:
-      sort: date
-      order: desc
+      sort: order
+      order: asc
   filename:
-    template: art-{year}{month}{day}{hour}{minute}{second}.json
+    template: '{id}.json'
     field: false
+  fields:
+  - name: id
+    label: 網址代號
+    type: string
+    required: true
+    description: 用英文或數字，不能重複，例如 commission-log
+  - name: title
+    label: 工具名稱
+    type: string
+    required: true
+  - name: order
+    label: 排序
+    type: number
+    description: 小工具頁的排列順序，數字小的排前面
+  - name: date
+    label: 日期
+    type: date
+  - name: status
+    label: 狀態
+    type: select
+    options:
+      values:
+      - 使用中
+      - 開發中
+      - 已停止
+  - name: image
+    label: 封面圖
+    type: image
+  - name: imageUrl
+    label: 封面圖網址（外部圖庫）
+    type: string
+    description: 貼上 R2 圖片網址，有填的話優先使用
+  - name: imageSize
+    label: 封面圖顯示大小
+    type: select
+    options:
+      values:
+      - 自動
+      - 小
+      - 中
+      - 大
+  - name: summary
+    label: 一句話簡介
+    type: text
+    description: 顯示在小工具列表的卡片上
+  - name: link
+    label: 工具網址
+    type: string
+    description: 點「開啟工具」會打開這個網址，例如 https://…github.io/…
+  - name: linkLabel
+    label: 按鈕文字
+    type: string
+    description: 留空會顯示「開啟工具」
+  - name: body
+    label: 介紹內文
+    type: text
+    description: '建議先到「你的網域/editor.html」用寫作小幫手編輯再貼過來。空一行是新段落。格式：插圖用 ![說明](圖片網址) 單獨放一段，要縮小寫 ![說明|小](圖片網址)（小／中／大）；**粗體**、*淺色*、~~刪除線~~、==螢光標記==、[文字](網址)；顏色字型大小用 {紅|文字}、{大|文字}、{楷體|文字}，可合併成 {藍,大|文字}，顏色也能填 #ff6699；「##
+      」小標題、「> 」引言、「- 」清單、單獨一行 --- 是分隔符號'
 - name: notes
   label: 文章
   type: collection
