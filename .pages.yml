@@ -640,6 +640,24 @@ content:
     type: select
     options: *id002
     description: 加大＝在電腦版佔兩格寬，適合想特別展示的作品
+  - name: variantUrls
+    label: 差分圖（一次貼上多張）
+    type: text
+    description: 同一張委託的差分、表情變化、有無背景版本等。一行一張圖片網址，會排在主圖後面，點開委託圖時可以左右滑動切換。要加說明就在網址後面寫「 | 說明」，例如 https://img.obsidianfirelight.com/xxx.png | 哭臉差分
+  - name: variants
+    label: 差分圖（逐張新增）
+    type: object
+    list: true
+    description: 想一張一張加、拖曳調整順序時用這裡；會排在上面整批貼上的差分前面
+    fields:
+    - name: imageUrl
+      label: 圖片網址
+      type: string
+      description: 貼上 R2 圖片網址
+    - name: caption
+      label: 說明
+      type: string
+      description: 例如：無背景版、閉眼差分，可留空
   - name: artist
     label: 繪師
     type: string
