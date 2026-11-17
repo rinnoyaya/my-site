@@ -300,6 +300,12 @@ body.has-bg{background:var(--paper)}
 .grid{align-items:start}
 @media (max-width:720px){.hero.hs-s,.hero.hs-l{grid-template-columns:1fr}.series.cs-s,.series.cs-l{grid-template-columns:1fr}}
 @media (max-width:560px){.char-hero.av-s,.char-hero.av-l{grid-template-columns:1fr}.char-hero.av-l .art{width:160px;height:160px}}
+/* 分享 */
+.share{display:inline-flex;gap:6px;flex-wrap:wrap}
+.share .tbtn{display:inline-flex;align-items:center;gap:4px}
+.share-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
+.site-toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:9px 18px;border-radius:99px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:40;max-width:90vw;text-align:center}
+.site-toast.on{opacity:1}
 /* 內文插圖 */
 .rich .body-fig{margin:1.8em 0;text-indent:0}
 .rich .body-fig .art{border-radius:10px;overflow:hidden;cursor:zoom-in}
@@ -459,6 +465,7 @@ footer{border-top:1px solid var(--line);color:var(--muted);font-size:13px;text-a
   </section>
 </main>
 
+<div class="site-toast" id="siteToast" role="status" aria-live="polite"></div>
 <div class="lb" id="lb" role="dialog" aria-modal="true" aria-labelledby="lbTitle">
   <div class="lb-in">
     <div class="art" id="lbArt"></div>
@@ -618,7 +625,7 @@ const commOf=n=>COMM.filter(m=>(m.characters||[]).includes(n));
 const notesOf=n=>NOTES.filter(x=>(x.characters||[]).includes(n));
 const charLink=n=>charOf(n)?`<a class="tag story" href="#char-${enc(n)}">${esc(n)}</a>`:`<span class="tag">${esc(n)}</span>`;
 
-const SITE_VERSION="2026-11-16 v22";
+const SITE_VERSION="2026-11-17 v24";
 const BROKEN=[];
 async function load(){
   const files=["site.json","series.json","chapters.json","side-stories.json","characters.json","commissions.json","gallery.json","notes.json","history.json"];
@@ -798,7 +805,7 @@ function renderReader(id,side){
   $("#reader").innerHTML=`<div class="crumb">${crumb}</div>
     <h1>${esc(c.title)}${badge(c)}</h1>
     <div class="rtools"><span class="row">${esc(c.date)}　${who.map(charLink).join("")}</span>
-      <span class="row"><button class="tbtn" type="button" data-fs="-1">字小一點</button><button class="tbtn" type="button" data-fs="1">字大一點</button></span></div>
+      <span class="row">${shareButtons(c.title)}<button class="tbtn" type="button" data-fs="-1">字小一點</button><button class="tbtn" type="button" data-fs="1">字大一點</button></span></div>
     ${cover}
     <div class="prose rich"><div class="${wrapCls(c)}">${ps.join("")}</div></div>
     <nav class="pager" aria-label="章節導覽">
@@ -835,6 +842,7 @@ function renderCharPage(n){
   $("#charPage").innerHTML=`<div class="crumb"><a href="#characters">角色</a> ／ ${esc(n)}</div>
     <div class="char-hero${(()=>{const a=szOf(h.avatarSize);return a&&a!=="m"?" av-"+a:"";})()}"><div class="art">${avatarOf(n)}</div><div>
       <div style="color:var(--lamp);font-size:14px">${esc(h.role)}</div><h1>${esc(n)}</h1>
+      <div class="share-row">${shareButtons(n)}</div>
       <dl class="profile">${(h.profile||[]).map(p=>`<dt>${esc(p.label)}</dt><dd>${inline(p.value)}</dd>`).join("")}</dl></div></div>
     <div class="bio rich">${blocks(h.bio).join("")}</div>
     ${refs.length?`<div class="sec"><h2>設定圖</h2></div><div class="grid" id="charRefs">${refs.map((r,i)=>`<button type="button" class="piece${r.size==="加大"?" wide":""}" data-ref="${i}"><div class="art">${pic(r.src,"ref-"+n+i,r.caption)}</div>${r.caption?`<div class="cap"><b>${esc(r.caption)}</b></div>`:""}</button>`).join("")}</div>`:""}
@@ -904,13 +912,42 @@ function renderNote(id){
   const body=blocks(n.body).join("");
   $("#noteReader").innerHTML=`<div class="crumb"><a href="#notes">文章</a> ／ ${esc(n.category)}</div>
     <h1>${esc(n.title)}${badge(n)}</h1>
-    <div class="rtools"><span>${esc(n.date)}</span><span class="row">${(n.characters||[]).map(charLink).join("")}</span></div>
+    <div class="rtools"><span class="row">${esc(n.date)}　${(n.characters||[]).map(charLink).join("")}</span>${shareButtons(n.title)}</div>
     <div class="notebody rich"><div class="${wrapCls(n)}">${body}</div></div>
     <nav class="pager" aria-label="文章導覽">
       ${prev?`<a href="#note-${enc(chId(prev))}"><small>較舊</small>${esc(prev.title)}</a>`:`<span><small>較舊</small>沒有了</span>`}
       ${next?`<a class="next" href="#note-${enc(chId(next))}"><small>較新</small>${esc(next.title)}</a>`:`<span class="next"><small>較新</small>沒有了</span>`}
     </nav>`;
 }
+
+/* ---------- 分享連結 ---------- */
+let stT;function siteToast(m){const t=$("#siteToast");t.textContent=m;t.classList.add("on");clearTimeout(stT);stT=setTimeout(()=>t.classList.remove("on"),2200);}
+/* 網址用看得懂的中文（貼上後瀏覽器會自動處理） */
+/* 分享網址：有分享頁（/s/類型/代號/）就用分享頁，社群預覽會顯示標題和封面；沒有就用一般網址 */
+function shareUrl(){
+  let h=location.hash.slice(1);try{h=decodeURIComponent(h);}catch(e){}
+  const ok=v=>/^[A-Za-z0-9][A-Za-z0-9._-]*$/.test(String(v||""));
+  const m=h.match(/^(read|side|note|char)-(.+)$/);
+  if(m){
+    let slug="";
+    if(m[1]==="read"){const c=CHAPTERS.find(x=>chId(x)===m[2]);slug=c&&(c.id||c._file);}
+    else if(m[1]==="side"){const c=SIDE.find(x=>chId(x)===m[2]);slug=c&&(c.id||c._file);}
+    else if(m[1]==="note"){const n=NOTES.find(x=>chId(x)===m[2]);slug=n&&(n.id||n._file);}
+    else {const c=charOf(m[2]);slug=c&&c._file;}
+    if(ok(slug))return `${location.origin}/s/${m[1]}/${slug}/`;
+  }
+  return location.origin+location.pathname+(h?"#"+h:"");
+}
+function shareButtons(title){
+  const canShare=!!navigator.share&&matchMedia("(pointer:coarse)").matches;
+  return `<span class="share"><button class="tbtn" type="button" data-copylink>🔗 複製連結</button>${canShare?`<button class="tbtn" type="button" data-share="${esc(title||"")}">分享</button>`:""}</span>`;
+}
+document.addEventListener("click",async e=>{
+  const c=e.target.closest("[data-copylink]");
+  if(c){const u=shareUrl();try{await navigator.clipboard.writeText(u);siteToast("連結已複製");}catch(err){siteToast("無法自動複製，請複製網址列的網址");}return;}
+  const sh=e.target.closest("[data-share]");
+  if(sh){try{await navigator.share({title:(sh.dataset.share?sh.dataset.share+"｜":"")+(SITE.siteName||document.title),url:shareUrl()});}catch(err){}}
+});
 
 /* ---------- 放大檢視 ---------- */
 function openLb(artHtml,title,desc,meta){
