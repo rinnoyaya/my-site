@@ -24,7 +24,7 @@
     "hideOriginal": true
   },
   "theme": {
-    "indent": "只有段落第一行縮排",
+    "indent": "不縮排",
     "defaultTheme": "固定深色",
     "bgImageUrl": "https://img.obsidianfirelight.com/commissions/img-20261116-223850.png",
     "bgFit": "填滿畫面",
