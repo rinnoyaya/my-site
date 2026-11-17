@@ -1,7 +1,6 @@
 """把 content/ 裡「一筆一個檔案」的內容，合併成網站讀取的 data/*.json，
 輸出到 _site/ 資料夾給 GitHub Pages 發佈。由 .github/workflows/deploy.yml 自動執行。"""
-import datetime, glob, html, json, os, re, shutil, sys
-from email.utils import format_datetime
+import glob, html, json, os, re, shutil, sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(ROOT, "_site")
@@ -66,7 +65,6 @@ def main():
             json.dump(items, fh, ensure_ascii=False, indent=1)
         print(f"[完成] content/{folder} → data/{outname}（{len(items)} 筆）")
     warnings += build_share_pages()
-    build_feed()
     inject_home_meta()
     print(f"建置完成，警告 {warnings} 個")
 
@@ -189,77 +187,6 @@ def build_share_pages():
     print(f"[完成] 產生分享頁 {count} 個")
     return warnings
 
-# ---------------- RSS 訂閱（/feed.xml） ----------------
-def load_out(name, default):
-    try:
-        with open(os.path.join(OUT, "data", name), encoding="utf-8") as fh:
-            d = json.load(fh)
-        return d if isinstance(d, type(default)) else default
-    except Exception:
-        return default
-
-def build_feed():
-    site = load_out("site.json", {})
-    origin = site_origin()
-    name = site.get("siteName") or "黑曜石堡壘"
-    safe = lambda v: bool(SAFE_SLUG.match(str(v or "")))
-    items = []
-    def add(x, title, kind, prefix, cat, desc_field="body"):
-        if not isinstance(x, dict) or not x.get("date"):
-            return
-        key = str(x.get("id") or x.get("title") or "")
-        slug = x.get("id") or x.get("_file")
-        link = f"{origin}/s/{kind}/{slug}/" if kind and safe(slug) else f"{origin}/#{prefix}{key}"
-        adult = x.get("adult") in (True, "true")
-        desc = "成人內容（18+），未滿 18 歲請勿閱覽。" if adult else (plain(x.get(desc_field), 200) or plain(x.get("body"), 200))
-        items.append((str(x["date"])[:10], title + ("（18+）" if adult else ""), link, desc, cat))
-    for c in load_out("chapters.json", []):
-        add(c, f"{c.get('series') or ''}・{c.get('title') or ''}".strip("・"), "read", "read-", "故事")
-    for c in load_out("side-stories.json", []):
-        add(c, f"{c.get('character') or ''}・{c.get('title') or ''}".strip("・"), "side", "side-", "角色故事")
-    for n in load_out("notes.json", []):
-        add(n, n.get("title") or "", "note", "note-", "文章", "excerpt")
-    for t in load_out("tools.json", []):
-        add(t, t.get("title") or "", "tool", "tool-", "小工具", "summary")
-    for m in load_out("commissions.json", []):
-        if isinstance(m, dict) and m.get("date"):
-            adult = m.get("adult") in (True, "true")
-            items.append((str(m["date"])[:10], f"委託圖〈{m.get('title') or ''}〉" + ("（18+）" if adult else ""), f"{origin}/#commissions",
-                          "成人內容（18+）" if adult else f"繪師：{m.get('artist') or ''}", "委託圖"))
-    items.sort(key=lambda i: i[0], reverse=True)
-    items = items[:40]
-    tz = datetime.timezone(datetime.timedelta(hours=8))
-    def when(d):
-        try:
-            return format_datetime(datetime.datetime.strptime(d, "%Y-%m-%d").replace(hour=12, tzinfo=tz))
-        except ValueError:
-            return format_datetime(datetime.datetime.now(tz))
-    e = lambda v: html.escape(str(v), quote=False)
-    body = "".join(f"""
-  <item>
-    <title>{e(t)}</title>
-    <link>{e(l)}</link>
-    <guid isPermaLink="false">{e(l)}#{e(d)}</guid>
-    <pubDate>{when(d)}</pubDate>
-    <category>{e(c)}</category>
-    <description>{e(ds)}</description>
-  </item>""" for d, t, l, ds, c in items)
-    xml = f"""<?xml version="1.0" encoding="UTF-8"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
-<channel>
-  <title>{e(name)}</title>
-  <link>{origin}/</link>
-  <atom:link href="{origin}/feed.xml" rel="self" type="application/rss+xml"/>
-  <description>{e(plain(site.get("heroText") or name, 200))}</description>
-  <language>zh-Hant</language>
-  <lastBuildDate>{format_datetime(datetime.datetime.now(tz))}</lastBuildDate>{body}
-</channel>
-</rss>
-"""
-    with open(os.path.join(OUT, "feed.xml"), "w", encoding="utf-8") as fh:
-        fh.write(xml)
-    print(f"[完成] RSS 訂閱 feed.xml（{len(items)} 則）")
-
 # 首頁的標題和社群預覽資訊（原本固定是「我的網站」）
 def inject_home_meta():
     path = os.path.join(OUT, "index.html")
@@ -281,8 +208,7 @@ def inject_home_meta():
 <meta property="og:description" content="{e(desc)}">
 <meta property="og:url" content="{e(origin)}/">
 <meta property="og:image" content="{e(image)}">
-<meta name="twitter:card" content="summary_large_image">
-<link rel="alternate" type="application/rss+xml" title="{e(name)}" href="/feed.xml">"""
+<meta name="twitter:card" content="summary_large_image">"""
     page = re.sub(r"<title>.*?</title>", lambda m: meta, page, count=1, flags=re.S)
     open(path, "w", encoding="utf-8").write(page)
     print("[完成] 首頁標題與預覽資訊")
