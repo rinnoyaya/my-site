@@ -271,6 +271,45 @@ body:has(.owner:not([hidden])) footer{padding-bottom:76px}
 .wm-on .art:has(img)::after,.wm-on #heroArt:has(img)::after{content:"";position:absolute;inset:0;pointer-events:none;background-image:var(--wm);background-repeat:repeat;z-index:1}
 .wm-on .blurred::after{display:none}
 /* 成人內容 */
+.rss-btn{font:inherit;font-size:inherit;color:var(--accent);background:none;border:0;padding:4px 0;cursor:pointer}
+.new-badge{display:inline-block;font-family:var(--f-body);font-size:10.5px;font-weight:700;color:var(--card);background:var(--lamp);border-radius:4px;padding:0 5px;margin-left:6px;vertical-align:middle;line-height:1.7;letter-spacing:.04em}
+.chlist li.seen a>span{color:var(--muted)}
+.chlist li.seen a>span::after{content:"✓";margin-left:6px;font-size:12px;color:var(--muted)}
+.seen-mark{font-size:12px;color:var(--muted);margin-left:6px;font-weight:400}
+/* 繼續閱讀 */
+.continue{display:flex;align-items:center;gap:14px;margin:26px 0 0;padding:14px 16px;border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink)}
+.continue:hover{text-decoration:none;border-color:var(--accent)}
+.continue .cv-ic{flex:none;width:38px;height:38px;border-radius:50%;background:var(--accent);color:var(--card);display:flex;align-items:center;justify-content:center;font-size:16px}
+.continue .cv-t{flex:1;min-width:0}
+.continue small{display:block;color:var(--muted);font-size:12.5px}
+.continue b{display:block;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.continue .cv-bar{height:4px;border-radius:2px;background:var(--line);margin-top:6px;overflow:hidden}
+.continue .cv-bar i{display:block;height:100%;background:var(--accent)}
+.continue .cv-go{flex:none;color:var(--accent);font-size:14px;white-space:nowrap}
+.series-go{display:inline-block;margin:4px 0 10px;font-size:14px}
+.resume{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin:0 0 18px;padding:10px 14px;border-radius:10px;background:var(--card);border:1px solid var(--line);font-family:var(--f-body);font-size:14px;color:var(--muted)}
+.resume button{font:inherit;font-size:14px;border:0;border-radius:999px;padding:6px 14px;cursor:pointer}
+.resume .rs-go{background:var(--accent);color:var(--card)}
+.resume .rs-x{background:transparent;color:var(--muted);padding:6px 8px;margin-left:auto}
+/* 名詞百科 */
+.gl{font:inherit;color:inherit;background:none;border:0;padding:0;margin:0;cursor:pointer;text-indent:0;border-bottom:1.5px dotted var(--accent);line-height:inherit;letter-spacing:inherit}
+.gl:hover,.gl:focus-visible{color:var(--accent);outline:none}
+#glPop{position:fixed;z-index:250;width:min(320px,calc(100vw - 24px));background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.28);padding:14px 16px;font-family:var(--f-body);font-size:14.5px;line-height:1.7}
+#glPop h4{margin:0 0 2px;font-size:16px;font-family:var(--f-head,inherit)}
+#glPop .gp-cat{font-size:12px;color:var(--muted)}
+#glPop p{margin:6px 0 0}
+#glPop .gp-more{display:inline-block;margin-top:8px;font-size:13.5px}
+#glPop .gp-x{position:absolute;top:6px;right:6px;width:30px;height:30px;border:0;background:none;color:var(--muted);font-size:18px;cursor:pointer;border-radius:50%}
+.gsearch{width:100%;box-sizing:border-box;font:inherit;padding:10px 14px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);margin:0 0 12px}
+.glist{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;align-items:start}
+.gcard{display:block;padding:14px 16px;border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink)}
+.gcard:hover{text-decoration:none;border-color:var(--accent)}
+.gcard h3{margin:0;font-size:17px}
+.gcard small{color:var(--muted);font-size:12.5px}
+.gcard p{margin:6px 0 0;color:var(--muted);font-size:14px;line-height:1.65}
+.term-alias{color:var(--muted);font-size:14px;margin:-6px 0 14px}
+.term-img{max-width:420px;margin:0 0 18px}
+.term-img .art{border-radius:10px;overflow:hidden}
 .adult-badge{display:inline-block;font-family:var(--f-body);font-size:11px;font-weight:700;color:#fff;background:#c0392b;border-radius:4px;padding:0 5px;margin-left:6px;vertical-align:middle;line-height:1.7;letter-spacing:.02em}
 .locked-art{width:100%;height:100%;min-height:120px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:var(--muted);background:repeating-linear-gradient(45deg,var(--paper) 0 12px,color-mix(in srgb,var(--line) 70%,var(--paper)) 12px 24px)}
 .blurred{position:relative;overflow:hidden}
@@ -455,6 +494,7 @@ footer{border-top:1px solid var(--line);color:var(--muted);font-size:13px;text-a
       <a href="#stories">故事</a>
       <a href="#side">角色故事</a>
       <a href="#characters">角色</a>
+      <a href="#glossary" id="navGloss" hidden>百科</a>
       <a href="#commissions">委託圖</a>
       <a href="#tools">小工具</a>
       <a href="#notes">文章</a>
@@ -479,6 +519,7 @@ footer{border-top:1px solid var(--line);color:var(--muted);font-size:13px;text-a
       </div>
       <div class="art" id="heroArt"></div>
     </div>
+    <div id="continueBox"></div>
     <div class="sec"><h2>最近更新</h2></div>
     <ul class="updates" id="updates"></ul>
     <div id="historyWrap" hidden>
@@ -514,6 +555,19 @@ footer{border-top:1px solid var(--line);color:var(--muted);font-size:13px;text-a
 
   <section class="view" id="v-char">
     <div id="charPage"></div>
+  </section>
+
+  <section class="view" id="v-glossary">
+    <div class="eyebrow">名詞百科</div>
+    <h1 style="font-size:32px;margin:4px 0 8px">名詞百科</h1>
+    <p style="color:var(--muted);margin:0 0 18px">故事裡出現的地名、組織、魔法與各種設定。閱讀時點一下有虛線的詞，也能看到簡短說明。</p>
+    <input class="gsearch" id="gsearch" type="search" placeholder="搜尋名詞…" aria-label="搜尋名詞">
+    <div class="filters" id="gfilters"></div>
+    <div class="glist" id="glist"></div>
+  </section>
+
+  <section class="view" id="v-term">
+    <article class="reader" id="termPage"></article>
   </section>
 
   <section class="view" id="v-commissions">
@@ -558,6 +612,7 @@ footer{border-top:1px solid var(--line);color:var(--muted);font-size:13px;text-a
     </div>
   </section>
 </main>
+<div id="glPop" role="dialog" aria-label="名詞說明" hidden></div>
 
 <div class="site-toast" id="siteToast" role="status" aria-live="polite"></div>
 <div class="lb" id="lb" role="dialog" aria-modal="true" aria-labelledby="lbTitle">
@@ -733,23 +788,47 @@ function placeholder(key){
 /* 圖片來源：「…網址」欄位（外部圖庫，例如 Cloudflare R2）優先，其次是上傳到 repo 的圖片 */
 const imgOf=(x,f)=>x?String(x[f+"Url"]||x[f]||"").trim():"";
 const pic=(src,key,alt)=>src?`<img src="${esc(src)}" alt="${esc(alt||"")}" loading="lazy">`:placeholder(key);
+/* 縮圖：列表用小圖（R2 的 thumbs/原檔名.webp），沒有縮圖會自動改用原圖 */
+const IMG_HOST="img.obsidianfirelight.com";
+let THUMB_MISS={};try{THUMB_MISS=JSON.parse(localStorage.getItem("thumb-miss")||"{}")||{};const now=Date.now();for(const k in THUMB_MISS)if(now-THUMB_MISS[k]>3*864e5)delete THUMB_MISS[k];}catch(e){THUMB_MISS={};}
+function thumbOf(src){
+  if(!SITE.useThumbs||!src)return "";
+  try{const u=new URL(src,location.href);
+    if(u.hostname!==(SITE.imageHost||IMG_HOST)||u.pathname.startsWith("/thumbs/")||!/\.(jpe?g|png|webp|avif)$/i.test(u.pathname))return "";
+    const t=u.origin+"/thumbs"+u.pathname+".webp";return THUMB_MISS[t]?"":t;}catch(e){return "";}
+}
+function thumbFail(img){img.onerror=null;THUMB_MISS[img.src]=Date.now();try{localStorage.setItem("thumb-miss",JSON.stringify(THUMB_MISS));}catch(e){}img.src=img.dataset.full;}
+const picT=(src,key,alt)=>{const t=thumbOf(src);return t?`<img src="${esc(t)}" data-full="${esc(src)}" alt="${esc(alt||"")}" loading="lazy" onerror="thumbFail(this)">`:pic(src,key,alt);};
 
-let SITE={},SERIES=[],CHAPTERS=[],SIDE=[],CHARS=[],COMM=[],TOOLS=[],NOTES=[],HISTORY=[];
+let SITE={},SERIES=[],CHAPTERS=[],SIDE=[],CHARS=[],COMM=[],TOOLS=[],NOTES=[],HISTORY=[],GLOSS=[];
 const byDateDesc=(a,b)=>String(b.date||"").localeCompare(String(a.date||""));
 const chId=c=>c.id||c.title;
 const charOf=n=>CHARS.find(h=>h.name===n);
-const avatarOf=n=>{const h=charOf(n);return pic(imgOf(h,"avatar"),"char-"+n,n);};
+const avatarOf=n=>{const h=charOf(n);return picT(imgOf(h,"avatar"),"char-"+n,n);};
 const chaptersOf=t=>CHAPTERS.filter(c=>c.series===t);
 const sideOf=n=>SIDE.filter(s=>s.character===n).sort(byDateDesc);
 const commOf=n=>COMM.filter(m=>(m.characters||[]).includes(n));
 const notesOf=n=>NOTES.filter(x=>(x.characters||[]).includes(n));
 const charLink=n=>charOf(n)?`<a class="tag story" href="#char-${enc(n)}">${esc(n)}</a>`:`<span class="tag">${esc(n)}</span>`;
 
-const SITE_VERSION="2026-11-17 v1.1";
+/* ---------- 閱讀進度（只存在讀者自己的瀏覽器） ---------- */
+let PG={last:"",seen:{},pos:{}};
+try{const o=JSON.parse(localStorage.getItem("read-progress")||"{}");PG={last:o.last||"",seen:o.seen||{},pos:o.pos||{}};}catch(e){}
+function pgSave(){
+  const ks=Object.keys(PG.seen);if(ks.length>400){ks.sort((a,b)=>PG.seen[a]-PG.seen[b]).slice(0,ks.length-400).forEach(k=>{delete PG.seen[k];delete PG.pos[k];});}
+  try{localStorage.setItem("read-progress",JSON.stringify(PG));}catch(e){}
+}
+const seenAt=k=>PG.seen[k]||0;
+/* 「NEW」：最近幾天內的內容（後台：網站設定 › NEW 標記天數，0 = 關閉）；讀者讀過的就不再顯示 */
+function newDays(){const v=SITE.newDays;if(v===undefined||v===null||v==="")return 14;const n=+v;return isNaN(n)?14:Math.max(0,n);}
+function isNew(x){const d=newDays();if(!d||!x||!x.date)return false;const t=Date.parse(String(x.date).slice(0,10)+"T00:00:00+08:00");if(isNaN(t))return false;const age=Date.now()-t;return age>-864e5&&age<d*864e5;}
+const newBadge=(x,k)=>isNew(x)&&!(k&&seenAt(k))?`<span class="new-badge" title="最近更新">NEW</span>`:"";
+
+const SITE_VERSION="2026-11-17 v1.3";
 const BROKEN=[];
 async function load(){
-  const files=["site.json","series.json","chapters.json","side-stories.json","characters.json","commissions.json","tools.json","notes.json","history.json"];
-  const optional=["history.json","tools.json"];
+  const files=["site.json","series.json","chapters.json","side-stories.json","characters.json","commissions.json","tools.json","notes.json","history.json","glossary.json"];
+  const optional=["history.json","tools.json","glossary.json"];
   const get=async f=>{
     const empty=f==="site.json"?{}:[];
     try{
@@ -762,7 +841,7 @@ async function load(){
       return f==="site.json"?d:d.filter(x=>x&&typeof x==="object");
     }catch(e){BROKEN.push({f,msg:e.message});return empty;}
   };
-  [SITE,SERIES,CHAPTERS,SIDE,CHARS,COMM,TOOLS,NOTES,HISTORY]=await Promise.all(files.map(get));
+  [SITE,SERIES,CHAPTERS,SIDE,CHARS,COMM,TOOLS,NOTES,HISTORY,GLOSS]=await Promise.all(files.map(get));
 }
 
 /* ---------- 網站資訊、首頁 ---------- */
@@ -838,15 +917,37 @@ function renderSite(){
   if(CHAPTERS[0])$("#heroRead").href="#read-"+enc(chId(CHAPTERS[0]));
   $("#aboutText").innerHTML=blocks(SITE.about).join("");
   $("#contact").innerHTML=inline(SITE.contact||"");
-  $("#footer").innerHTML=esc(`© ${new Date().getFullYear()} ${SITE.siteName||""}${SITE.author?" · "+SITE.author:""}　｜　`)+inline(SITE.footer||"");
+  $("#footer").innerHTML=esc(`© ${new Date().getFullYear()} ${SITE.siteName||""}${SITE.author?" · "+SITE.author:""}　｜　`)+inline(SITE.footer||"")+`　｜　<button type="button" class="rss-btn" id="rssBtn">RSS 訂閱</button>`;
+  $("#rssBtn").onclick=async()=>{const u=location.origin+"/feed.xml";try{await navigator.clipboard.writeText(u);siteToast("已複製訂閱網址，貼到 Feedly、Inoreader 等 RSS 閱讀器就能追更新");}catch(e){prompt("複製這個網址，貼到 RSS 閱讀器：",u);}};
   const ups=[
-    ...CHAPTERS.map(c=>({d:c.date,t:"故事",cls:"story",txt:`${c.series}・${c.title}`,href:"#read-"+enc(chId(c)),x:c})),
-    ...SIDE.map(c=>({d:c.date,t:"角色故事",cls:"story",txt:`${c.character}・${c.title}`,href:"#side-"+enc(chId(c)),x:c})),
+    ...CHAPTERS.map(c=>({d:c.date,t:"故事",cls:"story",txt:`${c.series}・${c.title}`,href:"#read-"+enc(chId(c)),x:c,k:"read:"+chId(c)})),
+    ...SIDE.map(c=>({d:c.date,t:"角色故事",cls:"story",txt:`${c.character}・${c.title}`,href:"#side-"+enc(chId(c)),x:c,k:"side:"+chId(c)})),
     ...COMM.map(m=>({d:m.date,t:"委託圖",cls:"warm",txt:`〈${m.title}〉繪師：${m.artist}`,href:"#commissions",x:m})),
-    ...NOTES.map(n=>({d:n.date,t:"文章",cls:"",txt:n.title,href:"#note-"+enc(chId(n)),x:n})),
+    ...NOTES.map(n=>({d:n.date,t:"文章",cls:"",txt:n.title,href:"#note-"+enc(chId(n)),x:n,k:"note:"+chId(n)})),
     ...TOOLS.map(t=>({d:t.date,t:"小工具",cls:"",txt:t.title,href:"#tool-"+enc(toolId(t)),x:t}))
-  ].filter(u=>u.d).sort((a,b)=>b.d.localeCompare(a.d)).slice(0,6);
-  $("#updates").innerHTML=ups.map(u=>`<li><time>${esc(u.d)}</time><span class="tag ${u.cls}">${u.t}</span><a href="${u.href}">${esc(u.txt)}</a>${badge(u.x)}</li>`).join("");
+  ].filter(u=>u.d).sort((a,b)=>String(b.d).localeCompare(String(a.d))).slice(0,6);
+  $("#updates").innerHTML=ups.map(u=>`<li><time>${esc(u.d)}</time><span class="tag ${u.cls}">${u.t}</span><a href="${u.href}">${esc(u.txt)}</a>${badge(u.x)}${newBadge(u.x,u.k)}</li>`).join("");
+  renderContinue();
+  $("#navGloss").hidden=!GLOSS.length;
+}
+/* 首頁「繼續閱讀」 */
+function readItem(k){
+  const [kind,...r]=String(k||"").split(":");const id=r.join(":");
+  if(kind==="read"){const c=CHAPTERS.find(x=>chId(x)===id);if(!c)return null;const l=chaptersOf(c.series);return {c,kind,label:`${c.series}・${c.title}`,href:"#read-"+enc(id),next:l[l.indexOf(c)+1],npre:"#read-",nk:"read:"};}
+  if(kind==="side"){const c=SIDE.find(x=>chId(x)===id);if(!c)return null;const l=SIDE.filter(x=>x.character===c.character).sort((a,b)=>String(a.date).localeCompare(String(b.date)));return {c,kind,label:`${c.character}・${c.title}`,href:"#side-"+enc(id),next:l[l.indexOf(c)+1],npre:"#side-",nk:"side:"};}
+  return null;
+}
+function renderContinue(){
+  const box=$("#continueBox"),it=readItem(PG.last);
+  if(!it){box.innerHTML="";return;}
+  const p=PG.pos[PG.last]||0;
+  if(p>=.95){
+    if(!it.next){box.innerHTML="";return;}
+    const nx=it.next,lab=it.kind==="read"?`${nx.series}・${nx.title}`:`${nx.character}・${nx.title}`;
+    box.innerHTML=`<a class="continue" href="${it.npre}${enc(chId(nx))}"><span class="cv-ic" aria-hidden="true">▶</span><span class="cv-t"><small>上次讀完了「${esc(it.c.title)}」，下一篇是</small><b>${esc(lab)}${badge(nx)}${newBadge(nx,it.nk+chId(nx))}</b></span><span class="cv-go">讀下一篇 →</span></a>`;
+    return;
+  }
+  box.innerHTML=`<a class="continue" href="${it.href}"><span class="cv-ic" aria-hidden="true">▶</span><span class="cv-t"><small>繼續閱讀${p>.02?`・讀到 ${Math.round(p*100)}%`:""}</small><b>${esc(it.label)}${badge(it.c)}</b>${p>.02?`<span class="cv-bar"><i style="width:${Math.round(p*100)}%"></i></span>`:""}</span><span class="cv-go">繼續 →</span></a>`;
 }
 
 /* ---------- 成人內容（後台每篇可勾「成人內容」；網站設定 › 成人內容設定 可設密碼） ---------- */
@@ -858,7 +959,7 @@ const badge=x=>isAdult(x)?`<span class="adult-badge" title="成人內容">18+</s
 const lockedArt=()=>`<div class="locked-art" aria-label="成人內容，需確認年齡"><span>18+</span><small>成人內容</small></div>`;
 /* 鎖住時的預覽：預設霧化；網站設定可改成「完全隱藏」 */
 const lockedThumb=(src,key,alt)=>(SITE.adult&&SITE.adult.preview==="完全隱藏")?lockedArt():
-  `<div class="blurred" style="width:100%;height:100%">${pic(src,key,"")}<div class="blur-veil" aria-label="成人內容，需確認年齡"><span>18+</span><small>點擊確認年齡</small></div></div>`;
+  `<div class="blurred" style="width:100%;height:100%">${picT(src,key,"")}<div class="blur-veil" aria-label="成人內容，需確認年齡"><span>18+</span><small>點擊確認年齡</small></div></div>`;
 const gatePanel=()=>`<div class="gate-panel"><div class="gate-icon">18+</div><p>這裡是成人內容，未滿 18 歲請勿閱覽。</p><button class="btn" type="button" data-unlock style="border:0;font:inherit;cursor:pointer">我已滿 18 歲，繼續</button></div>`;
 async function sha256(t){const b=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(t));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join("");}
 let gateCb=null;
@@ -901,10 +1002,12 @@ function renderHistory(){
 /* ---------- 故事系列 ---------- */
 function renderSeries(){
   $("#seriesList").innerHTML=SERIES.length?"":`<p style="color:var(--muted)">還沒有故事系列。</p>`;
-  if(SERIES.length)$("#seriesList").innerHTML=SERIES.map(s=>{const list=chaptersOf(s.title);const cs=szOf(s.coverSize);return `<div class="series${cs&&cs!=="m"?" cs-"+cs:""}"><div class="art">${pic(imgOf(s,"cover"),"series-"+s.title,s.title)}</div><div>
+  if(SERIES.length)$("#seriesList").innerHTML=SERIES.map(s=>{const list=chaptersOf(s.title);const cs=szOf(s.coverSize);return `<div class="series${cs&&cs!=="m"?" cs-"+cs:""}"><div class="art">${picT(imgOf(s,"cover"),"series-"+s.title,s.title)}</div><div>
   <div class="eyebrow">${esc(s.genre)}</div><h2>${esc(s.title)}</h2><p class="desc">${inline(s.description)}</p>
-  <div class="meta">${s.status?`<span class="tag story">${esc(s.status)}</span>`:""}<span class="tag">${list.length} 篇</span></div>
-  <ul class="chlist">${list.map(c=>`<li><a href="#read-${enc(chId(c))}"><span>${esc(c.title)}${badge(c)}</span><small>${esc(c.date)}</small></a></li>`).join("")}</ul></div></div>`}).join("");
+  <div class="meta">${s.status?`<span class="tag story">${esc(s.status)}</span>`:""}<span class="tag">${list.length} 篇</span>${list.some(c=>isNew(c)&&!seenAt("read:"+chId(c)))?`<span class="new-badge">NEW</span>`:""}</div>
+  ${(()=>{const r=list.filter(c=>seenAt("read:"+chId(c))).sort((a,b)=>seenAt("read:"+chId(b))-seenAt("read:"+chId(a)))[0];if(!r)return "";const k="read:"+chId(r),done=(PG.pos[k]||0)>=.95,nx=list[list.indexOf(r)+1];
+    return done&&nx?`<a class="series-go" href="#read-${enc(chId(nx))}">▶ 讀下一篇：${esc(nx.title)}</a>`:done?"":`<a class="series-go" href="#read-${enc(chId(r))}">▶ 繼續閱讀：${esc(r.title)}</a>`;})()}
+  <ul class="chlist">${list.map(c=>{const k="read:"+chId(c);return `<li${seenAt(k)?` class="seen"`:""}><a href="#read-${enc(chId(c))}"><span>${esc(c.title)}${badge(c)}${newBadge(c,k)}</span><small>${esc(c.date)}</small></a></li>`;}).join("")}</ul></div></div>`}).join("");
 }
 
 /* ---------- 閱讀頁（主線與角色故事共用） ---------- */
@@ -936,14 +1039,36 @@ function renderReader(id,side){
       ${next?`<a class="next" href="${pre}${enc(chId(next))}"><small>下一篇</small>${esc(next.title)}</a>`:`<span class="next"><small>下一篇</small>敬請期待</span>`}
     </nav>`;
   $("#reader").querySelectorAll("[data-fs]").forEach(b=>b.onclick=()=>setFs(+b.dataset.fs));
+  glossify($("#reader .prose"));
+  trackProgress((side?"side:":"read:")+id,$("#reader .prose"),$("#reader .rtools"));
 }
+/* 記住讀到哪裡：存「內文讀到幾 %」 */
+let PG_CUR=null;
+function proseRatio(el){const r=el.getBoundingClientRect(),h=el.offsetHeight;if(!h)return 0;if(r.bottom<=innerHeight)return 1;return Math.max(0,Math.min(1,(innerHeight*.35-r.top)/h));}
+function trackProgress(k,el,after){
+  const prev=PG.pos[k]||0;
+  PG.last=k;PG.seen[k]=Date.now();pgSave();
+  PG_CUR={k,el};
+  if(prev>.04&&prev<.95&&after){
+    const bar=document.createElement("div");bar.className="resume";
+    bar.innerHTML=`<span>上次讀到 ${Math.round(prev*100)}%</span><button type="button" class="rs-go">從上次的地方繼續</button><button type="button" class="rs-x" aria-label="關閉">✕</button>`;
+    after.after(bar);
+    bar.querySelector(".rs-go").onclick=()=>{const r=el.getBoundingClientRect();window.scrollTo({top:scrollY+r.top+prev*el.offsetHeight-innerHeight*.35,behavior:"smooth"});bar.remove();};
+    bar.querySelector(".rs-x").onclick=()=>bar.remove();
+  }
+}
+let pgT=0;
+addEventListener("scroll",()=>{if(!PG_CUR||pgT)return;pgT=setTimeout(()=>{pgT=0;if(!PG_CUR||!PG_CUR.el.isConnected||!PG_CUR.el.offsetParent)return;
+  const r=proseRatio(PG_CUR.el),k=PG_CUR.k,old=PG.pos[k]||0;
+  if(Math.abs(r-old)>=.01||(r>=.95&&old<.95)){PG.pos[k]=old>=.95&&r<old?old:r;if(r>=.95)PG.pos[k]=1;pgSave();}
+},400);},{passive:true});
 let fs=18; try{fs=+localStorage.getItem("fs")||18}catch(e){}
 function setFs(d){fs=Math.min(24,Math.max(15,fs+d));document.documentElement.style.setProperty("--read-size",fs+"px");try{localStorage.setItem("fs",fs)}catch(e){}}
 
 /* ---------- 角色故事列表 ---------- */
 let curSide="all";
 function sideCard(c){return `<a class="scard" href="#side-${enc(chId(c))}"><div class="art">${avatarOf(c.character)}</div><div>
-  <small>${esc(c.character)}　${esc(c.date)}</small><h3>${esc(c.title)}${badge(c)}</h3><p>${locked(c)?"成人內容，點進去確認年齡後閱讀。":esc(plain(paras(c.body).find(p=>!/^(-{3,}|##|!\[)/.test(p.trim())&&plain(p).trim())||""))}</p></div></a>`;}
+  <small>${esc(c.character)}　${esc(c.date)}${seenAt("side:"+chId(c))?`<span class="seen-mark">✓ 已讀</span>`:""}</small><h3>${esc(c.title)}${badge(c)}${newBadge(c,"side:"+chId(c))}</h3><p>${locked(c)?"成人內容，點進去確認年齡後閱讀。":esc(plain(paras(c.body).find(p=>!/^(-{3,}|##|!\[)/.test(p.trim())&&plain(p).trim())||""))}</p></div></a>`;}
 function renderSide(){
   $("#sfilters").innerHTML=[["all","全部角色"],...CHARS.filter(h=>SIDE.some(x=>x.character===h.name)).map(h=>[h.name,h.name])].map(([k,l])=>`<button type="button" class="chip${k===curSide?" on":""}" data-k="${esc(k)}">${esc(l)}</button>`).join("");
   $("#sfilters").querySelectorAll(".chip").forEach(b=>b.onclick=()=>{curSide=b.dataset.k;renderSide();});
@@ -968,13 +1093,14 @@ function renderCharPage(n){
       <div class="share-row">${shareButtons(n)}</div>
       <dl class="profile">${(h.profile||[]).map(p=>`<dt>${esc(p.label)}</dt><dd>${inline(p.value)}</dd>`).join("")}</dl></div></div>
     <div class="bio rich">${blocks(h.bio).join("")}</div>
-    ${refs.length?`<div class="sec"><h2>設定圖</h2></div><div class="grid" id="charRefs">${refs.map((r,i)=>`<button type="button" class="piece${r.size==="加大"?" wide":""}" data-ref="${i}"><div class="art">${pic(r.src,"ref-"+n+i,r.caption)}</div>${r.caption?`<div class="cap"><b>${esc(r.caption)}</b></div>`:""}</button>`).join("")}</div>`:""}
+    ${refs.length?`<div class="sec"><h2>設定圖</h2></div><div class="grid" id="charRefs">${refs.map((r,i)=>`<button type="button" class="piece${r.size==="加大"?" wide":""}" data-ref="${i}"><div class="art">${picT(r.src,"ref-"+n+i,r.caption)}</div>${r.caption?`<div class="cap"><b>${esc(r.caption)}</b></div>`:""}</button>`).join("")}</div>`:""}
     <div class="sec"><h2>委託圖</h2><a href="#commissions">全部委託圖</a></div>
     ${cm.length?`<div class="grid" id="charComm">${cm.map(commCard).join("")}</div>`:`<p style="color:var(--muted)">還沒有這個角色的委託圖。</p>`}
     <div class="sec"><h2>角色故事</h2><a href="#side">全部角色故事</a></div>
     ${sd.length?`<div class="slist">${sd.map(sideCard).join("")}</div>`:`<p style="color:var(--muted)">還沒有${esc(n)}的角色故事。</p>`}
-    ${ap.length?`<div class="sec"><h2>主線出場章節</h2></div><ul class="chlist">${ap.map(c=>`<li><a href="#read-${enc(chId(c))}"><span>${esc(c.series)}・${esc(c.title)}${badge(c)}</span><small>${esc(c.date)}</small></a></li>`).join("")}</ul>`:""}
+    ${ap.length?`<div class="sec"><h2>主線出場章節</h2></div><ul class="chlist">${ap.map(c=>`<li${seenAt("read:"+chId(c))?` class="seen"`:""}><a href="#read-${enc(chId(c))}"><span>${esc(c.series)}・${esc(c.title)}${badge(c)}${newBadge(c,"read:"+chId(c))}</span><small>${esc(c.date)}</small></a></li>`).join("")}</ul>`:""}
     ${nt.length?`<div class="sec"><h2>相關設定與筆記</h2></div><div class="nlist">${nt.map(noteCard).join("")}</div>`:""}`;
+  glossify($("#charPage .bio"));
   const g=$("#charComm"); if(g)bindComm(g);
   const rg=$("#charRefs"); if(rg)rg.querySelectorAll("[data-ref]").forEach(b=>b.onclick=()=>{const r=refs[+b.dataset.ref];openLb(pic(r.src,"ref",r.caption),r.caption||h.name+" 設定圖","",`<span class="tag story">${esc(h.name)}</span>`);});
 }
@@ -982,8 +1108,8 @@ function renderCharPage(n){
 /* ---------- 委託圖 ---------- */
 let curChar="all";
 function commCard(m){
-  return `<button type="button" class="piece${m.imageSize==="加大"?" wide":""}" data-c="${COMM.indexOf(m)}"><div class="artwrap"><div class="art">${locked(m)?lockedThumb(imgOf(m,"image"),"comm-"+m.title,m.title):pic(imgOf(m,"image"),"comm-"+m.title,m.title)}</div>${m.type?`<span class="ctype">${esc(m.type)}</span>`:""}</div>
-  <div class="cap"><b>${esc(m.title)}${badge(m)}</b><small>繪師：${esc(m.artist)}　${esc(m.date)}</small>
+  return `<button type="button" class="piece${m.imageSize==="加大"?" wide":""}" data-c="${COMM.indexOf(m)}"><div class="artwrap"><div class="art">${locked(m)?lockedThumb(imgOf(m,"image"),"comm-"+m.title,m.title):picT(imgOf(m,"image"),"comm-"+m.title,m.title)}</div>${m.type?`<span class="ctype">${esc(m.type)}</span>`:""}</div>
+  <div class="cap"><b>${esc(m.title)}${badge(m)}${newBadge(m)}</b><small>繪師：${esc(m.artist)}　${esc(m.date)}</small>
   <div class="who">${(m.characters||[]).map(n=>`<span class="tag story">${esc(n)}</span>`).join("")}</div></div></button>`;
 }
 function bindComm(root){
@@ -1011,9 +1137,9 @@ const STAT={"使用中":"on","開發中":"dev"};
 const toolLink=(t,cls)=>t.link?`<a class="${cls}" href="${esc(/^(https?:\/\/|\/|#)/i.test(t.link)?t.link:"https://"+t.link)}" target="_blank" rel="noopener">${esc(t.linkLabel||"開啟工具")} ↗</a>`:"";
 function renderTools(){
   const list=[...TOOLS].sort((a,b)=>{const o=(+a.order||1e9)-(+b.order||1e9);return o||String(b.date||"").localeCompare(String(a.date||""));});
-  $("#tlist").innerHTML=list.map(t=>`<div class="tcard"><a class="art" href="#tool-${enc(toolId(t))}" aria-label="${esc(t.title)}">${pic(imgOf(t,"image"),"tool-"+t.title,t.title)}</a>
+  $("#tlist").innerHTML=list.map(t=>`<div class="tcard"><a class="art" href="#tool-${enc(toolId(t))}" aria-label="${esc(t.title)}">${picT(imgOf(t,"image"),"tool-"+t.title,t.title)}</a>
     <div class="tbody">${t.status?`<span class="tstat ${STAT[t.status]||""}">${esc(t.status)}</span>`:""}
-      <h3><a href="#tool-${enc(toolId(t))}">${esc(t.title)}</a></h3><p>${inline(t.summary||"")}</p>${(()=>{const k=cardsOf(t).length;return k?`<p class="tcards">📖 教學圖卡 ${k} 張</p>`:"";})()}
+      <h3><a href="#tool-${enc(toolId(t))}">${esc(t.title)}</a>${newBadge(t)}</h3><p>${inline(t.summary||"")}</p>${(()=>{const k=cardsOf(t).length;return k?`<p class="tcards">📖 教學圖卡 ${k} 張</p>`:"";})()}
       <div class="tact">${toolLink(t,"btn")}<a class="btn ghost" href="#tool-${enc(toolId(t))}">看介紹</a></div></div></div>`).join("")||`<p style="color:var(--muted)">還沒有小工具。</p>`;
 }
 function renderTool(id){
@@ -1027,7 +1153,7 @@ function renderTool(id){
     ${cards.length?cardsHtml(cards,t.cardsTitle||"使用教學"):""}
     ${t.video?videoHtml(t.video,t.videoCaption||"",""):""}
     <div class="notebody rich">${blocks(t.body).join("")}</div>`;
-  initCards($("#toolPage"));
+  initCards($("#toolPage"));glossify($("#toolPage .notebody"));
 }
 
 
@@ -1144,7 +1270,7 @@ document.addEventListener("keydown",e=>{
 addEventListener("hashchange",()=>{if(cardsFsEl){cardsFsEl.classList.remove("fs");cardsFsEl=null;}document.documentElement.classList.remove("cards-lock");});
 /* ---------- 文章 ---------- */
 let curCat="全部";
-const noteCard=n=>`<a class="ncard" href="#note-${enc(chId(n))}"><time>${esc(n.date)}</time><div><span class="tag cat">${esc(n.category)}</span><h3>${esc(n.title)}${badge(n)}</h3><p>${locked(n)?"成人內容，點進去確認年齡後閱讀。":esc(plain(n.excerpt))}</p></div></a>`;
+const noteCard=n=>`<a class="ncard" href="#note-${enc(chId(n))}"><time>${esc(n.date)}</time><div><span class="tag cat">${esc(n.category)}</span><h3>${esc(n.title)}${badge(n)}${newBadge(n,"note:"+chId(n))}</h3><p>${locked(n)?"成人內容，點進去確認年齡後閱讀。":esc(plain(n.excerpt))}</p></div></a>`;
 function renderNotes(){
   const cats=["全部",...new Set(NOTES.map(n=>n.category).filter(Boolean))];
   $("#nfilters").innerHTML=cats.map(t=>`<button type="button" class="chip${t===curCat?" on":""}" data-t="${esc(t)}">${esc(t)}</button>`).join("");
@@ -1166,6 +1292,81 @@ function renderNote(id){
       ${prev?`<a href="#note-${enc(chId(prev))}"><small>較舊</small>${esc(prev.title)}</a>`:`<span><small>較舊</small>沒有了</span>`}
       ${next?`<a class="next" href="#note-${enc(chId(next))}"><small>較新</small>${esc(next.title)}</a>`:`<span class="next"><small>較新</small>沒有了</span>`}
     </nav>`;
+  glossify($("#noteReader .notebody"));
+  PG.seen["note:"+id]=Date.now();pgSave();
+}
+
+/* ---------- 名詞百科 ---------- */
+const termKey=g=>String(g.term||"").trim();
+const termOf=k=>GLOSS.find(g=>termKey(g)===k);
+const aliasesOf=g=>String(g.aliases||"").split(/[、,，/／\n]+/).map(x=>x.trim()).filter(Boolean);
+let GL_RE=null,GL_MAP=new Map();
+function glossPrep(){
+  GL_MAP=new Map();
+  GLOSS.forEach(g=>{if(!termKey(g)||g.autolink===false||g.autolink==="false")return;[termKey(g),...aliasesOf(g)].forEach(n=>{if(n.length>=1&&!GL_MAP.has(n.toLowerCase()))GL_MAP.set(n.toLowerCase(),g);});});
+  const names=[...GL_MAP.keys()].sort((a,b)=>b.length-a.length);
+  GL_RE=names.length?new RegExp(names.map(n=>{const e=n.replace(/[.*+?^${}()|[\]\\]/g,"\\$&");return /^[\w\s'-]+$/.test(n)?`\\b${e}\\b`:e;}).join("|"),"gi"):null;
+}
+function glossify(root,self){
+  if(!root||!GLOSS.length||SITE.glossaryMode==="關閉")return;
+  if(!GL_RE&&GL_MAP.size===0)glossPrep();if(!GL_RE)return;
+  const all=SITE.glossaryMode==="全部標示",used=new Set();
+  const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,{acceptNode:n=>n.parentElement.closest("a,button,h1,h2,h3,code,pre,figcaption,.gl,.vcard,.video-fig,script,style")?NodeFilter.FILTER_REJECT:NodeFilter.FILTER_ACCEPT});
+  const nodes=[];while(w.nextNode())nodes.push(w.currentNode);
+  for(const n of nodes){
+    const t=n.nodeValue;if(!t.trim())continue;GL_RE.lastIndex=0;let m,last=0,frag=null;
+    while((m=GL_RE.exec(t))){
+      if(!m[0]){GL_RE.lastIndex++;continue;}
+      const g=GL_MAP.get(m[0].toLowerCase());if(!g||g===self||(!all&&used.has(g)))continue;
+      used.add(g);frag=frag||document.createDocumentFragment();frag.append(t.slice(last,m.index));
+      const b=document.createElement("button");b.type="button";b.className="gl";b.dataset.term=termKey(g);b.textContent=m[0];b.setAttribute("aria-haspopup","dialog");frag.append(b);last=m.index+m[0].length;
+    }
+    if(frag){frag.append(t.slice(last));n.replaceWith(frag);}
+  }
+}
+let glFrom=null;
+function openGlPop(btn){
+  const g=termOf(btn.dataset.term);if(!g)return;
+  const pop=$("#glPop");glFrom=btn;
+  const more=!!(g.body||imgOf(g,"image"));
+  pop.innerHTML=`<button type="button" class="gp-x" aria-label="關閉">✕</button><h4>${esc(termKey(g))}</h4>${g.category?`<div class="gp-cat">${esc(g.category)}</div>`:""}<p>${inline(g.short||plain(g.body||"").slice(0,90)||"（還沒有說明）")}</p><a class="gp-more" href="#term-${enc(termKey(g))}">${more?"看完整介紹 →":"在百科中查看 →"}</a>`;
+  pop.hidden=false;
+  const r=btn.getBoundingClientRect(),pw=pop.offsetWidth,ph=pop.offsetHeight;
+  let left=Math.min(Math.max(12,r.left+r.width/2-pw/2),innerWidth-pw-12);
+  let top=r.bottom+8;if(top+ph>innerHeight-12&&r.top-ph-8>12)top=r.top-ph-8;
+  pop.style.left=left+"px";pop.style.top=Math.max(12,Math.min(top,innerHeight-ph-12))+"px";
+  pop.querySelector(".gp-x").onclick=closeGlPop;pop.querySelector(".gp-more").focus({preventScroll:true});
+}
+function closeGlPop(){const p=$("#glPop");if(p.hidden)return;p.hidden=true;if(glFrom&&document.contains(glFrom))glFrom.focus({preventScroll:true});glFrom=null;}
+document.addEventListener("click",e=>{const b=e.target.closest(".gl");if(b){e.preventDefault();if(glFrom===b&&!$("#glPop").hidden){closeGlPop();return;}openGlPop(b);return;}if(!e.target.closest("#glPop"))closeGlPop();});
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closeGlPop();});
+addEventListener("scroll",()=>{if(!$("#glPop").hidden&&glFrom){const r=glFrom.getBoundingClientRect();if(r.bottom<0||r.top>innerHeight)closeGlPop();}},{passive:true});
+addEventListener("resize",closeGlPop);
+let curGcat="全部";
+function renderGlossary(){
+  const cats=["全部",...new Set(GLOSS.map(g=>g.category).filter(Boolean))];
+  $("#gfilters").innerHTML=cats.length>2?cats.map(c=>`<button type="button" class="chip${c===curGcat?" on":""}" data-c="${esc(c)}">${esc(c)}</button>`).join(""):"";
+  $("#gfilters").querySelectorAll(".chip").forEach(b=>b.onclick=()=>{curGcat=b.dataset.c;renderGlossary();});
+  const q=$("#gsearch").value.trim().toLowerCase();
+  const list=GLOSS.filter(g=>termKey(g)&&(curGcat==="全部"||g.category===curGcat)&&(!q||[termKey(g),...aliasesOf(g),g.short||"",g.category||""].join(" ").toLowerCase().includes(q)))
+    .sort((a,b)=>((+a.order||1e9)-(+b.order||1e9))||termKey(a).localeCompare(termKey(b),"zh-Hant"));
+  $("#glist").innerHTML=list.map(g=>`<a class="gcard" href="#term-${enc(termKey(g))}"><h3>${esc(termKey(g))}</h3>${g.category||aliasesOf(g).length?`<small>${esc([g.category,aliasesOf(g).length?"又稱 "+aliasesOf(g).join("、"):""].filter(Boolean).join("・"))}</small>`:""}${g.short?`<p>${esc(plain(g.short))}</p>`:""}</a>`).join("")||`<p style="color:var(--muted)">${q?"找不到符合的名詞。":"還沒有名詞。"}</p>`;
+}
+$("#gsearch").addEventListener("input",()=>renderGlossary());
+function renderTerm(k){
+  const g=termOf(k);if(!g){location.hash="glossary";return;}
+  const names=[termKey(g),...aliasesOf(g)].map(x=>x.toLowerCase());
+  const has=x=>{if(locked(x))return false;const t=String((x.title||"")+" "+(x.body||"")).toLowerCase();return names.some(n=>t.includes(n));};
+  const seen=[...CHAPTERS.filter(has).map(c=>({h:"#read-"+enc(chId(c)),t:`${c.series}・${c.title}`,d:c.date})),...SIDE.filter(has).map(c=>({h:"#side-"+enc(chId(c)),t:`${c.character}・${c.title}`,d:c.date})),...NOTES.filter(has).map(n=>({h:"#note-"+enc(chId(n)),t:n.title,d:n.date}))].slice(0,12);
+  const src=imgOf(g,"image");
+  $("#termPage").innerHTML=`<div class="crumb"><a href="#glossary">名詞百科</a>${g.category?` ／ ${esc(g.category)}`:""}</div>
+    <h1>${esc(termKey(g))}</h1>${aliasesOf(g).length?`<p class="term-alias">又稱：${esc(aliasesOf(g).join("、"))}</p>`:""}
+    <div class="rtools"><span class="row">${(g.characters||[]).map(charLink).join("")}</span>${shareButtons(termKey(g))}</div>
+    ${src?`<figure class="term-img"><div class="art full" data-zoom="${esc(src)}" data-cap="${esc(termKey(g))}" style="cursor:zoom-in">${pic(src,"term",termKey(g))}</div></figure>`:""}
+    ${g.short?`<p style="font-size:1.08em">${inline(g.short)}</p>`:""}
+    <div class="notebody rich">${blocks(g.body).join("")}</div>
+    ${seen.length?`<div class="sec"><h2>出現在</h2></div><ul class="chlist">${seen.map(x=>`<li><a href="${x.h}"><span>${esc(x.t)}</span><small>${esc(x.d||"")}</small></a></li>`).join("")}</ul>`:""}`;
+  glossify($("#termPage .notebody"),g);
 }
 
 /* ---------- 分享連結 ---------- */
@@ -1219,15 +1420,16 @@ document.addEventListener("keydown",e=>{if(e.key==="Escape"){closeLb();$("#gate"
 let OWNER=false;try{OWNER=localStorage.getItem("owner-mode")==="1";}catch(e){}
 /* 後台網址：app.pagescms.org/帳號/repo/分支 */
 const CMS="https://app.pagescms.org/rinnoyaya/my-site/main";
-const CMS_ENTRIES=[["site","網站設定"],["history","網站歷程"],["series","故事系列"],["chapters","故事章節"],["side","角色故事"],["characters","角色"],["commissions","委託圖"],["tools","小工具"],["notes","文章"]];
-const CMS_COLLECTIONS=["history","series","chapters","side","characters","commissions","tools","notes"];
+const CMS_ENTRIES=[["site","網站設定"],["history","網站歷程"],["series","故事系列"],["chapters","故事章節"],["side","角色故事"],["characters","角色"],["commissions","委託圖"],["tools","小工具"],["notes","文章"],["glossary","名詞百科"]];
+const CMS_COLLECTIONS=["history","series","chapters","side","characters","commissions","tools","notes","glossary"];
 const cmsUrl=name=>CMS+(CMS_COLLECTIONS.includes(name)?"/collection/":"/file/")+name;
 function updateFab(pre,arg,v){
   const box=$("#owner");if(!OWNER){box.hidden=true;return;}
-  const map={"read-":"chapters","side-":"side","note-":"notes","char-":"characters","tool-":"tools"};
+  const map={"read-":"chapters","side-":"side","note-":"notes","char-":"characters","tool-":"tools","term-":"glossary"};
   let key=pre&&map[pre]?map[pre]+":"+arg:v==="about"?"site:about":"";
-  if(key&&pre!=="char-"){const pool=pre==="read-"?CHAPTERS:pre==="side-"?SIDE:pre==="tool-"?TOOLS:NOTES;if(!pool.find(x=>chId(x)===arg))key="";}
-  const viewEntry={stories:"series",side:"side",characters:"characters",commissions:"commissions",tools:"tools",notes:"notes",about:"site",home:"site"};
+  if(key&&pre==="term-"&&!termOf(arg))key="";
+  if(key&&pre!=="char-"&&pre!=="term-"){const pool=pre==="read-"?CHAPTERS:pre==="side-"?SIDE:pre==="tool-"?TOOLS:NOTES;if(!pool.find(x=>chId(x)===arg))key="";}
+  const viewEntry={stories:"series",side:"side",characters:"characters",commissions:"commissions",tools:"tools",notes:"notes",about:"site",home:"site",glossary:"glossary"};
   const entry=pre?map[pre]:viewEntry[v];
   const name=(CMS_ENTRIES.find(e=>e[0]===entry)||[])[1];
   const ext=' target="_blank" rel="noopener"';
@@ -1246,13 +1448,13 @@ $("#omenu").addEventListener("click",e=>{if(e.target.closest("a"))closeOwner();}
 /* ---------- 換頁 ---------- */
 function route(){
   let h="home";try{h=decodeURIComponent(location.hash.slice(1))||"home";}catch(e){}
-  const pre=["read-","side-","char-","note-","tool-"].find(p=>h.startsWith(p));
+  const pre=["read-","side-","char-","note-","tool-","term-"].find(p=>h.startsWith(p));
   const arg=pre?h.slice(pre.length):"";
-  let v=pre==="read-"?"read":pre==="side-"?"read":pre==="char-"?"char":pre==="note-"?"note":pre==="tool-"?"tool":h;
+  let v=pre==="read-"?"read":pre==="side-"?"read":pre==="char-"?"char":pre==="note-"?"note":pre==="tool-"?"tool":pre==="term-"?"term":h;
   if(!document.getElementById("v-"+v))v="home";
-  closeLb();
+  closeLb();closeGlPop();PG_CUR=null;
   document.querySelectorAll(".view").forEach(x=>x.classList.toggle("on",x.id==="v-"+v));
-  const navKey=pre==="read-"?"stories":pre==="side-"?"side":pre==="char-"?"characters":pre==="note-"?"notes":pre==="tool-"?"tools":v;
+  const navKey=pre==="read-"?"stories":pre==="side-"?"side":pre==="char-"?"characters":pre==="note-"?"notes":pre==="tool-"?"tools":pre==="term-"?"glossary":v;
   document.querySelectorAll("#nav a").forEach(a=>a.classList.toggle("on",a.getAttribute("href")==="#"+navKey));
   const on=$("#nav a.on");if(on&&$("#nav").scrollWidth>$("#nav").clientWidth)$("#nav").scrollTo({left:on.offsetLeft-$("#nav").clientWidth/2+on.offsetWidth/2});
   if(pre==="read-")renderReader(arg,false);
@@ -1260,9 +1462,15 @@ function route(){
   if(pre==="char-")renderCharPage(arg);
   if(pre==="note-")renderNote(arg);
   if(pre==="tool-")renderTool(arg);
+  if(pre==="term-")renderTerm(arg);
+  if(v==="home")renderContinue();
+  if(v==="stories")renderSeries();
+  if(v==="side")renderSide();
+  if(v==="notes")renderNotes();
+  if(v==="glossary")renderGlossary();
   updateFab(pre,arg,v);
   /* 分頁標題：例如「第一章｜黑曜石堡壘」 */
-  const names={stories:"故事",side:"角色故事",characters:"角色",commissions:"委託圖",tools:"小工具",notes:"文章",about:"關於"};
+  const names={stories:"故事",side:"角色故事",characters:"角色",commissions:"委託圖",tools:"小工具",notes:"文章",about:"關於",glossary:"名詞百科"};
   const h1=document.querySelector(".view.on h1");
   const sub=pre?(h1?h1.textContent.replace(/18\+$/,"").trim():""):(names[v]||"");
   document.title=(sub?sub+"｜":"")+(SITE.siteName||"");
@@ -1277,7 +1485,7 @@ load().then(()=>{
     document.querySelector("main").prepend(w);
   }
   setFs(0);
-  renderSite();renderHistory();renderSeries();renderSide();renderChars();renderComm();renderTools();renderNotes();
+  glossPrep();renderSite();renderHistory();renderSeries();renderSide();renderChars();renderComm();renderTools();renderNotes();renderGlossary();
   addEventListener("hashchange",route);route();
 }).catch(err=>{
   $("#loading").textContent="內容載入失敗："+err.message+"。請確認 data 資料夾裡的檔案都在，而且格式正確。";

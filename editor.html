@@ -276,6 +276,45 @@ body:has(.owner:not([hidden])) footer{padding-bottom:76px}
 .wm-on .art:has(img)::after,.wm-on #heroArt:has(img)::after{content:"";position:absolute;inset:0;pointer-events:none;background-image:var(--wm);background-repeat:repeat;z-index:1}
 .wm-on .blurred::after{display:none}
 /* 成人內容 */
+.rss-btn{font:inherit;font-size:inherit;color:var(--accent);background:none;border:0;padding:4px 0;cursor:pointer}
+.new-badge{display:inline-block;font-family:var(--f-body);font-size:10.5px;font-weight:700;color:var(--card);background:var(--lamp);border-radius:4px;padding:0 5px;margin-left:6px;vertical-align:middle;line-height:1.7;letter-spacing:.04em}
+.chlist li.seen a>span{color:var(--muted)}
+.chlist li.seen a>span::after{content:"✓";margin-left:6px;font-size:12px;color:var(--muted)}
+.seen-mark{font-size:12px;color:var(--muted);margin-left:6px;font-weight:400}
+/* 繼續閱讀 */
+.continue{display:flex;align-items:center;gap:14px;margin:26px 0 0;padding:14px 16px;border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink)}
+.continue:hover{text-decoration:none;border-color:var(--accent)}
+.continue .cv-ic{flex:none;width:38px;height:38px;border-radius:50%;background:var(--accent);color:var(--card);display:flex;align-items:center;justify-content:center;font-size:16px}
+.continue .cv-t{flex:1;min-width:0}
+.continue small{display:block;color:var(--muted);font-size:12.5px}
+.continue b{display:block;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.continue .cv-bar{height:4px;border-radius:2px;background:var(--line);margin-top:6px;overflow:hidden}
+.continue .cv-bar i{display:block;height:100%;background:var(--accent)}
+.continue .cv-go{flex:none;color:var(--accent);font-size:14px;white-space:nowrap}
+.series-go{display:inline-block;margin:4px 0 10px;font-size:14px}
+.resume{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin:0 0 18px;padding:10px 14px;border-radius:10px;background:var(--card);border:1px solid var(--line);font-family:var(--f-body);font-size:14px;color:var(--muted)}
+.resume button{font:inherit;font-size:14px;border:0;border-radius:999px;padding:6px 14px;cursor:pointer}
+.resume .rs-go{background:var(--accent);color:var(--card)}
+.resume .rs-x{background:transparent;color:var(--muted);padding:6px 8px;margin-left:auto}
+/* 名詞百科 */
+.gl{font:inherit;color:inherit;background:none;border:0;padding:0;margin:0;cursor:pointer;text-indent:0;border-bottom:1.5px dotted var(--accent);line-height:inherit;letter-spacing:inherit}
+.gl:hover,.gl:focus-visible{color:var(--accent);outline:none}
+#glPop{position:fixed;z-index:250;width:min(320px,calc(100vw - 24px));background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.28);padding:14px 16px;font-family:var(--f-body);font-size:14.5px;line-height:1.7}
+#glPop h4{margin:0 0 2px;font-size:16px;font-family:var(--f-head,inherit)}
+#glPop .gp-cat{font-size:12px;color:var(--muted)}
+#glPop p{margin:6px 0 0}
+#glPop .gp-more{display:inline-block;margin-top:8px;font-size:13.5px}
+#glPop .gp-x{position:absolute;top:6px;right:6px;width:30px;height:30px;border:0;background:none;color:var(--muted);font-size:18px;cursor:pointer;border-radius:50%}
+.gsearch{width:100%;box-sizing:border-box;font:inherit;padding:10px 14px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);margin:0 0 12px}
+.glist{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;align-items:start}
+.gcard{display:block;padding:14px 16px;border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink)}
+.gcard:hover{text-decoration:none;border-color:var(--accent)}
+.gcard h3{margin:0;font-size:17px}
+.gcard small{color:var(--muted);font-size:12.5px}
+.gcard p{margin:6px 0 0;color:var(--muted);font-size:14px;line-height:1.65}
+.term-alias{color:var(--muted);font-size:14px;margin:-6px 0 14px}
+.term-img{max-width:420px;margin:0 0 18px}
+.term-img .art{border-radius:10px;overflow:hidden}
 .adult-badge{display:inline-block;font-family:var(--f-body);font-size:11px;font-weight:700;color:#fff;background:#c0392b;border-radius:4px;padding:0 5px;margin-left:6px;vertical-align:middle;line-height:1.7;letter-spacing:.02em}
 .locked-art{width:100%;height:100%;min-height:120px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:var(--muted);background:repeating-linear-gradient(45deg,var(--paper) 0 12px,color-mix(in srgb,var(--line) 70%,var(--paper)) 12px 24px)}
 .blurred{position:relative;overflow:hidden}
@@ -779,7 +818,7 @@ const $=s=>document.querySelector(s);
 /* ---------- 寫作小幫手 ---------- */
 /* 後台網址：app.pagescms.org/帳號/repo/分支 */
 const CMS="https://app.pagescms.org/rinnoyaya/my-site/main";
-function cmsHref(key){const t=key?key.slice(0,key.indexOf(":")):"";const m={chapters:"chapters",side:"side",notes:"notes",characters:"characters",tools:"tools"}[t];return CMS+(m?"/collection/"+m:"/file/site");}
+function cmsHref(key){const t=key?key.slice(0,key.indexOf(":")):"";const m={chapters:"chapters",side:"side",notes:"notes",characters:"characters",tools:"tools",glossary:"glossary"}[t];return CMS+(m?"/collection/"+m:"/file/site");}
 const src=$("#src"),KEY="writer-drafts-v1";
 let store={cur:null,list:[]};
 try{store=JSON.parse(localStorage.getItem(KEY))||store;}catch(e){}
@@ -797,7 +836,7 @@ else{if(!cur())store.cur=store.list[0].id;src.value=cur().text;fillSel();}
 
 function backHref(key){
   if(!key)return "./";const i=key.indexOf(":"),t=key.slice(0,i),id=encodeURIComponent(key.slice(i+1));
-  return "./"+({chapters:"#read-",side:"#side-",notes:"#note-",characters:"#char-",tools:"#tool-"}[t]?{chapters:"#read-",side:"#side-",notes:"#note-",characters:"#char-",tools:"#tool-"}[t]+id:t==="site"?"#about":"");
+  return "./"+({chapters:"#read-",side:"#side-",notes:"#note-",characters:"#char-",tools:"#tool-",glossary:"#term-"}[t]?{chapters:"#read-",side:"#side-",notes:"#note-",characters:"#char-",tools:"#tool-",glossary:"#term-"}[t]+id:t==="site"?"#about":"");
 }
 function showTarget(){
   const d=cur();$("#cmsLink").href=cmsHref(d&&d.src);$("#target").hidden=!(d&&d.src);$("#siteLink").href=backHref(d&&d.src);
@@ -1011,6 +1050,7 @@ const SRC={
   notes:{file:"notes.json",label:"文章",key:x=>x.id||x.title,field:"body",fieldLabel:"內文"},
   tools:{file:"tools.json",label:"小工具",key:x=>x.id||x.title,field:"body",fieldLabel:"介紹內文"},
   characters:{file:"characters.json",label:"角色",key:x=>x.name,field:"bio",fieldLabel:"詳細介紹"},
+  glossary:{file:"glossary.json",label:"名詞百科",key:x=>String(x.term||"").trim(),field:"body",fieldLabel:"詳細介紹"},
   site:{file:"site.json",label:"網站設定",field:"about",fieldLabel:"關於頁內容"}
 };
 async function fetchSrc(key){
@@ -1019,7 +1059,7 @@ async function fetchSrc(key){
   const t=await r.text();const data=t.trim()?JSON.parse(t):[];
   if(type==="site")return {label:"網站設定｜關於頁",field:cfg.fieldLabel,text:data[cfg.field]||""};
   const item=(Array.isArray(data)?data:[]).find(x=>x&&cfg.key(x)===id);if(!item)throw new Error("網站上找不到這篇內容");
-  return {label:`${cfg.label}｜${item.title||item.name}`,field:cfg.fieldLabel,text:item[cfg.field]||""};
+  return {label:`${cfg.label}｜${item.title||item.name||item.term}`,field:cfg.fieldLabel,text:item[cfg.field]||""};
 }
 async function openFromHash(){
   const m=location.hash.match(/^#edit=(.+)$/);if(!m)return;
