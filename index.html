@@ -335,6 +335,45 @@ body.has-bg{background:var(--paper)}
 .video-box iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
 .video-fig figcaption{font-family:var(--f-body);font-size:13px;color:var(--muted);text-align:center;margin-top:8px;text-indent:0}
 .video-fig .vlink{display:block;text-align:center;font-family:var(--f-body);font-size:13px;margin-top:6px}
+.tcards{font-family:var(--f-body);font-size:13px;color:var(--muted);margin:-4px 0 10px}
+/* 教學圖卡（左右滑動） */
+.cards{margin:28px 0 8px}
+.cards-head{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.cards-head h2{margin:0;font-size:1.15em;flex:1;min-width:0}
+.cards-count{font-family:var(--f-body);font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+.cards-fs{font:inherit;font-size:13px;padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--ink);cursor:pointer;white-space:nowrap}
+.cards-stage{position:relative}
+.cards-track{display:flex;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;overscroll-behavior-x:contain;scrollbar-width:none;-webkit-overflow-scrolling:touch;border:1px solid var(--line);border-radius:14px;background:var(--paper);outline:none;touch-action:pan-x pan-y}
+.cards-track::-webkit-scrollbar{display:none}
+.cards-track:focus-visible{box-shadow:0 0 0 2px var(--accent)}
+.cards-track.drag{scroll-snap-type:none;cursor:grabbing}
+.card-slide{flex:0 0 100%;min-width:100%;scroll-snap-align:center;scroll-snap-stop:always;margin:0;padding:14px;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:zoom-in;user-select:none;-webkit-user-select:none}
+.card-slide img{display:block;max-width:100%;max-height:min(72vh,760px);width:auto;height:auto;object-fit:contain;border-radius:8px;-webkit-user-drag:none}
+.card-slide figcaption{font-family:var(--f-body);font-size:14px;color:var(--muted);text-align:center;margin-top:10px;text-indent:0;line-height:1.6}
+.card-miss{padding:60px 20px;color:var(--muted);font-size:14px}
+.cards-nav{position:absolute;top:50%;transform:translateY(-50%);width:42px;height:42px;border-radius:50%;border:1px solid var(--line);background:var(--card);color:var(--ink);font-size:22px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(0,0,0,.18);opacity:.92;z-index:2}
+.cards-nav.prev{left:8px}.cards-nav.next{right:8px}
+.cards-nav[disabled]{opacity:0;pointer-events:none}
+.cards-dots{display:flex;justify-content:center;flex-wrap:wrap;gap:4px;margin-top:10px}
+.cards-dots button{width:22px;height:22px;padding:0;border:0;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.cards-dots button::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--line);transition:all .2s}
+.cards-dots button.on::before{background:var(--accent);width:18px;border-radius:4px}
+.cards-hint{font-family:var(--f-body);font-size:12px;color:var(--muted);text-align:center;margin-top:4px}
+@media (hover:none){.cards-nav{width:36px;height:36px;font-size:19px;opacity:.8}}
+@media (pointer:coarse){.cards-dots{gap:0}.cards-dots button{width:30px;height:30px}}
+/* 全螢幕 */
+.cards.fs{position:fixed;inset:0;z-index:300;margin:0;background:#0a0a0c;display:flex;flex-direction:column;padding:max(10px,env(safe-area-inset-top)) 10px max(10px,env(safe-area-inset-bottom));color:#eee}
+.cards.fs .cards-head h2,.cards.fs .cards-count{color:#eee}
+.cards.fs .cards-fs{color:#eee;border-color:#555}
+.cards.fs .cards-stage{flex:1;min-height:0;display:flex}
+.cards.fs .cards-track{flex:1;border:0;background:transparent;border-radius:0}
+.cards.fs .card-slide{cursor:default;padding:4px}
+.cards.fs .card-slide img{max-height:calc(100dvh - 150px);border-radius:4px}
+.cards.fs .card-slide figcaption{color:#bbb}
+.cards.fs .cards-nav{background:rgba(30,30,34,.85);color:#fff;border-color:#555}
+.cards.fs .cards-dots button::before{background:#555}.cards.fs .cards-dots button.on::before{background:#fff}
+.cards.fs .cards-hint{display:none}
+html.cards-lock,html.cards-lock body{overflow:hidden}
 .vcard{display:inline-flex;align-items:center;gap:6px}
 /* 內文插圖 */
 .rich .body-fig{margin:1.8em 0;text-indent:0}
@@ -685,7 +724,7 @@ const commOf=n=>COMM.filter(m=>(m.characters||[]).includes(n));
 const notesOf=n=>NOTES.filter(x=>(x.characters||[]).includes(n));
 const charLink=n=>charOf(n)?`<a class="tag story" href="#char-${enc(n)}">${esc(n)}</a>`:`<span class="tag">${esc(n)}</span>`;
 
-const SITE_VERSION="2026-11-17 v26";
+const SITE_VERSION="2026-11-17 v27";
 const BROKEN=[];
 async function load(){
   const files=["site.json","series.json","chapters.json","side-stories.json","characters.json","commissions.json","tools.json","notes.json","history.json"];
@@ -953,21 +992,85 @@ function renderTools(){
   const list=[...TOOLS].sort((a,b)=>{const o=(+a.order||1e9)-(+b.order||1e9);return o||String(b.date||"").localeCompare(String(a.date||""));});
   $("#tlist").innerHTML=list.map(t=>`<div class="tcard"><a class="art" href="#tool-${enc(toolId(t))}" aria-label="${esc(t.title)}">${pic(imgOf(t,"image"),"tool-"+t.title,t.title)}</a>
     <div class="tbody">${t.status?`<span class="tstat ${STAT[t.status]||""}">${esc(t.status)}</span>`:""}
-      <h3><a href="#tool-${enc(toolId(t))}">${esc(t.title)}</a></h3><p>${inline(t.summary||"")}</p>
+      <h3><a href="#tool-${enc(toolId(t))}">${esc(t.title)}</a></h3><p>${inline(t.summary||"")}</p>${(()=>{const k=cardsOf(t).length;return k?`<p class="tcards">📖 教學圖卡 ${k} 張</p>`:"";})()}
       <div class="tact">${toolLink(t,"btn")}<a class="btn ghost" href="#tool-${enc(toolId(t))}">看介紹</a></div></div></div>`).join("")||`<p style="color:var(--muted)">還沒有小工具。</p>`;
 }
 function renderTool(id){
   const t=TOOLS.find(x=>toolId(x)===id); if(!t){location.hash="tools";return;}
-  const cover=imgOf(t,"image"),csz=szOf(t.imageSize);
+  const cover=imgOf(t,"image"),csz=szOf(t.imageSize),cards=cardsOf(t);
   $("#toolPage").innerHTML=`<div class="crumb"><a href="#tools">小工具</a></div>
     <h1>${esc(t.title)}</h1>
     <div class="rtools"><span class="row">${esc(t.date||"")}${t.status?`　<span class="tstat ${STAT[t.status]||""}">${esc(t.status)}</span>`:""}</span>${shareButtons(t.title)}</div>
     ${cover?`<figure class="cover-fig${csz?" sz-"+csz:""}"><div class="art full" data-zoom="${esc(cover)}" data-cap="${esc(t.title)}" style="cursor:zoom-in">${pic(cover,"tool",t.title)}</div></figure>`:""}
     ${t.link?`<div class="tool-open">${toolLink(t,"btn")}</div>`:""}
+    ${cards.length?cardsHtml(cards,t.cardsTitle||"使用教學"):""}
     ${t.video?videoHtml(t.video,t.videoCaption||"",""):""}
     <div class="notebody rich">${blocks(t.body).join("")}</div>`;
+  initCards($("#toolPage"));
 }
 
+
+/* ---------- 教學圖卡：左右滑動 ---------- */
+function cardsOf(t){
+  const out=[];
+  (t.cards||[]).forEach(c=>{const src=imgOf(c,"image");if(src)out.push({src,cap:c.caption||""});});
+  String(t.cardUrls||"").split(/\r?\n/).forEach(line=>{
+    line=line.trim();if(!line)return;
+    const m=line.match(/^(\S+)(?:\s*[|｜]\s*(.*))?$/);if(!m)return;
+    const src=imgOf({imageUrl:m[1]},"image");if(src)out.push({src,cap:(m[2]||"").trim()});
+  });
+  return out;
+}
+function cardsHtml(list,title){
+  const n=list.length,dots=n>1&&n<=20;
+  return `<section class="cards" aria-roledescription="carousel" aria-label="${esc(title)}">
+    <div class="cards-head"><h2>${esc(title)}</h2><span class="cards-count" aria-live="polite">1 / ${n}</span><button type="button" class="cards-fs">全螢幕</button></div>
+    <div class="cards-stage">
+      ${n>1?`<button type="button" class="cards-nav prev" aria-label="上一張" disabled>‹</button>`:""}
+      <div class="cards-track" tabindex="0" aria-label="${esc(title)}，可左右滑動或用方向鍵換張">
+        ${list.map((c,i)=>`<figure class="card-slide" aria-roledescription="slide" aria-label="第 ${i+1} 張，共 ${n} 張"><img src="${esc(c.src)}" alt="${esc(c.cap||title+" 第 "+(i+1)+" 張")}" ${i<2?"":`loading="lazy"`} draggable="false" onerror="this.outerHTML='<div class=card-miss>這張圖片讀不到</div>'">${c.cap?`<figcaption>${inline(c.cap)}</figcaption>`:""}</figure>`).join("")}
+      </div>
+      ${n>1?`<button type="button" class="cards-nav next" aria-label="下一張">›</button>`:""}
+    </div>
+    ${dots?`<div class="cards-dots">${list.map((_,i)=>`<button type="button" class="${i?"":"on"}" aria-label="跳到第 ${i+1} 張"></button>`).join("")}</div>`:""}
+    ${n>1?`<div class="cards-hint">左右滑動換張・點圖片放大</div>`:""}
+  </section>`;
+}
+let cardsFsEl=null;
+function setCardsFs(box,on){
+  box.classList.toggle("fs",on);document.documentElement.classList.toggle("cards-lock",on);
+  cardsFsEl=on?box:null;box.querySelector(".cards-fs").textContent=on?"關閉 ✕":"全螢幕";
+  const k=box._cur||0;requestAnimationFrame(()=>box._go(k,false));
+  (on?box.querySelector(".cards-track"):box.querySelector(".cards-fs")).focus({preventScroll:true});
+}
+function initCards(root){
+  root.querySelectorAll(".cards").forEach(box=>{
+    const tr=box.querySelector(".cards-track"),slides=[...tr.children],n=slides.length;
+    const cnt=box.querySelector(".cards-count"),pv=box.querySelector(".prev"),nx=box.querySelector(".next"),dots=[...box.querySelectorAll(".cards-dots button")];
+    box._cur=0;
+    const show=i=>{box._cur=i;cnt.textContent=`${i+1} / ${n}`;if(pv)pv.disabled=i<=0;if(nx)nx.disabled=i>=n-1;dots.forEach((d,j)=>d.classList.toggle("on",j===i));};
+    box._go=(i,smooth=true)=>{i=Math.max(0,Math.min(n-1,i));tr.scrollTo({left:i*tr.clientWidth,behavior:smooth?"smooth":"auto"});show(i);};
+    let raf=0;tr.addEventListener("scroll",()=>{cancelAnimationFrame(raf);raf=requestAnimationFrame(()=>{const i=Math.round(tr.scrollLeft/Math.max(1,tr.clientWidth));if(i!==box._cur)show(Math.max(0,Math.min(n-1,i)));});},{passive:true});
+    if(pv)pv.onclick=()=>box._go(box._cur-1);if(nx)nx.onclick=()=>box._go(box._cur+1);
+    dots.forEach((d,j)=>d.onclick=()=>box._go(j));
+    tr.addEventListener("keydown",e=>{if(e.key==="ArrowRight"){e.preventDefault();box._go(box._cur+1);}else if(e.key==="ArrowLeft"){e.preventDefault();box._go(box._cur-1);}else if(e.key==="Home"){e.preventDefault();box._go(0);}else if(e.key==="End"){e.preventDefault();box._go(n-1);}});
+    box.querySelector(".cards-fs").onclick=()=>setCardsFs(box,!box.classList.contains("fs"));
+    /* 滑鼠拖曳（電腦） */
+    let sx=0,sl=0,moved=false,down=false;
+    tr.addEventListener("pointerdown",e=>{if(e.pointerType!=="mouse"||e.button)return;down=true;moved=false;sx=e.clientX;sl=tr.scrollLeft;});
+    addEventListener("pointermove",e=>{if(!down)return;const dx=e.clientX-sx;if(Math.abs(dx)>5){moved=true;tr.classList.add("drag");}if(moved)tr.scrollLeft=sl-dx;});
+    addEventListener("pointerup",e=>{if(!down)return;down=false;if(!moved)return;tr.classList.remove("drag");const dx=e.clientX-sx,w=tr.clientWidth;let i=Math.round(sl/w);if(dx<-w*.12)i++;else if(dx>w*.12)i--;box._go(i);});
+    tr.addEventListener("click",e=>{if(moved){moved=false;e.preventDefault();return;}if(e.target.closest(".card-slide")&&!box.classList.contains("fs"))setCardsFs(box,true);});
+    let rt;addEventListener("resize",()=>{clearTimeout(rt);rt=setTimeout(()=>{if(box.isConnected)box._go(box._cur,false);},120);});
+  });
+}
+document.addEventListener("keydown",e=>{
+  if(!cardsFsEl)return;
+  if(e.key==="Escape"){e.stopImmediatePropagation();setCardsFs(cardsFsEl,false);}
+  else if(e.key==="ArrowRight"&&!e.target.closest(".cards-track")){cardsFsEl._go(cardsFsEl._cur+1);}
+  else if(e.key==="ArrowLeft"&&!e.target.closest(".cards-track")){cardsFsEl._go(cardsFsEl._cur-1);}
+},true);
+addEventListener("hashchange",()=>{if(cardsFsEl){cardsFsEl.classList.remove("fs");cardsFsEl=null;}document.documentElement.classList.remove("cards-lock");});
 /* ---------- 文章 ---------- */
 let curCat="全部";
 const noteCard=n=>`<a class="ncard" href="#note-${enc(chId(n))}"><time>${esc(n.date)}</time><div><span class="tag cat">${esc(n.category)}</span><h3>${esc(n.title)}${badge(n)}</h3><p>${locked(n)?"成人內容，點進去確認年齡後閱讀。":esc(plain(n.excerpt))}</p></div></a>`;

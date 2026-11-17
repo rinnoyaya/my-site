@@ -340,6 +340,45 @@ body.has-bg{background:var(--paper)}
 .video-box iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
 .video-fig figcaption{font-family:var(--f-body);font-size:13px;color:var(--muted);text-align:center;margin-top:8px;text-indent:0}
 .video-fig .vlink{display:block;text-align:center;font-family:var(--f-body);font-size:13px;margin-top:6px}
+.tcards{font-family:var(--f-body);font-size:13px;color:var(--muted);margin:-4px 0 10px}
+/* 教學圖卡（左右滑動） */
+.cards{margin:28px 0 8px}
+.cards-head{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.cards-head h2{margin:0;font-size:1.15em;flex:1;min-width:0}
+.cards-count{font-family:var(--f-body);font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+.cards-fs{font:inherit;font-size:13px;padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--ink);cursor:pointer;white-space:nowrap}
+.cards-stage{position:relative}
+.cards-track{display:flex;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;overscroll-behavior-x:contain;scrollbar-width:none;-webkit-overflow-scrolling:touch;border:1px solid var(--line);border-radius:14px;background:var(--paper);outline:none;touch-action:pan-x pan-y}
+.cards-track::-webkit-scrollbar{display:none}
+.cards-track:focus-visible{box-shadow:0 0 0 2px var(--accent)}
+.cards-track.drag{scroll-snap-type:none;cursor:grabbing}
+.card-slide{flex:0 0 100%;min-width:100%;scroll-snap-align:center;scroll-snap-stop:always;margin:0;padding:14px;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:zoom-in;user-select:none;-webkit-user-select:none}
+.card-slide img{display:block;max-width:100%;max-height:min(72vh,760px);width:auto;height:auto;object-fit:contain;border-radius:8px;-webkit-user-drag:none}
+.card-slide figcaption{font-family:var(--f-body);font-size:14px;color:var(--muted);text-align:center;margin-top:10px;text-indent:0;line-height:1.6}
+.card-miss{padding:60px 20px;color:var(--muted);font-size:14px}
+.cards-nav{position:absolute;top:50%;transform:translateY(-50%);width:42px;height:42px;border-radius:50%;border:1px solid var(--line);background:var(--card);color:var(--ink);font-size:22px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(0,0,0,.18);opacity:.92;z-index:2}
+.cards-nav.prev{left:8px}.cards-nav.next{right:8px}
+.cards-nav[disabled]{opacity:0;pointer-events:none}
+.cards-dots{display:flex;justify-content:center;flex-wrap:wrap;gap:4px;margin-top:10px}
+.cards-dots button{width:22px;height:22px;padding:0;border:0;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.cards-dots button::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--line);transition:all .2s}
+.cards-dots button.on::before{background:var(--accent);width:18px;border-radius:4px}
+.cards-hint{font-family:var(--f-body);font-size:12px;color:var(--muted);text-align:center;margin-top:4px}
+@media (hover:none){.cards-nav{width:36px;height:36px;font-size:19px;opacity:.8}}
+@media (pointer:coarse){.cards-dots{gap:0}.cards-dots button{width:30px;height:30px}}
+/* 全螢幕 */
+.cards.fs{position:fixed;inset:0;z-index:300;margin:0;background:#0a0a0c;display:flex;flex-direction:column;padding:max(10px,env(safe-area-inset-top)) 10px max(10px,env(safe-area-inset-bottom));color:#eee}
+.cards.fs .cards-head h2,.cards.fs .cards-count{color:#eee}
+.cards.fs .cards-fs{color:#eee;border-color:#555}
+.cards.fs .cards-stage{flex:1;min-height:0;display:flex}
+.cards.fs .cards-track{flex:1;border:0;background:transparent;border-radius:0}
+.cards.fs .card-slide{cursor:default;padding:4px}
+.cards.fs .card-slide img{max-height:calc(100dvh - 150px);border-radius:4px}
+.cards.fs .card-slide figcaption{color:#bbb}
+.cards.fs .cards-nav{background:rgba(30,30,34,.85);color:#fff;border-color:#555}
+.cards.fs .cards-dots button::before{background:#555}.cards.fs .cards-dots button.on::before{background:#fff}
+.cards.fs .cards-hint{display:none}
+html.cards-lock,html.cards-lock body{overflow:hidden}
 .vcard{display:inline-flex;align-items:center;gap:6px}
 /* 內文插圖 */
 .rich .body-fig{margin:1.8em 0;text-indent:0}
