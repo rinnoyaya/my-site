@@ -137,6 +137,16 @@ content:
         - 小
         - 大
         - 特大
+    - name: indent
+      label: 段落縮排
+      type: select
+      description: 只影響這一篇。不選或選「跟隨網站設定」，就照「外觀」裡的整體設定
+      options:
+        values:
+        - 跟隨網站設定
+        - 不縮排
+        - 每一行都縮排
+        - 只有段落第一行縮排
   - name: side
     label: 角色故事
     description: 主線以外，以某個角色為主角的短篇與番外。
@@ -246,6 +256,16 @@ content:
         - 小
         - 大
         - 特大
+    - name: indent
+      label: 段落縮排
+      type: select
+      description: 只影響這一篇。不選或選「跟隨網站設定」，就照「外觀」裡的整體設定
+      options:
+        values:
+        - 跟隨網站設定
+        - 不縮排
+        - 每一行都縮排
+        - 只有段落第一行縮排
   - name: series
     label: 故事系列
     description: 一部作品就是一個系列。先建立系列，再到「故事章節」新增章節。
@@ -845,6 +865,16 @@ content:
       - 小
       - 大
       - 特大
+  - name: indent
+    label: 段落縮排
+    type: select
+    description: 只影響這一篇。不選或選「跟隨網站設定」，就照「外觀」裡的整體設定
+    options:
+      values:
+      - 跟隨網站設定
+      - 不縮排
+      - 每一行都縮排
+      - 只有段落第一行縮排
 - name: g-site
   label: 網站設定
   type: group
