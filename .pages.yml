@@ -727,6 +727,28 @@ content:
     label: 按鈕文字
     type: string
     description: 留空會顯示「開啟工具」
+  - name: cardsTitle
+    label: 教學圖卡標題
+    type: string
+    description: 顯示在圖卡上方，留空會顯示「使用教學」
+  - name: cardUrls
+    label: 教學圖卡（一次貼上多張）
+    type: text
+    description: 一行一張圖片網址，照順序排成可以左右滑的圖卡。可以在上傳頁按「複製全部網址」直接整批貼上。要加說明就在網址後面寫「 | 說明」，例如 https://img.obsidianfirelight.com/xxx.png | 第一步：建立委託
+  - name: cards
+    label: 教學圖卡（逐張新增）
+    type: object
+    list: true
+    description: 想一張一張加、拖曳調整順序時用這裡；會排在上面整批貼上的圖卡前面
+    fields:
+    - name: imageUrl
+      label: 圖片網址
+      type: string
+      description: 貼上 R2 圖片網址
+    - name: caption
+      label: 說明
+      type: string
+      description: 顯示在這張圖卡下方，可留空
   - name: video
     label: 介紹影片網址
     type: string
