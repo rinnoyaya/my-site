@@ -64,6 +64,7 @@ def main():
             json.dump(items, fh, ensure_ascii=False, indent=1)
         print(f"[完成] content/{folder} → data/{outname}（{len(items)} 筆）")
     warnings += build_share_pages()
+    inject_home_meta()
     print(f"建置完成，警告 {warnings} 個")
 
 # ---------------- 分享頁 ----------------
@@ -179,6 +180,32 @@ def build_share_pages():
             count += 1
     print(f"[完成] 產生分享頁 {count} 個")
     return warnings
+
+# 首頁的標題和社群預覽資訊（原本固定是「我的網站」）
+def inject_home_meta():
+    path = os.path.join(OUT, "index.html")
+    try:
+        site = json.load(open(os.path.join(OUT, "data", "site.json"), encoding="utf-8"))
+        page = open(path, encoding="utf-8").read()
+    except Exception:
+        return
+    origin = site_origin()
+    e = lambda v: html.escape(str(v), quote=True)
+    name = site.get("siteName") or "我的網站"
+    desc = plain(site.get("heroText") or site.get("heroEyebrow") or "", 150) or name
+    image = absolute(img_of(site, "heroImage"), origin) or origin + "/icon.png"
+    meta = f"""<title>{e(name)}</title>
+<meta name="description" content="{e(desc)}">
+<meta property="og:site_name" content="{e(name)}">
+<meta property="og:type" content="website">
+<meta property="og:title" content="{e(name)}">
+<meta property="og:description" content="{e(desc)}">
+<meta property="og:url" content="{e(origin)}/">
+<meta property="og:image" content="{e(image)}">
+<meta name="twitter:card" content="summary_large_image">"""
+    page = re.sub(r"<title>.*?</title>", lambda m: meta, page, count=1, flags=re.S)
+    open(path, "w", encoding="utf-8").write(page)
+    print("[完成] 首頁標題與預覽資訊")
 
 if __name__ == "__main__":
     sys.exit(main())
