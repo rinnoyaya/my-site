@@ -305,6 +305,26 @@ body.has-bg{background:var(--paper)}
 .grid{align-items:start}
 @media (max-width:720px){.hero.hs-s,.hero.hs-l{grid-template-columns:1fr}.series.cs-s,.series.cs-l{grid-template-columns:1fr}}
 @media (max-width:560px){.char-hero.av-s,.char-hero.av-l{grid-template-columns:1fr}.char-hero.av-l .art{width:160px;height:160px}}
+/* 小工具 */
+.tlist{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;align-items:start}
+.tcard{background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden;display:flex;flex-direction:column}
+.tcard .art{aspect-ratio:16/9}
+.tcard .tbody{padding:14px 16px 16px;display:flex;flex-direction:column;gap:8px;flex:1}
+.tcard h3{font-size:20px}
+.tcard h3 a{color:var(--ink)}
+.tcard p{margin:0;color:var(--muted);font-size:15px}
+.tcard .tact{display:flex;gap:8px;flex-wrap:wrap;margin-top:auto;padding-top:6px}
+.tstat{font-size:12px;padding:1px 8px;border-radius:99px;border:1px solid var(--line);color:var(--muted);align-self:flex-start}
+.tstat.on{color:var(--c-green);border-color:var(--c-green)}
+.tstat.dev{color:var(--c-orange);border-color:var(--c-orange)}
+.tool-open{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:0 0 26px}
+.tool-open .btn{font-size:16px;padding:11px 22px}
+/* 分享 */
+.share{display:inline-flex;gap:6px;flex-wrap:wrap}
+.share .tbtn{display:inline-flex;align-items:center;gap:4px}
+.share-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
+.site-toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:9px 18px;border-radius:99px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:40;max-width:90vw;text-align:center}
+.site-toast.on{opacity:1}
 /* 內文插圖 */
 .rich .body-fig{margin:1.8em 0;text-indent:0}
 .rich .body-fig .art{border-radius:10px;overflow:hidden;cursor:zoom-in}
@@ -647,7 +667,7 @@ const $=s=>document.querySelector(s);
 /* ---------- 寫作小幫手 ---------- */
 /* 後台網址：app.pagescms.org/帳號/repo/分支 */
 const CMS="https://app.pagescms.org/rinnoyaya/my-site/main";
-function cmsHref(key){const t=key?key.slice(0,key.indexOf(":")):"";const m={chapters:"chapters",side:"side",notes:"notes",characters:"characters"}[t];return CMS+(m?"/collection/"+m:"/file/site");}
+function cmsHref(key){const t=key?key.slice(0,key.indexOf(":")):"";const m={chapters:"chapters",side:"side",notes:"notes",characters:"characters",tools:"tools"}[t];return CMS+(m?"/collection/"+m:"/file/site");}
 const src=$("#src"),KEY="writer-drafts-v1";
 let store={cur:null,list:[]};
 try{store=JSON.parse(localStorage.getItem(KEY))||store;}catch(e){}
@@ -665,7 +685,7 @@ else{if(!cur())store.cur=store.list[0].id;src.value=cur().text;fillSel();}
 
 function backHref(key){
   if(!key)return "./";const i=key.indexOf(":"),t=key.slice(0,i),id=encodeURIComponent(key.slice(i+1));
-  return "./"+({chapters:"#read-",side:"#side-",notes:"#note-",characters:"#char-"}[t]?{chapters:"#read-",side:"#side-",notes:"#note-",characters:"#char-"}[t]+id:t==="site"?"#about":"");
+  return "./"+({chapters:"#read-",side:"#side-",notes:"#note-",characters:"#char-",tools:"#tool-"}[t]?{chapters:"#read-",side:"#side-",notes:"#note-",characters:"#char-",tools:"#tool-"}[t]+id:t==="site"?"#about":"");
 }
 function showTarget(){
   const d=cur();$("#cmsLink").href=cmsHref(d&&d.src);$("#target").hidden=!(d&&d.src);$("#siteLink").href=backHref(d&&d.src);
@@ -853,6 +873,7 @@ const SRC={
   chapters:{file:"chapters.json",label:"故事章節",key:x=>x.id||x.title,field:"body",fieldLabel:"內文"},
   side:{file:"side-stories.json",label:"角色故事",key:x=>x.id||x.title,field:"body",fieldLabel:"內文"},
   notes:{file:"notes.json",label:"文章",key:x=>x.id||x.title,field:"body",fieldLabel:"內文"},
+  tools:{file:"tools.json",label:"小工具",key:x=>x.id||x.title,field:"body",fieldLabel:"介紹內文"},
   characters:{file:"characters.json",label:"角色",key:x=>x.name,field:"bio",fieldLabel:"詳細介紹"},
   site:{file:"site.json",label:"網站設定",field:"about",fieldLabel:"關於頁內容"}
 };

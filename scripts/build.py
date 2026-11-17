@@ -13,7 +13,7 @@ COLLECTIONS = {
     "side-stories": ("side-stories.json", lambda x, f: str(x.get("date") or ""), False),
     "characters": ("characters.json", lambda x, f: (num(x.get("order")), str(x.get("name") or "")), False),
     "commissions": ("commissions.json", lambda x, f: str(x.get("date") or ""), False),
-    "gallery": ("gallery.json", lambda x, f: str(x.get("date") or ""), False),
+    "tools": ("tools.json", lambda x, f: (num(x.get("order")), str(x.get("date") or "")), False),
     "notes": ("notes.json", lambda x, f: str(x.get("date") or ""), False),
     # 網站歷程：新的在上面；同一天的話，後新增的（檔名較大）在上面
     "history": ("history.json", lambda x, f: (str(x.get("date") or ""), f), True),
@@ -75,6 +75,7 @@ SHARE_TYPES = [
     ("side-stories.json", "side", "side-", "id", "title", "body", "image"),
     ("notes.json", "note", "note-", "id", "title", "excerpt", None),
     ("characters.json", "char", "char-", "name", "name", "summary", "avatar"),
+    ("tools.json", "tool", "tool-", "id", "title", "summary", "image"),
 ]
 SAFE_SLUG = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
 

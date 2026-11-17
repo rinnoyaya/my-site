@@ -300,6 +300,20 @@ body.has-bg{background:var(--paper)}
 .grid{align-items:start}
 @media (max-width:720px){.hero.hs-s,.hero.hs-l{grid-template-columns:1fr}.series.cs-s,.series.cs-l{grid-template-columns:1fr}}
 @media (max-width:560px){.char-hero.av-s,.char-hero.av-l{grid-template-columns:1fr}.char-hero.av-l .art{width:160px;height:160px}}
+/* 小工具 */
+.tlist{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;align-items:start}
+.tcard{background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden;display:flex;flex-direction:column}
+.tcard .art{aspect-ratio:16/9}
+.tcard .tbody{padding:14px 16px 16px;display:flex;flex-direction:column;gap:8px;flex:1}
+.tcard h3{font-size:20px}
+.tcard h3 a{color:var(--ink)}
+.tcard p{margin:0;color:var(--muted);font-size:15px}
+.tcard .tact{display:flex;gap:8px;flex-wrap:wrap;margin-top:auto;padding-top:6px}
+.tstat{font-size:12px;padding:1px 8px;border-radius:99px;border:1px solid var(--line);color:var(--muted);align-self:flex-start}
+.tstat.on{color:var(--c-green);border-color:var(--c-green)}
+.tstat.dev{color:var(--c-orange);border-color:var(--c-orange)}
+.tool-open{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:0 0 26px}
+.tool-open .btn{font-size:16px;padding:11px 22px}
 /* 分享 */
 .share{display:inline-flex;gap:6px;flex-wrap:wrap}
 .share .tbtn{display:inline-flex;align-items:center;gap:4px}
@@ -366,7 +380,7 @@ footer{border-top:1px solid var(--line);color:var(--muted);font-size:13px;text-a
       <a href="#side">角色故事</a>
       <a href="#characters">角色</a>
       <a href="#commissions">委託圖</a>
-      <a href="#gallery">插圖</a>
+      <a href="#tools">小工具</a>
       <a href="#notes">文章</a>
       <a href="#about">關於</a>
     </nav>
@@ -436,11 +450,15 @@ footer{border-top:1px solid var(--line);color:var(--muted);font-size:13px;text-a
     <ul class="artists" id="artists"></ul>
   </section>
 
-  <section class="view" id="v-gallery">
-    <div class="eyebrow">插圖</div>
-    <h1 style="font-size:32px;margin:4px 0 18px">自繪插圖</h1>
-    <div class="filters" id="filters"></div>
-    <div class="grid" id="grid"></div>
+  <section class="view" id="v-tools">
+    <div class="eyebrow">小工具</div>
+    <h1 style="font-size:32px;margin:4px 0 8px">小工具</h1>
+    <p style="color:var(--muted);margin:0 0 18px">我自己做來用的小工具，也開放給大家使用。</p>
+    <div class="tlist" id="tlist"></div>
+  </section>
+
+  <section class="view" id="v-tool">
+    <article class="reader" id="toolPage"></article>
   </section>
 
   <section class="view" id="v-notes">
@@ -614,7 +632,7 @@ function placeholder(key){
 const imgOf=(x,f)=>x?String(x[f+"Url"]||x[f]||"").trim():"";
 const pic=(src,key,alt)=>src?`<img src="${esc(src)}" alt="${esc(alt||"")}" loading="lazy">`:placeholder(key);
 
-let SITE={},SERIES=[],CHAPTERS=[],SIDE=[],CHARS=[],COMM=[],ART=[],NOTES=[],HISTORY=[];
+let SITE={},SERIES=[],CHAPTERS=[],SIDE=[],CHARS=[],COMM=[],TOOLS=[],NOTES=[],HISTORY=[];
 const byDateDesc=(a,b)=>String(b.date||"").localeCompare(String(a.date||""));
 const chId=c=>c.id||c.title;
 const charOf=n=>CHARS.find(h=>h.name===n);
@@ -625,11 +643,11 @@ const commOf=n=>COMM.filter(m=>(m.characters||[]).includes(n));
 const notesOf=n=>NOTES.filter(x=>(x.characters||[]).includes(n));
 const charLink=n=>charOf(n)?`<a class="tag story" href="#char-${enc(n)}">${esc(n)}</a>`:`<span class="tag">${esc(n)}</span>`;
 
-const SITE_VERSION="2026-11-17 v24";
+const SITE_VERSION="2026-11-17 v25";
 const BROKEN=[];
 async function load(){
-  const files=["site.json","series.json","chapters.json","side-stories.json","characters.json","commissions.json","gallery.json","notes.json","history.json"];
-  const optional=["history.json"];
+  const files=["site.json","series.json","chapters.json","side-stories.json","characters.json","commissions.json","tools.json","notes.json","history.json"];
+  const optional=["history.json","tools.json"];
   const get=async f=>{
     const empty=f==="site.json"?{}:[];
     try{
@@ -642,7 +660,7 @@ async function load(){
       return f==="site.json"?d:d.filter(x=>x&&typeof x==="object");
     }catch(e){BROKEN.push({f,msg:e.message});return empty;}
   };
-  [SITE,SERIES,CHAPTERS,SIDE,CHARS,COMM,ART,NOTES,HISTORY]=await Promise.all(files.map(get));
+  [SITE,SERIES,CHAPTERS,SIDE,CHARS,COMM,TOOLS,NOTES,HISTORY]=await Promise.all(files.map(get));
 }
 
 /* ---------- 網站資訊、首頁 ---------- */
@@ -723,7 +741,8 @@ function renderSite(){
     ...CHAPTERS.map(c=>({d:c.date,t:"故事",cls:"story",txt:`${c.series}・${c.title}`,href:"#read-"+enc(chId(c)),x:c})),
     ...SIDE.map(c=>({d:c.date,t:"角色故事",cls:"story",txt:`${c.character}・${c.title}`,href:"#side-"+enc(chId(c)),x:c})),
     ...COMM.map(m=>({d:m.date,t:"委託圖",cls:"warm",txt:`〈${m.title}〉繪師：${m.artist}`,href:"#commissions",x:m})),
-    ...NOTES.map(n=>({d:n.date,t:"文章",cls:"",txt:n.title,href:"#note-"+enc(chId(n)),x:n}))
+    ...NOTES.map(n=>({d:n.date,t:"文章",cls:"",txt:n.title,href:"#note-"+enc(chId(n)),x:n})),
+    ...TOOLS.map(t=>({d:t.date,t:"小工具",cls:"",txt:t.title,href:"#tool-"+enc(toolId(t)),x:t}))
   ].filter(u=>u.d).sort((a,b)=>b.d.localeCompare(a.d)).slice(0,6);
   $("#updates").innerHTML=ups.map(u=>`<li><time>${esc(u.d)}</time><span class="tag ${u.cls}">${u.t}</span><a href="${u.href}">${esc(u.txt)}</a>${badge(u.x)}</li>`).join("");
 }
@@ -757,7 +776,7 @@ async function tryUnlock(){
   ADULT_OK=true;
   try{sessionStorage.setItem("adult-ok","1");if($("#gateRemember").checked)localStorage.setItem("adult-until",String(Date.now()+30*864e5));}catch(e){}
   $("#gate").classList.remove("on");
-  renderSite();renderSeries();renderSide();renderChars();renderComm();renderGallery();renderNotes();
+  renderSite();renderSeries();renderSide();renderChars();renderComm();renderTools();renderNotes();
   const cb=gateCb;gateCb=null;if(cb)cb();
 }
 $("#gateYes").onclick=tryUnlock;
@@ -882,17 +901,26 @@ function renderComm(){
   bindComm($("#cgrid"));
 }
 
-/* ---------- 自繪插圖 ---------- */
-let curTag="全部";
-function renderGallery(){
-  const tags=["全部",...new Set(ART.flatMap(a=>a.tags||[]))];
-  $("#filters").innerHTML=tags.map(t=>`<button type="button" class="chip${t===curTag?" on":""}" data-t="${esc(t)}">${esc(t)}</button>`).join("");
-  $("#filters").querySelectorAll(".chip").forEach(b=>b.onclick=()=>{curTag=b.dataset.t;renderGallery();});
-  const items=ART.filter(a=>curTag==="全部"||(a.tags||[]).includes(curTag)).sort(byDateDesc);
-  $("#grid").innerHTML=items.map(a=>`<button type="button" class="piece${a.imageSize==="加大"?" wide":""}" data-i="${ART.indexOf(a)}"><div class="art">${locked(a)?lockedThumb(imgOf(a,"image"),"art-"+a.title,a.title):pic(imgOf(a,"image"),"art-"+a.title,a.title)}</div><div class="cap"><b>${esc(a.title)}${badge(a)}</b><small>${esc(a.date)}</small></div></button>`).join("");
-  $("#grid").querySelectorAll(".piece").forEach(b=>b.onclick=()=>{const a=ART[+b.dataset.i];
-    if(locked(a)){const i=b.dataset.i;openGate(()=>{setTimeout(()=>{const t=document.querySelector(`#grid [data-i="${i}"]`);if(t)t.click();},50);});return;}
-    openLb(pic(imgOf(a,"image"),"art-"+a.title,a.title),a.title,a.description,`<span class="tag">${esc(a.date)}</span>`+(a.tags||[]).map(t=>`<span class="tag story">${esc(t)}</span>`).join(""));});
+/* ---------- 小工具 ---------- */
+const toolId=t=>t.id||t.title;
+const STAT={"使用中":"on","開發中":"dev"};
+const toolLink=(t,cls)=>t.link?`<a class="${cls}" href="${esc(/^(https?:\/\/|\/|#)/i.test(t.link)?t.link:"https://"+t.link)}" target="_blank" rel="noopener">${esc(t.linkLabel||"開啟工具")} ↗</a>`:"";
+function renderTools(){
+  const list=[...TOOLS].sort((a,b)=>{const o=(+a.order||1e9)-(+b.order||1e9);return o||String(b.date||"").localeCompare(String(a.date||""));});
+  $("#tlist").innerHTML=list.map(t=>`<div class="tcard"><a class="art" href="#tool-${enc(toolId(t))}" aria-label="${esc(t.title)}">${pic(imgOf(t,"image"),"tool-"+t.title,t.title)}</a>
+    <div class="tbody">${t.status?`<span class="tstat ${STAT[t.status]||""}">${esc(t.status)}</span>`:""}
+      <h3><a href="#tool-${enc(toolId(t))}">${esc(t.title)}</a></h3><p>${inline(t.summary||"")}</p>
+      <div class="tact">${toolLink(t,"btn")}<a class="btn ghost" href="#tool-${enc(toolId(t))}">看介紹</a></div></div></div>`).join("")||`<p style="color:var(--muted)">還沒有小工具。</p>`;
+}
+function renderTool(id){
+  const t=TOOLS.find(x=>toolId(x)===id); if(!t){location.hash="tools";return;}
+  const cover=imgOf(t,"image"),csz=szOf(t.imageSize);
+  $("#toolPage").innerHTML=`<div class="crumb"><a href="#tools">小工具</a></div>
+    <h1>${esc(t.title)}</h1>
+    <div class="rtools"><span class="row">${esc(t.date||"")}${t.status?`　<span class="tstat ${STAT[t.status]||""}">${esc(t.status)}</span>`:""}</span>${shareButtons(t.title)}</div>
+    ${cover?`<figure class="cover-fig${csz?" sz-"+csz:""}"><div class="art full" data-zoom="${esc(cover)}" data-cap="${esc(t.title)}" style="cursor:zoom-in">${pic(cover,"tool",t.title)}</div></figure>`:""}
+    ${t.link?`<div class="tool-open">${toolLink(t,"btn")}</div>`:""}
+    <div class="notebody rich">${blocks(t.body).join("")}</div>`;
 }
 
 /* ---------- 文章 ---------- */
@@ -927,12 +955,13 @@ let stT;function siteToast(m){const t=$("#siteToast");t.textContent=m;t.classLis
 function shareUrl(){
   let h=location.hash.slice(1);try{h=decodeURIComponent(h);}catch(e){}
   const ok=v=>/^[A-Za-z0-9][A-Za-z0-9._-]*$/.test(String(v||""));
-  const m=h.match(/^(read|side|note|char)-(.+)$/);
+  const m=h.match(/^(read|side|note|char|tool)-(.+)$/);
   if(m){
     let slug="";
     if(m[1]==="read"){const c=CHAPTERS.find(x=>chId(x)===m[2]);slug=c&&(c.id||c._file);}
     else if(m[1]==="side"){const c=SIDE.find(x=>chId(x)===m[2]);slug=c&&(c.id||c._file);}
     else if(m[1]==="note"){const n=NOTES.find(x=>chId(x)===m[2]);slug=n&&(n.id||n._file);}
+    else if(m[1]==="tool"){const t=TOOLS.find(x=>toolId(x)===m[2]);slug=t&&(t.id||t._file);}
     else {const c=charOf(m[2]);slug=c&&c._file;}
     if(ok(slug))return `${location.origin}/s/${m[1]}/${slug}/`;
   }
@@ -969,15 +998,15 @@ document.addEventListener("keydown",e=>{if(e.key==="Escape"){closeLb();$("#gate"
 let OWNER=false;try{OWNER=localStorage.getItem("owner-mode")==="1";}catch(e){}
 /* 後台網址：app.pagescms.org/帳號/repo/分支 */
 const CMS="https://app.pagescms.org/rinnoyaya/my-site/main";
-const CMS_ENTRIES=[["site","網站設定"],["history","網站歷程"],["series","故事系列"],["chapters","故事章節"],["side","角色故事"],["characters","角色"],["commissions","委託圖"],["gallery","自繪插圖"],["notes","文章"]];
-const CMS_COLLECTIONS=["history","series","chapters","side","characters","commissions","gallery","notes"];
+const CMS_ENTRIES=[["site","網站設定"],["history","網站歷程"],["series","故事系列"],["chapters","故事章節"],["side","角色故事"],["characters","角色"],["commissions","委託圖"],["tools","小工具"],["notes","文章"]];
+const CMS_COLLECTIONS=["history","series","chapters","side","characters","commissions","tools","notes"];
 const cmsUrl=name=>CMS+(CMS_COLLECTIONS.includes(name)?"/collection/":"/file/")+name;
 function updateFab(pre,arg,v){
   const box=$("#owner");if(!OWNER){box.hidden=true;return;}
-  const map={"read-":"chapters","side-":"side","note-":"notes","char-":"characters"};
+  const map={"read-":"chapters","side-":"side","note-":"notes","char-":"characters","tool-":"tools"};
   let key=pre&&map[pre]?map[pre]+":"+arg:v==="about"?"site:about":"";
-  if(key&&pre!=="char-"){const pool=pre==="read-"?CHAPTERS:pre==="side-"?SIDE:NOTES;if(!pool.find(x=>chId(x)===arg))key="";}
-  const viewEntry={stories:"series",side:"side",characters:"characters",commissions:"commissions",gallery:"gallery",notes:"notes",about:"site",home:"site"};
+  if(key&&pre!=="char-"){const pool=pre==="read-"?CHAPTERS:pre==="side-"?SIDE:pre==="tool-"?TOOLS:NOTES;if(!pool.find(x=>chId(x)===arg))key="";}
+  const viewEntry={stories:"series",side:"side",characters:"characters",commissions:"commissions",tools:"tools",notes:"notes",about:"site",home:"site"};
   const entry=pre?map[pre]:viewEntry[v];
   const name=(CMS_ENTRIES.find(e=>e[0]===entry)||[])[1];
   const ext=' target="_blank" rel="noopener"';
@@ -996,19 +1025,20 @@ $("#omenu").addEventListener("click",e=>{if(e.target.closest("a"))closeOwner();}
 /* ---------- 換頁 ---------- */
 function route(){
   let h="home";try{h=decodeURIComponent(location.hash.slice(1))||"home";}catch(e){}
-  const pre=["read-","side-","char-","note-"].find(p=>h.startsWith(p));
+  const pre=["read-","side-","char-","note-","tool-"].find(p=>h.startsWith(p));
   const arg=pre?h.slice(pre.length):"";
-  let v=pre==="read-"?"read":pre==="side-"?"read":pre==="char-"?"char":pre==="note-"?"note":h;
+  let v=pre==="read-"?"read":pre==="side-"?"read":pre==="char-"?"char":pre==="note-"?"note":pre==="tool-"?"tool":h;
   if(!document.getElementById("v-"+v))v="home";
   closeLb();
   document.querySelectorAll(".view").forEach(x=>x.classList.toggle("on",x.id==="v-"+v));
-  const navKey=pre==="read-"?"stories":pre==="side-"?"side":pre==="char-"?"characters":pre==="note-"?"notes":v;
+  const navKey=pre==="read-"?"stories":pre==="side-"?"side":pre==="char-"?"characters":pre==="note-"?"notes":pre==="tool-"?"tools":v;
   document.querySelectorAll("#nav a").forEach(a=>a.classList.toggle("on",a.getAttribute("href")==="#"+navKey));
   const on=$("#nav a.on");if(on&&$("#nav").scrollWidth>$("#nav").clientWidth)$("#nav").scrollTo({left:on.offsetLeft-$("#nav").clientWidth/2+on.offsetWidth/2});
   if(pre==="read-")renderReader(arg,false);
   if(pre==="side-")renderReader(arg,true);
   if(pre==="char-")renderCharPage(arg);
   if(pre==="note-")renderNote(arg);
+  if(pre==="tool-")renderTool(arg);
   updateFab(pre,arg,v);
   window.scrollTo(0,0);
 }
@@ -1021,7 +1051,7 @@ load().then(()=>{
     document.querySelector("main").prepend(w);
   }
   setFs(0);
-  renderSite();renderHistory();renderSeries();renderSide();renderChars();renderComm();renderGallery();renderNotes();
+  renderSite();renderHistory();renderSeries();renderSide();renderChars();renderComm();renderTools();renderNotes();
   addEventListener("hashchange",route);route();
 }).catch(err=>{
   $("#loading").textContent="內容載入失敗："+err.message+"。請確認 data 資料夾裡的檔案都在，而且格式正確。";
