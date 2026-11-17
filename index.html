@@ -221,9 +221,6 @@ main{max-width:1040px;margin:0 auto;padding:28px 20px 64px}
 .ctype{position:absolute;top:8px;left:8px;background:rgba(10,12,20,.7);color:#fff;font-size:12px;padding:1px 8px;border-radius:99px}
 .piece .artwrap{position:relative}
 .piece .who{display:flex;gap:4px;flex-wrap:wrap;margin-top:6px}
-.artists{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
-.artists li{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px;display:flex;justify-content:space-between;gap:10px;align-items:baseline}
-.artists small{color:var(--muted)}
 
 /* 角色故事 */
 .slist{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
@@ -288,26 +285,7 @@ body:has(.owner:not([hidden])) footer{padding-bottom:76px}
 .wm-on .art:has(img)::after,.wm-on #heroArt:has(img)::after{content:"";position:absolute;inset:0;pointer-events:none;background-image:var(--wm);background-repeat:repeat;z-index:1}
 .wm-on .blurred::after{display:none}
 /* 成人內容 */
-.rss-btn{font:inherit;font-size:inherit;color:var(--accent);background:none;border:0;padding:4px 0;cursor:pointer}
 .new-badge{display:inline-block;font-family:var(--f-body);font-size:10.5px;font-weight:700;color:var(--card);background:var(--lamp);border-radius:4px;padding:0 5px;margin-left:6px;vertical-align:middle;line-height:1.7;letter-spacing:.04em}
-.chlist li.seen a>span{color:var(--muted)}
-.chlist li.seen a>span::after{content:"✓";margin-left:6px;font-size:12px;color:var(--muted)}
-.seen-mark{font-size:12px;color:var(--muted);margin-left:6px;font-weight:400}
-/* 繼續閱讀 */
-.continue{display:flex;align-items:center;gap:14px;margin:26px 0 0;padding:14px 16px;border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink)}
-.continue:hover{text-decoration:none;border-color:var(--accent)}
-.continue .cv-ic{flex:none;width:38px;height:38px;border-radius:50%;background:var(--accent);color:var(--card);display:flex;align-items:center;justify-content:center;font-size:16px}
-.continue .cv-t{flex:1;min-width:0}
-.continue small{display:block;color:var(--muted);font-size:12.5px}
-.continue b{display:block;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.continue .cv-bar{height:4px;border-radius:2px;background:var(--line);margin-top:6px;overflow:hidden}
-.continue .cv-bar i{display:block;height:100%;background:var(--accent)}
-.continue .cv-go{flex:none;color:var(--accent);font-size:14px;white-space:nowrap}
-.series-go{display:inline-block;margin:4px 0 10px;font-size:14px}
-.resume{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin:0 0 18px;padding:10px 14px;border-radius:10px;background:var(--card);border:1px solid var(--line);font-family:var(--f-body);font-size:14px;color:var(--muted)}
-.resume button{font:inherit;font-size:14px;border:0;border-radius:999px;padding:6px 14px;cursor:pointer}
-.resume .rs-go{background:var(--accent);color:var(--card)}
-.resume .rs-x{background:transparent;color:var(--muted);padding:6px 8px;margin-left:auto}
 /* 名詞百科 */
 .gl{font:inherit;color:inherit;background:none;border:0;padding:0;margin:0;cursor:pointer;text-indent:0;border-bottom:1.5px dotted var(--accent);line-height:inherit;letter-spacing:inherit}
 .gl:hover,.gl:focus-visible{color:var(--accent);outline:none}
@@ -498,8 +476,8 @@ footer{border-top:1px solid var(--line);color:var(--muted);font-size:13px;text-a
 }
 /* 電腦（滑鼠）：卡片浮起、鍵盤換篇提示 */
 @media (hover:hover) and (pointer:fine){
-  .piece,.scard,.gcard,.tcard,.char,.ncard,.continue{transition:border-color .15s,transform .15s,box-shadow .15s}
-  .piece:hover,.scard:hover,.gcard:hover,.tcard:hover,.continue:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(0,0,0,.12)}
+  .piece,.scard,.gcard,.tcard,.char,.ncard{transition:border-color .15s,transform .15s,box-shadow .15s}
+  .piece:hover,.scard:hover,.gcard:hover,.tcard:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(0,0,0,.12)}
   .pager a:not(.next) small::before{content:"← "}
   .pager a.next small::after{content:" →"}
   .chlist li a{padding-left:6px;padding-right:6px;border-radius:6px}
@@ -528,7 +506,7 @@ footer{border-top:1px solid var(--line);color:var(--muted);font-size:13px;text-a
 }
 @media (max-width:400px){.char{grid-template-columns:64px 1fr;padding:14px;gap:12px}.char .art{width:64px;height:64px}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
-@media print{header,footer,.owner,#toTop,#readBar,.rtools .share,.pager,.resume,[data-fs]{display:none!important}body{background:#fff;color:#000}main{max-width:none;padding:0}}
+@media print{header,footer,.owner,#toTop,#readBar,.rtools .share,.pager,[data-fs]{display:none!important}body{background:#fff;color:#000}main{max-width:none;padding:0}}
 </style>
 </head>
 <body>
@@ -564,14 +542,9 @@ footer{border-top:1px solid var(--line);color:var(--muted);font-size:13px;text-a
         <div class="eyebrow" id="heroEyebrow"></div>
         <h1 id="heroTitle"></h1>
         <p id="heroText"></p>
-        <div class="row">
-          <a class="btn" id="heroRead" href="#stories">開始閱讀</a>
-          <a class="btn ghost" href="#commissions">看委託圖</a>
-        </div>
       </div>
       <div class="art" id="heroArt"></div>
     </div>
-    <div id="continueBox"></div>
     <div class="sec"><h2>最近更新</h2></div>
     <ul class="updates" id="updates"></ul>
     <div id="historyWrap" hidden>
@@ -628,8 +601,6 @@ footer{border-top:1px solid var(--line);color:var(--muted);font-size:13px;text-a
     <div class="stats" id="cstats"></div>
     <div class="filters" id="cfilters"></div>
     <div class="grid" id="cgrid"></div>
-    <div class="sec"><h2>合作過的繪師</h2></div>
-    <ul class="artists" id="artists"></ul>
   </section>
 
   <section class="view" id="v-tools">
@@ -866,20 +837,14 @@ const commOf=n=>COMM.filter(m=>(m.characters||[]).includes(n));
 const notesOf=n=>NOTES.filter(x=>(x.characters||[]).includes(n));
 const charLink=n=>charOf(n)?`<a class="tag story" href="#char-${enc(n)}">${esc(n)}</a>`:`<span class="tag">${esc(n)}</span>`;
 
-/* ---------- 閱讀進度（只存在讀者自己的瀏覽器） ---------- */
-let PG={last:"",seen:{},pos:{}};
-try{const o=JSON.parse(localStorage.getItem("read-progress")||"{}");PG={last:o.last||"",seen:o.seen||{},pos:o.pos||{}};}catch(e){}
-function pgSave(){
-  const ks=Object.keys(PG.seen);if(ks.length>400){ks.sort((a,b)=>PG.seen[a]-PG.seen[b]).slice(0,ks.length-400).forEach(k=>{delete PG.seen[k];delete PG.pos[k];});}
-  try{localStorage.setItem("read-progress",JSON.stringify(PG));}catch(e){}
-}
-const seenAt=k=>PG.seen[k]||0;
-/* 「NEW」：最近幾天內的內容（後台：網站設定 › NEW 標記天數，0 = 關閉）；讀者讀過的就不再顯示 */
+/* 舊版「繼續閱讀」留在讀者瀏覽器裡的紀錄，順手清掉 */
+try{localStorage.removeItem("read-progress");}catch(e){}
+/* 「NEW」：最近幾天內的內容（後台：網站設定 › NEW 標記天數，0 = 關閉） */
 function newDays(){const v=SITE.newDays;if(v===undefined||v===null||v==="")return 14;const n=+v;return isNaN(n)?14:Math.max(0,n);}
 function isNew(x){const d=newDays();if(!d||!x||!x.date)return false;const t=Date.parse(String(x.date).slice(0,10)+"T00:00:00+08:00");if(isNaN(t))return false;const age=Date.now()-t;return age>-864e5&&age<d*864e5;}
-const newBadge=(x,k)=>isNew(x)&&!(k&&seenAt(k))?`<span class="new-badge" title="最近更新">NEW</span>`:"";
+const newBadge=x=>isNew(x)?`<span class="new-badge" title="最近更新">NEW</span>`:"";
 
-const SITE_VERSION="2026-11-17 v1.7";
+const SITE_VERSION="2026-11-17 v1.8";
 const BROKEN=[];
 async function load(){
   const files=["site.json","series.json","chapters.json","side-stories.json","characters.json","commissions.json","tools.json","notes.json","history.json","glossary.json"];
@@ -970,42 +935,19 @@ function renderSite(){
   $("#heroText").innerHTML=inline(SITE.heroText||"");
   renderHeroSlides();
   const hs=szOf(SITE.heroImageSize);document.querySelector(".hero").className="hero"+(hs&&hs!=="m"?" hs-"+hs:"");
-  if(CHAPTERS[0])$("#heroRead").href="#read-"+enc(chId(CHAPTERS[0]));
   $("#aboutText").innerHTML=blocks(SITE.about).join("");
   $("#contact").innerHTML=inline(SITE.contact||"");
-  $("#footer").innerHTML=esc(`© ${new Date().getFullYear()} ${SITE.siteName||""}${SITE.author?" · "+SITE.author:""}　｜　`)+inline(SITE.footer||"")+`　｜　<button type="button" class="rss-btn" id="rssBtn">RSS 訂閱</button>`;
-  $("#rssBtn").onclick=async()=>{const u=location.origin+"/feed.xml";try{await navigator.clipboard.writeText(u);siteToast("已複製訂閱網址，貼到 Feedly、Inoreader 等 RSS 閱讀器就能追更新");}catch(e){prompt("複製這個網址，貼到 RSS 閱讀器：",u);}};
+  $("#footer").innerHTML=esc(`© ${new Date().getFullYear()} ${SITE.siteName||""}${SITE.author?" · "+SITE.author:""}　｜　`)+inline(SITE.footer||"");
   const ups=[
-    ...CHAPTERS.map(c=>({d:c.date,t:"故事",cls:"story",txt:`${c.series}・${c.title}`,href:"#read-"+enc(chId(c)),x:c,k:"read:"+chId(c)})),
-    ...SIDE.map(c=>({d:c.date,t:"角色故事",cls:"story",txt:`${c.character}・${c.title}`,href:"#side-"+enc(chId(c)),x:c,k:"side:"+chId(c)})),
+    ...CHAPTERS.map(c=>({d:c.date,t:"故事",cls:"story",txt:`${c.series}・${c.title}`,href:"#read-"+enc(chId(c)),x:c})),
+    ...SIDE.map(c=>({d:c.date,t:"角色故事",cls:"story",txt:`${c.character}・${c.title}`,href:"#side-"+enc(chId(c)),x:c})),
     ...COMM.map(m=>({d:m.date,t:"委託圖",cls:"warm",txt:`〈${m.title}〉繪師：${m.artist}`,href:"#commissions",x:m})),
-    ...NOTES.map(n=>({d:n.date,t:"文章",cls:"",txt:n.title,href:"#note-"+enc(chId(n)),x:n,k:"note:"+chId(n)})),
+    ...NOTES.map(n=>({d:n.date,t:"文章",cls:"",txt:n.title,href:"#note-"+enc(chId(n)),x:n})),
     ...TOOLS.map(t=>({d:t.date,t:"小工具",cls:"",txt:t.title,href:"#tool-"+enc(toolId(t)),x:t}))
   ].filter(u=>u.d).sort((a,b)=>String(b.d).localeCompare(String(a.d))).slice(0,6);
-  $("#updates").innerHTML=ups.map(u=>`<li><time>${esc(u.d)}</time><span class="tag ${u.cls}">${u.t}</span><span class="utxt"><a href="${u.href}">${esc(u.txt)}</a>${badge(u.x)}${newBadge(u.x,u.k)}</span></li>`).join("");
-  renderContinue();
+  $("#updates").innerHTML=ups.map(u=>`<li><time>${esc(u.d)}</time><span class="tag ${u.cls}">${u.t}</span><span class="utxt"><a href="${u.href}">${esc(u.txt)}</a>${badge(u.x)}${newBadge(u.x)}</span></li>`).join("");
   $("#navGloss").hidden=!GLOSS.length;
 }
-/* 首頁「繼續閱讀」 */
-function readItem(k){
-  const [kind,...r]=String(k||"").split(":");const id=r.join(":");
-  if(kind==="read"){const c=CHAPTERS.find(x=>chId(x)===id);if(!c)return null;const l=chaptersOf(c.series);return {c,kind,label:`${c.series}・${c.title}`,href:"#read-"+enc(id),next:l[l.indexOf(c)+1],npre:"#read-",nk:"read:"};}
-  if(kind==="side"){const c=SIDE.find(x=>chId(x)===id);if(!c)return null;const l=SIDE.filter(x=>x.character===c.character).sort((a,b)=>String(a.date).localeCompare(String(b.date)));return {c,kind,label:`${c.character}・${c.title}`,href:"#side-"+enc(id),next:l[l.indexOf(c)+1],npre:"#side-",nk:"side:"};}
-  return null;
-}
-function renderContinue(){
-  const box=$("#continueBox"),it=readItem(PG.last);
-  if(!it){box.innerHTML="";return;}
-  const p=PG.pos[PG.last]||0;
-  if(p>=.95){
-    if(!it.next){box.innerHTML="";return;}
-    const nx=it.next,lab=it.kind==="read"?`${nx.series}・${nx.title}`:`${nx.character}・${nx.title}`;
-    box.innerHTML=`<a class="continue" href="${it.npre}${enc(chId(nx))}"><span class="cv-ic" aria-hidden="true">▶</span><span class="cv-t"><small>上次讀完了「${esc(it.c.title)}」，下一篇是</small><b>${esc(lab)}${badge(nx)}${newBadge(nx,it.nk+chId(nx))}</b></span><span class="cv-go">讀下一篇 →</span></a>`;
-    return;
-  }
-  box.innerHTML=`<a class="continue" href="${it.href}"><span class="cv-ic" aria-hidden="true">▶</span><span class="cv-t"><small>繼續閱讀${p>.02?`・讀到 ${Math.round(p*100)}%`:""}</small><b>${esc(it.label)}${badge(it.c)}</b>${p>.02?`<span class="cv-bar"><i style="width:${Math.round(p*100)}%"></i></span>`:""}</span><span class="cv-go">繼續 →</span></a>`;
-}
-
 /* ---------- 成人內容（後台每篇可勾「成人內容」；網站設定 › 成人內容設定 可設密碼） ---------- */
 let ADULT_OK=false;
 try{if(sessionStorage.getItem("adult-ok")==="1"||(+localStorage.getItem("adult-until")||0)>Date.now())ADULT_OK=true;}catch(e){}
@@ -1060,10 +1002,8 @@ function renderSeries(){
   $("#seriesList").innerHTML=SERIES.length?"":`<p style="color:var(--muted)">還沒有故事系列。</p>`;
   if(SERIES.length)$("#seriesList").innerHTML=SERIES.map(s=>{const list=chaptersOf(s.title);const cs=szOf(s.coverSize);return `<div class="series${cs&&cs!=="m"?" cs-"+cs:""}"><div class="art">${picT(imgOf(s,"cover"),"series-"+s.title,s.title)}</div><div>
   <div class="eyebrow">${esc(s.genre)}</div><h2>${esc(s.title)}</h2><p class="desc">${inline(s.description)}</p>
-  <div class="meta">${s.status?`<span class="tag story">${esc(s.status)}</span>`:""}<span class="tag">${list.length} 篇</span>${list.some(c=>isNew(c)&&!seenAt("read:"+chId(c)))?`<span class="new-badge">NEW</span>`:""}</div>
-  ${(()=>{const r=list.filter(c=>seenAt("read:"+chId(c))).sort((a,b)=>seenAt("read:"+chId(b))-seenAt("read:"+chId(a)))[0];if(!r)return "";const k="read:"+chId(r),done=(PG.pos[k]||0)>=.95,nx=list[list.indexOf(r)+1];
-    return done&&nx?`<a class="series-go" href="#read-${enc(chId(nx))}">▶ 讀下一篇：${esc(nx.title)}</a>`:done?"":`<a class="series-go" href="#read-${enc(chId(r))}">▶ 繼續閱讀：${esc(r.title)}</a>`;})()}
-  <ul class="chlist">${list.map(c=>{const k="read:"+chId(c);return `<li${seenAt(k)?` class="seen"`:""}><a href="#read-${enc(chId(c))}"><span>${esc(c.title)}${badge(c)}${newBadge(c,k)}</span><small>${esc(c.date)}</small></a></li>`;}).join("")}</ul></div></div>`}).join("");
+  <div class="meta">${s.status?`<span class="tag story">${esc(s.status)}</span>`:""}<span class="tag">${list.length} 篇</span>${list.some(isNew)?`<span class="new-badge">NEW</span>`:""}</div>
+  <ul class="chlist">${list.map(c=>`<li><a href="#read-${enc(chId(c))}"><span>${esc(c.title)}${badge(c)}${newBadge(c)}</span><small>${esc(c.date)}</small></a></li>`).join("")}</ul></div></div>`}).join("");
 }
 
 /* ---------- 閱讀頁（主線與角色故事共用） ---------- */
@@ -1096,35 +1036,14 @@ function renderReader(id,side){
     </nav>`;
   $("#reader").querySelectorAll("[data-fs]").forEach(b=>b.onclick=()=>setFs(+b.dataset.fs));
   glossify($("#reader .prose"));
-  trackProgress((side?"side:":"read:")+id,$("#reader .prose"),$("#reader .rtools"));
 }
-/* 記住讀到哪裡：存「內文讀到幾 %」 */
-let PG_CUR=null;
-function proseRatio(el){const r=el.getBoundingClientRect(),h=el.offsetHeight;if(!h)return 0;if(r.bottom<=innerHeight)return 1;return Math.max(0,Math.min(1,(innerHeight*.35-r.top)/h));}
-function trackProgress(k,el,after){
-  const prev=PG.pos[k]||0;
-  PG.last=k;PG.seen[k]=Date.now();pgSave();
-  PG_CUR={k,el};
-  if(prev>.04&&prev<.95&&after){
-    const bar=document.createElement("div");bar.className="resume";
-    bar.innerHTML=`<span>上次讀到 ${Math.round(prev*100)}%</span><button type="button" class="rs-go">從上次的地方繼續</button><button type="button" class="rs-x" aria-label="關閉">✕</button>`;
-    after.after(bar);
-    bar.querySelector(".rs-go").onclick=()=>{const r=el.getBoundingClientRect();window.scrollTo({top:scrollY+r.top+prev*el.offsetHeight-innerHeight*.35,behavior:"smooth"});bar.remove();};
-    bar.querySelector(".rs-x").onclick=()=>bar.remove();
-  }
-}
-let pgT=0;
-addEventListener("scroll",()=>{if(!PG_CUR||pgT)return;pgT=setTimeout(()=>{pgT=0;if(!PG_CUR||!PG_CUR.el.isConnected||!PG_CUR.el.offsetParent)return;
-  const r=proseRatio(PG_CUR.el),k=PG_CUR.k,old=PG.pos[k]||0;
-  if(r>=old+.01||(r>=.95&&old<1)){PG.pos[k]=r>=.95?1:r;pgSave();}
-},400);},{passive:true});
 let fs=18; try{fs=+localStorage.getItem("fs")||18}catch(e){}
 function setFs(d){fs=Math.min(24,Math.max(15,fs+d));document.documentElement.style.setProperty("--read-size",fs+"px");try{localStorage.setItem("fs",fs)}catch(e){}}
 
 /* ---------- 角色故事列表 ---------- */
 let curSide="all";
 function sideCard(c){return `<a class="scard" href="#side-${enc(chId(c))}"><div class="art">${avatarOf(c.character)}</div><div>
-  <small>${esc(c.character)}　${esc(c.date)}${seenAt("side:"+chId(c))?`<span class="seen-mark">✓ 已讀</span>`:""}</small><h3>${esc(c.title)}${badge(c)}${newBadge(c,"side:"+chId(c))}</h3><p>${locked(c)?"成人內容，點進去確認年齡後閱讀。":esc(plain(paras(c.body).find(p=>!/^(-{3,}|##|!\[)/.test(p.trim())&&plain(p).trim())||""))}</p></div></a>`;}
+  <small>${esc(c.character)}　${esc(c.date)}</small><h3>${esc(c.title)}${badge(c)}${newBadge(c)}</h3><p>${locked(c)?"成人內容，點進去確認年齡後閱讀。":esc(plain(paras(c.body).find(p=>!/^(-{3,}|##|!\[)/.test(p.trim())&&plain(p).trim())||""))}</p></div></a>`;}
 function renderSide(){
   $("#sfilters").innerHTML=[["all","全部角色"],...CHARS.filter(h=>SIDE.some(x=>x.character===h.name)).map(h=>[h.name,h.name])].map(([k,l])=>`<button type="button" class="chip${k===curSide?" on":""}" data-k="${esc(k)}">${esc(l)}</button>`).join("");
   $("#sfilters").querySelectorAll(".chip").forEach(b=>b.onclick=()=>{curSide=b.dataset.k;renderSide();});
@@ -1154,7 +1073,7 @@ function renderCharPage(n){
     ${cm.length?`<div class="grid" id="charComm">${cm.map(commCard).join("")}</div>`:`<p style="color:var(--muted)">還沒有這個角色的委託圖。</p>`}
     <div class="sec"><h2>角色故事</h2><a href="#side">全部角色故事</a></div>
     ${sd.length?`<div class="slist">${sd.map(sideCard).join("")}</div>`:`<p style="color:var(--muted)">還沒有${esc(n)}的角色故事。</p>`}
-    ${ap.length?`<div class="sec"><h2>主線出場章節</h2></div><ul class="chlist">${ap.map(c=>`<li${seenAt("read:"+chId(c))?` class="seen"`:""}><a href="#read-${enc(chId(c))}"><span>${esc(c.series)}・${esc(c.title)}${badge(c)}${newBadge(c,"read:"+chId(c))}</span><small>${esc(c.date)}</small></a></li>`).join("")}</ul>`:""}
+    ${ap.length?`<div class="sec"><h2>主線出場章節</h2></div><ul class="chlist">${ap.map(c=>`<li><a href="#read-${enc(chId(c))}"><span>${esc(c.series)}・${esc(c.title)}${badge(c)}${newBadge(c)}</span><small>${esc(c.date)}</small></a></li>`).join("")}</ul>`:""}
     ${nt.length?`<div class="sec"><h2>相關設定與筆記</h2></div><div class="nlist">${nt.map(noteCard).join("")}</div>`:""}`;
   glossify($("#charPage .bio"));
   const g=$("#charComm"); if(g)bindComm(g);
@@ -1187,9 +1106,8 @@ function bindComm(root){
   });
 }
 function renderComm(){
-  const artists={};COMM.forEach(m=>{const a=artists[m.artist]=artists[m.artist]||{n:0,last:"",link:m.artistLink};a.n++;if(String(m.date)>a.last)a.last=m.date;if(m.artistLink)a.link=m.artistLink;});
-  $("#cstats").innerHTML=`<div><b>${COMM.length}</b><small>張委託圖</small></div><div><b>${Object.keys(artists).length}</b><small>位繪師</small></div><div><b>${new Set(COMM.flatMap(m=>m.characters||[])).size}</b><small>個角色</small></div>`;
-  $("#artists").innerHTML=Object.entries(artists).map(([n,a])=>`<li><span><b>${a.link?`<a href="${esc(a.link)}" target="_blank" rel="noopener">${esc(n)}</a>`:esc(n)}</b></span><small>${a.n} 張・最近 ${esc(a.last)}</small></li>`).join("");
+  const artists=new Set(COMM.map(m=>m.artist).filter(Boolean));
+  $("#cstats").innerHTML=`<div><b>${COMM.length}</b><small>張委託圖</small></div><div><b>${artists.size}</b><small>位繪師</small></div><div><b>${new Set(COMM.flatMap(m=>m.characters||[])).size}</b><small>個角色</small></div>`;
   $("#cfilters").innerHTML=[["all","全部角色"],...CHARS.filter(h=>COMM.some(m=>(m.characters||[]).includes(h.name))).map(h=>[h.name,h.name])].map(([k,l])=>`<button type="button" class="chip${k===curChar?" on":""}" data-k="${esc(k)}">${esc(l)}</button>`).join("");
   $("#cfilters").querySelectorAll(".chip").forEach(b=>b.onclick=()=>{curChar=b.dataset.k;renderComm();});
   $("#cgrid").innerHTML=COMM.filter(m=>curChar==="all"||(m.characters||[]).includes(curChar)).sort(byDateDesc).map(commCard).join("")||`<p style="color:var(--muted)">還沒有委託圖。</p>`;
@@ -1337,7 +1255,7 @@ document.addEventListener("keydown",e=>{
 addEventListener("hashchange",()=>{if(cardsFsEl){cardsFsEl.classList.remove("fs");cardsFsEl=null;}document.documentElement.classList.remove("cards-lock");});
 /* ---------- 文章 ---------- */
 let curCat="全部";
-const noteCard=n=>`<a class="ncard" href="#note-${enc(chId(n))}"><time>${esc(n.date)}</time><div><span class="tag cat">${esc(n.category)}</span><h3>${esc(n.title)}${badge(n)}${newBadge(n,"note:"+chId(n))}</h3><p>${locked(n)?"成人內容，點進去確認年齡後閱讀。":esc(plain(n.excerpt))}</p></div></a>`;
+const noteCard=n=>`<a class="ncard" href="#note-${enc(chId(n))}"><time>${esc(n.date)}</time><div><span class="tag cat">${esc(n.category)}</span><h3>${esc(n.title)}${badge(n)}${newBadge(n)}</h3><p>${locked(n)?"成人內容，點進去確認年齡後閱讀。":esc(plain(n.excerpt))}</p></div></a>`;
 function renderNotes(){
   const cats=["全部",...new Set(NOTES.map(n=>n.category).filter(Boolean))];
   $("#nfilters").innerHTML=cats.map(t=>`<button type="button" class="chip${t===curCat?" on":""}" data-t="${esc(t)}">${esc(t)}</button>`).join("");
@@ -1360,7 +1278,6 @@ function renderNote(id){
       ${next?`<a class="next" href="#note-${enc(chId(next))}"><small>較新</small>${esc(next.title)}</a>`:`<span class="next"><small>較新</small>沒有了</span>`}
     </nav>`;
   glossify($("#noteReader .notebody"));
-  PG.seen["note:"+id]=Date.now();pgSave();
 }
 
 /* ---------- 名詞百科 ---------- */
@@ -1543,7 +1460,7 @@ function route(){
   const arg=pre?h.slice(pre.length):"";
   let v=pre==="read-"?"read":pre==="side-"?"read":pre==="char-"?"char":pre==="note-"?"note":pre==="tool-"?"tool":pre==="term-"?"term":h;
   if(!document.getElementById("v-"+v))v="home";
-  closeLb();closeGlPop();PG_CUR=null;
+  closeLb();closeGlPop();
   document.querySelectorAll(".view").forEach(x=>x.classList.toggle("on",x.id==="v-"+v));
   const navKey=pre==="read-"?"stories":pre==="side-"?"side":pre==="char-"?"characters":pre==="note-"?"notes":pre==="tool-"?"tools":pre==="term-"?"glossary":v;
   document.querySelectorAll("#nav a").forEach(a=>{const on=a.getAttribute("href")==="#"+navKey;a.classList.toggle("on",on);if(on)a.setAttribute("aria-current","page");else a.removeAttribute("aria-current");});
@@ -1554,10 +1471,6 @@ function route(){
   if(pre==="note-")renderNote(arg);
   if(pre==="tool-")renderTool(arg);
   if(pre==="term-")renderTerm(arg);
-  if(v==="home")renderContinue();
-  if(v==="stories")renderSeries();
-  if(v==="side")renderSide();
-  if(v==="notes")renderNotes();
   if(v==="glossary")renderGlossary();
   updateFab(pre,arg,v);
   /* 分頁標題：例如「第一章｜黑曜石堡壘」 */

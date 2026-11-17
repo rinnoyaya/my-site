@@ -224,9 +224,6 @@ main{max-width:1040px;margin:0 auto;padding:28px 20px 64px}
 .ctype{position:absolute;top:8px;left:8px;background:rgba(10,12,20,.7);color:#fff;font-size:12px;padding:1px 8px;border-radius:99px}
 .piece .artwrap{position:relative}
 .piece .who{display:flex;gap:4px;flex-wrap:wrap;margin-top:6px}
-.artists{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
-.artists li{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px;display:flex;justify-content:space-between;gap:10px;align-items:baseline}
-.artists small{color:var(--muted)}
 
 /* 角色故事 */
 .slist{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
@@ -291,26 +288,7 @@ body:has(.owner:not([hidden])) footer{padding-bottom:76px}
 .wm-on .art:has(img)::after,.wm-on #heroArt:has(img)::after{content:"";position:absolute;inset:0;pointer-events:none;background-image:var(--wm);background-repeat:repeat;z-index:1}
 .wm-on .blurred::after{display:none}
 /* 成人內容 */
-.rss-btn{font:inherit;font-size:inherit;color:var(--accent);background:none;border:0;padding:4px 0;cursor:pointer}
 .new-badge{display:inline-block;font-family:var(--f-body);font-size:10.5px;font-weight:700;color:var(--card);background:var(--lamp);border-radius:4px;padding:0 5px;margin-left:6px;vertical-align:middle;line-height:1.7;letter-spacing:.04em}
-.chlist li.seen a>span{color:var(--muted)}
-.chlist li.seen a>span::after{content:"✓";margin-left:6px;font-size:12px;color:var(--muted)}
-.seen-mark{font-size:12px;color:var(--muted);margin-left:6px;font-weight:400}
-/* 繼續閱讀 */
-.continue{display:flex;align-items:center;gap:14px;margin:26px 0 0;padding:14px 16px;border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink)}
-.continue:hover{text-decoration:none;border-color:var(--accent)}
-.continue .cv-ic{flex:none;width:38px;height:38px;border-radius:50%;background:var(--accent);color:var(--card);display:flex;align-items:center;justify-content:center;font-size:16px}
-.continue .cv-t{flex:1;min-width:0}
-.continue small{display:block;color:var(--muted);font-size:12.5px}
-.continue b{display:block;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.continue .cv-bar{height:4px;border-radius:2px;background:var(--line);margin-top:6px;overflow:hidden}
-.continue .cv-bar i{display:block;height:100%;background:var(--accent)}
-.continue .cv-go{flex:none;color:var(--accent);font-size:14px;white-space:nowrap}
-.series-go{display:inline-block;margin:4px 0 10px;font-size:14px}
-.resume{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin:0 0 18px;padding:10px 14px;border-radius:10px;background:var(--card);border:1px solid var(--line);font-family:var(--f-body);font-size:14px;color:var(--muted)}
-.resume button{font:inherit;font-size:14px;border:0;border-radius:999px;padding:6px 14px;cursor:pointer}
-.resume .rs-go{background:var(--accent);color:var(--card)}
-.resume .rs-x{background:transparent;color:var(--muted);padding:6px 8px;margin-left:auto}
 /* 名詞百科 */
 .gl{font:inherit;color:inherit;background:none;border:0;padding:0;margin:0;cursor:pointer;text-indent:0;border-bottom:1.5px dotted var(--accent);line-height:inherit;letter-spacing:inherit}
 .gl:hover,.gl:focus-visible{color:var(--accent);outline:none}
@@ -501,8 +479,8 @@ footer{border-top:1px solid var(--line);color:var(--muted);font-size:13px;text-a
 }
 /* 電腦（滑鼠）：卡片浮起、鍵盤換篇提示 */
 @media (hover:hover) and (pointer:fine){
-  .piece,.scard,.gcard,.tcard,.char,.ncard,.continue{transition:border-color .15s,transform .15s,box-shadow .15s}
-  .piece:hover,.scard:hover,.gcard:hover,.tcard:hover,.continue:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(0,0,0,.12)}
+  .piece,.scard,.gcard,.tcard,.char,.ncard{transition:border-color .15s,transform .15s,box-shadow .15s}
+  .piece:hover,.scard:hover,.gcard:hover,.tcard:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(0,0,0,.12)}
   .pager a:not(.next) small::before{content:"← "}
   .pager a.next small::after{content:" →"}
   .chlist li a{padding-left:6px;padding-right:6px;border-radius:6px}
@@ -531,7 +509,7 @@ footer{border-top:1px solid var(--line);color:var(--muted);font-size:13px;text-a
 }
 @media (max-width:400px){.char{grid-template-columns:64px 1fr;padding:14px;gap:12px}.char .art{width:64px;height:64px}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
-@media print{header,footer,.owner,#toTop,#readBar,.rtools .share,.pager,.resume,[data-fs]{display:none!important}body{background:#fff;color:#000}main{max-width:none;padding:0}}
+@media print{header,footer,.owner,#toTop,#readBar,.rtools .share,.pager,[data-fs]{display:none!important}body{background:#fff;color:#000}main{max-width:none;padding:0}}
 
 
 /* ---------- 寫作小幫手 ---------- */
