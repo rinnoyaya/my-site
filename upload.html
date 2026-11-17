@@ -149,6 +149,10 @@ main{max-width:1040px;margin:0 auto;padding:28px 20px 64px}
 :root.ind-all .prose p .ln,:root.ind-all .notebody p .ln{text-indent:2em}
 :root.ind-first .prose p .ln:first-child,:root.ind-first .notebody p .ln:first-child{text-indent:2em}
 .rich p .ln .inline-fig{text-indent:0}
+/* 單篇的「段落縮排」設定，優先於網站的整體設定 */
+.pi-none p .ln{text-indent:0!important}
+.pi-all p .ln{text-indent:2em!important}
+.pi-first p .ln{text-indent:0!important}.pi-first p .ln:first-child{text-indent:2em!important}
 .prose figure{margin:2em 0}
 .prose figure .art{border-radius:10px;overflow:hidden;aspect-ratio:16/10}
 .prose figcaption{font-family:var(--f-body);font-size:13px;color:var(--muted);text-align:center;margin-top:8px}
@@ -223,9 +227,6 @@ main{max-width:1040px;margin:0 auto;padding:28px 20px 64px}
 .ctype{position:absolute;top:8px;left:8px;background:rgba(10,12,20,.7);color:#fff;font-size:12px;padding:1px 8px;border-radius:99px}
 .piece .artwrap{position:relative}
 .piece .who{display:flex;gap:4px;flex-wrap:wrap;margin-top:6px}
-.artists{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
-.artists li{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px;display:flex;justify-content:space-between;gap:10px;align-items:baseline}
-.artists small{color:var(--muted)}
 
 /* 角色故事 */
 .slist{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
@@ -290,26 +291,7 @@ body:has(.owner:not([hidden])) footer{padding-bottom:76px}
 .wm-on .art:has(img)::after,.wm-on #heroArt:has(img)::after{content:"";position:absolute;inset:0;pointer-events:none;background-image:var(--wm);background-repeat:repeat;z-index:1}
 .wm-on .blurred::after{display:none}
 /* 成人內容 */
-.rss-btn{font:inherit;font-size:inherit;color:var(--accent);background:none;border:0;padding:4px 0;cursor:pointer}
 .new-badge{display:inline-block;font-family:var(--f-body);font-size:10.5px;font-weight:700;color:var(--card);background:var(--lamp);border-radius:4px;padding:0 5px;margin-left:6px;vertical-align:middle;line-height:1.7;letter-spacing:.04em}
-.chlist li.seen a>span{color:var(--muted)}
-.chlist li.seen a>span::after{content:"✓";margin-left:6px;font-size:12px;color:var(--muted)}
-.seen-mark{font-size:12px;color:var(--muted);margin-left:6px;font-weight:400}
-/* 繼續閱讀 */
-.continue{display:flex;align-items:center;gap:14px;margin:26px 0 0;padding:14px 16px;border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink)}
-.continue:hover{text-decoration:none;border-color:var(--accent)}
-.continue .cv-ic{flex:none;width:38px;height:38px;border-radius:50%;background:var(--accent);color:var(--card);display:flex;align-items:center;justify-content:center;font-size:16px}
-.continue .cv-t{flex:1;min-width:0}
-.continue small{display:block;color:var(--muted);font-size:12.5px}
-.continue b{display:block;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.continue .cv-bar{height:4px;border-radius:2px;background:var(--line);margin-top:6px;overflow:hidden}
-.continue .cv-bar i{display:block;height:100%;background:var(--accent)}
-.continue .cv-go{flex:none;color:var(--accent);font-size:14px;white-space:nowrap}
-.series-go{display:inline-block;margin:4px 0 10px;font-size:14px}
-.resume{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin:0 0 18px;padding:10px 14px;border-radius:10px;background:var(--card);border:1px solid var(--line);font-family:var(--f-body);font-size:14px;color:var(--muted)}
-.resume button{font:inherit;font-size:14px;border:0;border-radius:999px;padding:6px 14px;cursor:pointer}
-.resume .rs-go{background:var(--accent);color:var(--card)}
-.resume .rs-x{background:transparent;color:var(--muted);padding:6px 8px;margin-left:auto}
 /* 名詞百科 */
 .gl{font:inherit;color:inherit;background:none;border:0;padding:0;margin:0;cursor:pointer;text-indent:0;border-bottom:1.5px dotted var(--accent);line-height:inherit;letter-spacing:inherit}
 .gl:hover,.gl:focus-visible{color:var(--accent);outline:none}
@@ -500,8 +482,8 @@ footer{border-top:1px solid var(--line);color:var(--muted);font-size:13px;text-a
 }
 /* 電腦（滑鼠）：卡片浮起、鍵盤換篇提示 */
 @media (hover:hover) and (pointer:fine){
-  .piece,.scard,.gcard,.tcard,.char,.ncard,.continue{transition:border-color .15s,transform .15s,box-shadow .15s}
-  .piece:hover,.scard:hover,.gcard:hover,.tcard:hover,.continue:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(0,0,0,.12)}
+  .piece,.scard,.gcard,.tcard,.char,.ncard{transition:border-color .15s,transform .15s,box-shadow .15s}
+  .piece:hover,.scard:hover,.gcard:hover,.tcard:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(0,0,0,.12)}
   .pager a:not(.next) small::before{content:"← "}
   .pager a.next small::after{content:" →"}
   .chlist li a{padding-left:6px;padding-right:6px;border-radius:6px}
@@ -530,7 +512,7 @@ footer{border-top:1px solid var(--line);color:var(--muted);font-size:13px;text-a
 }
 @media (max-width:400px){.char{grid-template-columns:64px 1fr;padding:14px;gap:12px}.char .art{width:64px;height:64px}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
-@media print{header,footer,.owner,#toTop,#readBar,.rtools .share,.pager,.resume,[data-fs]{display:none!important}body{background:#fff;color:#000}main{max-width:none;padding:0}}
+@media print{header,footer,.owner,#toTop,#readBar,.rtools .share,.pager,[data-fs]{display:none!important}body{background:#fff;color:#000}main{max-width:none;padding:0}}
 
 
 /* ---------- 圖片上傳 ---------- */
@@ -847,9 +829,18 @@ $("#libThumbs").onclick=async()=>{
     for(const [i,o] of todo.entries()){
       info.textContent=`產生縮圖中… ${i+1} / ${todo.length}（${o.key}）`;
       let blob;
-      try{const r=await fetch(base+"/"+o.key.split("/").map(encodeURIComponent).join("/"),{mode:"cors",cache:"no-store"});if(!r.ok)throw new Error("讀取失敗（"+r.status+"）");blob=await r.blob();}
+      /* 網址加上 ?cors=1：Cloudflare 會把一般瀏覽時存的那份（沒有 CORS 標頭）當成不同檔案，改跟 R2 拿一份有 CORS 標頭的 */
+      const src=base+"/"+o.key.split("/").map(encodeURIComponent).join("/")+"?cors=1";
+      try{const r=await fetch(src,{mode:"cors",cache:"no-store",credentials:"omit"});if(!r.ok)throw new Error("讀取失敗（"+r.status+"）");blob=await r.blob();}
       catch(e){
-        if(e instanceof TypeError){info.innerHTML="讀不到圖庫的原圖，需要先在 Cloudflare 打開 R2 的 CORS 設定（只要設定一次）：R2 → 你的 bucket → Settings → CORS Policy → Add CORS policy，貼上：<br><code style=\"word-break:break-all\">[{\"AllowedOrigins\":[\""+location.origin+"\"],\"AllowedMethods\":[\"GET\"],\"AllowedHeaders\":[\"*\"],\"MaxAgeSeconds\":86400}]</code><br>儲存後等一分鐘再按一次「產生縮圖」。";toast("需要先設定 R2 的 CORS");return;}
+        if(e instanceof TypeError){
+          /* 判斷是「圖片拿得到但缺 CORS 標頭」還是「整個被擋掉」 */
+          let reach=false;try{await fetch(src,{mode:"no-cors",cache:"no-store",credentials:"omit"});reach=true;}catch(e2){}
+          const rule='<code style="word-break:break-all">[{"AllowedOrigins":["'+esc(location.origin)+'"],"AllowedMethods":["GET"],"AllowedHeaders":["*"],"MaxAgeSeconds":86400}]</code>';
+          info.innerHTML=reach
+            ?"讀得到圖片，但 R2 沒有回傳允許讀取的 CORS 標頭。請確認：<br>① Cloudflare → R2 → obsidian-images → Settings → CORS Policy 的 Allowed Origins 是 <b>"+esc(location.origin)+"</b>（結尾不要有 /），Methods 有 GET。完整設定："+rule+"<br>② Cloudflare 左邊選你的網域 → <b>快取（Caching）→ 設定（Configuration）→ 清除所有內容（Purge Everything）</b>，把之前存的舊版圖片清掉。<br>③ 等一兩分鐘再按一次「產生縮圖」。"
+            :"連不到圖庫（"+esc(base)+"）。可能是 Cloudflare 的 WAF 或防盜連規則把這個頁面擋掉了：到 Security → Security rules 看那條擋 img 網址的規則，確認 Referer 條件包含 obsidianfirelight.com；也確認上傳頁的「連線設定」裡，圖片網址開頭是 https://img.obsidianfirelight.com。";
+          toast("縮圖產生失敗，請看下方說明");return;}
         fail++;continue;
       }
       try{const extType="image/"+o.key.split(".").pop().toLowerCase().replace("jpg","jpeg");const t=await makeThumb(/^image\/(jpeg|png|webp|avif)$/.test(blob.type)?blob:new Blob([blob],{type:extType}));if(!t){fail++;continue;}await putThumb(o.key,t);ok++;}catch(e){fail++;}
