@@ -1,966 +1,758 @@
-# Pages CMS 後台設定
-# 網站歷程、故事系列、章節、角色故事、角色、委託圖、小工具、名詞百科、文章 是「集合」：一筆一個檔案，存在 content/ 底下，可以搜尋和排序
-# 網站設定 是單一檔案，存在 data/ 底下
+# Pages CMS 後台設定（由 Claude 整理，欄位名稱和舊版相同）
+# settings.content.merge：儲存時只更新表單上有的欄位，檔案裡其他內容會保留。
+#   「網站設定」底下的幾頁其實都存在同一個 data/site.json，靠這個設定才不會互相蓋掉，請不要刪除。
+settings:
+  content:
+    merge: true
 media:
   input: images
   output: /images
 content:
-- name: site
-  label: 網站設定
-  type: file
-  path: data/site.json
-  format: json
-  fields:
-  - name: siteName
-    label: 網站名稱
-    type: string
-    required: true
-  - name: author
-    label: 作者名稱
-    type: string
-  - name: showDemoBanner
-    label: 顯示頂部「範例網站」提示
-    type: boolean
-  - name: heroEyebrow
-    label: 首頁小標
-    type: string
-  - name: heroTitle
-    label: 首頁大標題
-    type: string
-  - name: heroText
-    label: 首頁介紹文字
-    type: text
-  - name: heroImage
-    label: 首頁主圖
-    type: image
-  - name: heroImageUrl
-    label: 首頁主圖網址（外部圖庫）
-    type: string
-    description: 貼上 Cloudflare R2 等外部圖庫的圖片網址（https://…）。有填的話會優先使用，上面的上傳欄位可以留空
-  - name: heroImageSize
-    label: 首頁主圖顯示大小
-    type: select
-    options: &id001
-      values:
-      - 自動
-      - 小
-      - 中
-      - 大
-    description: 小：圖片佔比較少、文字比較多；大：圖片佔比較多
-  - name: heroSlides
-    label: 首頁輪播圖片
-    type: text
-    description: 一行一張圖片網址，會接在上面的首頁主圖後面輪流播放；只有一張就不會輪播。網址後面可以加「 | 說明」或「 | 連結」，兩個都要就寫「網址 | 說明 | 連結」，例如 https://img.obsidianfirelight.com/a.png | 大咒術師與小龍妻 | #stories。連結可以填站內的 #read-lg-1，或外部 https:// 網址
-  - name: heroInterval
-    label: 輪播秒數
-    type: number
-    description: 每張停留幾秒，2～60，留空是 5 秒。滑鼠移到圖上時會暫停
-  - name: heroEffect
-    label: 輪播效果
-    type: select
-    options:
-      values:
-      - 淡入淡出
-      - 左右滑動
-  - name: heroOrder
-    label: 輪播順序
-    type: select
-    options:
-      values:
-      - 依順序
-      - 隨機
-  - name: heroFit
-    label: 主圖顯示方式
-    type: select
-    options:
-      values:
-      - 裁切填滿
-      - 完整顯示
-    description: 裁切填滿：圖片填滿框框，邊緣可能被切掉；完整顯示：整張圖都看得到，旁邊可能留底色
-  - name: about
-    label: 關於頁內容
-    type: text
-    description: '建議先到「你的網域/editor.html」用寫作小幫手編輯再貼過來。空一行是新段落。格式：插圖用 ![說明](圖片網址)；影片直接貼 YouTube／Vimeo／Bilibili 網址成一段，或寫 ![說明](影片網址) 單獨放一段，要縮小寫 ![說明|小](圖片網址)（小／中／大）；**粗體**、*淺色*、~~刪除線~~、==螢光標記==、[文字](網址)；顏色字型大小用 {紅|文字}、{大|文字}、{楷體|文字}，可合併成
-      {藍,大|文字}，顏色也能填 #ff6699；「## 」小標題、「> 」引言、「- 」清單、單獨一行 --- 是分隔符號'
-  - name: contact
-    label: 聯絡方式
-    type: string
-  - name: footer
-    label: 頁尾文字
-    type: string
-  - name: adult
-    label: 成人內容設定
-    type: object
+- name: g-story
+  label: 故事
+  type: group
+  items:
+  - name: chapters
+    label: 故事章節
+    description: 主線故事的每一章。
+    type: collection
+    path: content/chapters
+    format: json
+    filename:
+      template: '{id}.json'
+      field: false
+    view:
+      fields:
+      - title
+      - series
+      - order
+      - date
+      - adult
+      primary: title
+      sort:
+      - order
+      - date
+      - title
+      - series
+      search:
+      - title
+      - series
+      - body
+      default:
+        sort: date
+        order: desc
     fields:
-    - name: notice
-      label: 年齡確認的提醒文字
+    - name: title
+      label: 章節標題
+      type: string
+      required: true
+    - name: series
+      label: 所屬系列
+      type: reference
+      description: 從已建立的系列裡選
+      required: true
+      options:
+        collection: series
+        value: '{fields.title}'
+        label: '{fields.title}'
+        search: fields.title
+    - name: id
+      label: 網址代號
+      type: string
+      description: 這一篇的網址會用到，建立後盡量不要改。只能用英文、數字和 -，例如 lg-3
+      required: true
+      pattern:
+        regex: ^[A-Za-z0-9][A-Za-z0-9_-]*$
+        message: 只能用英文、數字、- 和 _，而且不能有空白
+    - name: order
+      label: 第幾章
+      type: number
+      description: 同一個系列裡的順序，數字小的排前面，例如第 3 章就填 3
+    - name: date
+      label: 發布日期
+      type: date
+    - name: body
+      label: 內文
       type: text
-      description: 留空會顯示「以下內容僅限 18 歲以上閱覽…」
-    - name: preview
-      label: 鎖住時的圖片預覽
-      type: select
-      description: 霧化預覽會顯示模糊的圖；完全隱藏只顯示「18+」方塊
+      description: 建議用寫作小幫手寫（在網站上打開這一篇 → 右下角「編輯」→ 用小幫手編輯），寫好按「複製全部」再貼到這裡。空一行是新段落
+    - name: characters
+      label: 出場角色
+      type: reference
+      description: 從角色名單裡選，可以選很多個；打字可以搜尋
       options:
-        values:
-        - 霧化預覽
-        - 完全隱藏
-    - name: passwordHash
-      label: 密碼代碼
-      type: string
-      description: 到寫作小幫手按「？」→「產生密碼代碼」，把代碼貼在這裡（不是直接填密碼）。留空就只需要確認年齡
-  - name: newDays
-    label: NEW 標記天數
-    type: number
-    description: 幾天內的新內容會加上「NEW」標記（讀者讀過就不再顯示）。留空是 14 天，填 0 就關閉
-  - name: glossaryMode
-    label: 名詞百科在內文的標示方式
-    type: select
-    options:
-      values:
-      - 每篇第一次
-      - 全部標示
-      - 關閉
-    description: 故事和文章裡出現百科的名詞時，加上虛線讓讀者點開看說明。留空是「每篇第一次」
-  - name: useThumbs
-    label: 列表使用縮圖
-    type: boolean
-    default: false
-    description: 打開後，委託圖、角色頭像、系列封面等列表會改用小縮圖，載入比較快。請先到上傳頁的「圖庫」幫舊圖產生縮圖再打開；之後新上傳的圖會自動產生縮圖。沒有縮圖的圖片會自動改用原圖
-  - name: protect
-    label: 圖片保護
-    type: object
-    fields:
-    - name: enabled
-      label: 擋掉右鍵和長按另存圖片
+        collection: characters
+        multiple: true
+        value: '{fields.name}'
+        label: '{fields.name}'
+        search: fields.name,fields.role
+    - name: adult
+      label: 成人內容（18+）
       type: boolean
-      default: true
-      description: 預設開啟；關掉後訪客可以直接另存
-    - name: hideOriginal
-      label: 隱藏「開啟原圖」連結
-      type: boolean
-      default: true
-      description: 預設開啟；關掉後點開大圖會出現「開啟原圖」
-    - name: watermark
-      label: 浮水印文字
-      type: string
-      description: 例如網站名稱或你的帳號，會斜斜地鋪滿網站上的圖片；留空就不顯示
-    - name: watermarkOpacity
-      label: 浮水印濃度
-      type: select
-      options:
-        values:
-        - 淡
-        - 中
-        - 明顯
-  - name: theme
-    label: 外觀設定
-    type: object
-    fields:
-    - name: indent
-      label: 段落縮排
-      type: select
-      options:
-        values:
-        - 不縮排
-        - 每一行都縮排
-        - 只有段落第一行縮排
-      description: 故事和文章的排版。不縮排：每行都貼齊左邊（預設，適合短句換行的寫法）
-    - name: defaultTheme
-      label: 預設顯示模式
-      type: select
-      options:
-        values:
-        - 跟隨裝置
-        - 固定淺色
-        - 固定深色
-    - name: bgImage
-      label: 背景圖
-      type: image
-      description: 留空就是純色背景
-    - name: bgImageUrl
-      label: 背景圖網址（外部圖庫）
-      type: string
-      description: 貼上 Cloudflare R2 等外部圖庫的圖片網址（https://…）。有填的話會優先使用，上面的上傳欄位可以留空
-    - name: bgFit
-      label: 背景圖顯示方式
-      type: select
-      options:
-        values:
-        - 填滿畫面
-        - 重複拼貼
-    - name: bgOverlay
-      label: 背景圖遮罩
-      type: select
-      description: 遮罩越濃，背景圖越淡、文字越清楚
-      options:
-        values:
-        - 無
-        - 淡
-        - 中
-        - 濃
-    - name: accentColor
-      label: 主題色（按鈕、連結）
-      type: string
-      description: '填色碼，例如 #8a5cf6；留空用預設'
-    - name: lightText
-      label: 淺色模式・文字顏色
-      type: string
-      description: '例如 #1c2133；留空用預設'
-    - name: lightBg
-      label: 淺色模式・背景顏色
-      type: string
-      description: '例如 #f3f4f8；留空用預設'
-    - name: darkText
-      label: 深色模式・文字顏色
-      type: string
-      description: '例如 #e5e8f1；留空用預設'
-    - name: darkBg
-      label: 深色模式・背景顏色
-      type: string
-      description: '例如 #11141d；留空用預設'
-- name: history
-  label: 網站歷程
-  type: collection
-  path: content/history
-  format: json
-  fields:
-  - name: date
-    label: 日期
-    type: date
-    required: true
-  - name: title
-    label: 標題
-    type: string
-    required: true
-    description: 例如：開站、新增角色故事區
-  - name: description
-    label: 說明
-    type: text
-    description: 一兩句話就好，可留空
-  - name: link
-    label: 連結
-    type: string
-    description: '點標題會跳到的地方，可留空；例如 #notes 或 https://…'
-  view:
-    fields:
-    - date
-    - title
-    primary: title
-    sort:
-    - date
-    - title
-    search:
-    - title
-    - description
-    default:
-      sort: date
-      order: desc
-  filename:
-    template: hist-{year}{month}{day}{hour}{minute}{second}.json
-    field: false
-- name: series
-  label: 故事系列
-  type: collection
-  path: content/series
-  format: json
-  fields:
-  - name: title
-    label: 系列名稱
-    type: string
-    required: true
-    description: 章節的「所屬系列」要填一模一樣的名字
-  - name: order
-    label: 排序
-    type: number
-    description: 系列在「故事」頁的順序，數字小的排前面
-  - name: genre
-    label: 類型
-    type: string
-  - name: status
-    label: 狀態
-    type: select
-    options:
-      values:
-      - 連載中
-      - 已完結
-      - 短篇集
-      - 暫停中
-  - name: description
-    label: 簡介
-    type: text
-  - name: cover
-    label: 封面圖
-    type: image
-  - name: coverUrl
-    label: 封面圖網址（外部圖庫）
-    type: string
-    description: 貼上 Cloudflare R2 等外部圖庫的圖片網址（https://…）。有填的話會優先使用，上面的上傳欄位可以留空
-  - name: coverSize
-    label: 封面顯示大小
-    type: select
-    options: *id001
-    description: 系列封面在「故事」頁的寬度
-  view:
-    fields:
-    - title
-    - genre
-    - status
-    - order
-    primary: title
-    sort:
-    - order
-    - title
-    search:
-    - title
-    - genre
-    - description
-    default:
-      sort: order
-      order: asc
-  filename:
-    template: series-{year}{month}{day}{hour}{minute}{second}.json
-    field: false
-- name: chapters
-  label: 故事章節
-  type: collection
-  path: content/chapters
-  format: json
-  fields:
-  - name: id
-    label: 網址代號
-    type: string
-    required: true
-    description: 用英文或數字，不能和其他章節重複，例如 lh-4
-  - name: series
-    label: 所屬系列
-    type: string
-    required: true
-    description: 填系列名稱，例如 燈塔守夜人
-  - name: order
-    label: 排序
-    type: number
-    description: 同一個系列裡的章節順序，例如 1、2、3；數字小的排前面
-  - name: title
-    label: 章節標題
-    type: string
-    required: true
-  - name: adult
-    label: 成人內容（18+）
-    type: boolean
-    description: 勾選後，訪客要確認年齡（和輸入密碼）才看得到
-  - name: date
-    label: 發布日期
-    type: date
-  - name: characters
-    label: 出場角色
-    type: string
-    list: true
-    description: 填角色名字，要和角色資料裡的名字一樣
-  - name: font
-    label: 整篇字型
-    type: select
-    options:
-      values:
-      - 預設
-      - 明體
-      - 黑體
-      - 楷體
-  - name: size
-    label: 整篇字體大小
-    type: select
-    options:
-      values:
-      - 預設
-      - 小
-      - 大
-      - 特大
-  - name: image
-    label: 章節封面圖
-    type: image
-  - name: imageUrl
-    label: 章節封面圖網址（外部圖庫）
-    type: string
-    description: 貼上 Cloudflare R2 等外部圖庫的圖片網址（https://…）。有填的話會優先使用，上面的上傳欄位可以留空
-  - name: imageSize
-    label: 封面圖顯示大小
-    type: select
-    options: *id001
-    description: 自動＝和內文同寬；小、中會置中縮小顯示
-  - name: caption
-    label: 封面圖說明
-    type: string
-  - name: video
-    label: 影片網址
-    type: string
-    description: 貼上 YouTube（含 Shorts）、Vimeo 或 Bilibili 的影片網址，會嵌入在頁面上；留空就不顯示
-  - name: videoCaption
-    label: 影片說明
-    type: string
-    description: 顯示在影片下方，可留空
-  - name: body
-    label: 內文
-    type: text
-    description: '建議先到「你的網域/editor.html」用寫作小幫手編輯再貼過來。空一行是新段落。格式：插圖用 ![說明](圖片網址)；影片直接貼 YouTube／Vimeo／Bilibili 網址成一段，或寫 ![說明](影片網址) 單獨放一段，要縮小寫 ![說明|小](圖片網址)（小／中／大）；**粗體**、*淺色*、~~刪除線~~、==螢光標記==、[文字](網址)；顏色字型大小用 {紅|文字}、{大|文字}、{楷體|文字}，可合併成
-      {藍,大|文字}，顏色也能填 #ff6699；「## 」小標題、「> 」引言、「- 」清單、單獨一行 --- 是分隔符號'
-  view:
-    fields:
-    - title
-    - series
-    - order
-    - date
-    - adult
-    primary: title
-    sort:
-    - order
-    - date
-    - title
-    - series
-    search:
-    - title
-    - series
-    - body
-    default:
-      sort: order
-      order: asc
-  filename:
-    template: '{id}.json'
-    field: false
-- name: side
-  label: 角色故事
-  type: collection
-  path: content/side-stories
-  format: json
-  fields:
-  - name: id
-    label: 網址代號
-    type: string
-    required: true
-    description: 用英文或數字，不能重複，例如 axi-3
-  - name: character
-    label: 主角
-    type: string
-    required: true
-    description: 填角色名字
-  - name: title
-    label: 標題
-    type: string
-    required: true
-  - name: adult
-    label: 成人內容（18+）
-    type: boolean
-    description: 勾選後，訪客要確認年齡（和輸入密碼）才看得到
-  - name: date
-    label: 發布日期
-    type: date
-  - name: font
-    label: 整篇字型
-    type: select
-    options:
-      values:
-      - 預設
-      - 明體
-      - 黑體
-      - 楷體
-  - name: size
-    label: 整篇字體大小
-    type: select
-    options:
-      values:
-      - 預設
-      - 小
-      - 大
-      - 特大
-  - name: image
-    label: 封面圖
-    type: image
-  - name: imageUrl
-    label: 封面圖網址（外部圖庫）
-    type: string
-    description: 貼上 Cloudflare R2 等外部圖庫的圖片網址（https://…）。有填的話會優先使用，上面的上傳欄位可以留空
-  - name: imageSize
-    label: 封面圖顯示大小
-    type: select
-    options: *id001
-    description: 自動＝和內文同寬；小、中會置中縮小顯示
-  - name: caption
-    label: 封面圖說明
-    type: string
-  - name: video
-    label: 影片網址
-    type: string
-    description: 貼上 YouTube（含 Shorts）、Vimeo 或 Bilibili 的影片網址，會嵌入在頁面上；留空就不顯示
-  - name: videoCaption
-    label: 影片說明
-    type: string
-    description: 顯示在影片下方，可留空
-  - name: body
-    label: 內文
-    type: text
-    description: '建議先到「你的網域/editor.html」用寫作小幫手編輯再貼過來。空一行是新段落。格式：插圖用 ![說明](圖片網址)；影片直接貼 YouTube／Vimeo／Bilibili 網址成一段，或寫 ![說明](影片網址) 單獨放一段，要縮小寫 ![說明|小](圖片網址)（小／中／大）；**粗體**、*淺色*、~~刪除線~~、==螢光標記==、[文字](網址)；顏色字型大小用 {紅|文字}、{大|文字}、{楷體|文字}，可合併成
-      {藍,大|文字}，顏色也能填 #ff6699；「## 」小標題、「> 」引言、「- 」清單、單獨一行 --- 是分隔符號'
-  view:
-    fields:
-    - title
-    - character
-    - date
-    - adult
-    primary: title
-    sort:
-    - date
-    - title
-    - character
-    search:
-    - title
-    - character
-    - body
-    default:
-      sort: date
-      order: desc
-  filename:
-    template: '{id}.json'
-    field: false
-- name: characters
-  label: 角色
-  type: collection
-  path: content/characters
-  format: json
-  fields:
-  - name: name
-    label: 名字
-    type: string
-    required: true
-    description: 其他地方提到這個角色時，要填一模一樣的名字
-  - name: role
-    label: 一句話身分
-    type: string
-    description: 例如《燈塔守夜人》主角
-  - name: order
-    label: 排序
-    type: number
-    description: 角色頁的排列順序，數字小的排前面
-  - name: avatar
-    label: 頭像
-    type: image
-  - name: avatarUrl
-    label: 頭像網址（外部圖庫）
-    type: string
-    description: 貼上 Cloudflare R2 等外部圖庫的圖片網址（https://…）。有填的話會優先使用，上面的上傳欄位可以留空
-  - name: avatarSize
-    label: 頭像顯示大小
-    type: select
-    options: *id001
-    description: 角色個人頁上的頭像大小
-  - name: summary
-    label: 簡短介紹
-    type: text
-  - name: profile
-    label: 基本資料
-    type: object
-    list: true
-    fields:
-    - name: label
-      label: 項目
-      type: string
-      description: 例如 年齡、身分、喜歡
-    - name: value
-      label: 內容
-      type: string
-  - name: bio
-    label: 詳細介紹
-    type: text
-    description: '建議先到「你的網域/editor.html」用寫作小幫手編輯再貼過來。空一行是新段落。格式：插圖用 ![說明](圖片網址)；影片直接貼 YouTube／Vimeo／Bilibili 網址成一段，或寫 ![說明](影片網址) 單獨放一段，要縮小寫 ![說明|小](圖片網址)（小／中／大）；**粗體**、*淺色*、~~刪除線~~、==螢光標記==、[文字](網址)；顏色字型大小用 {紅|文字}、{大|文字}、{楷體|文字}，可合併成
-      {藍,大|文字}，顏色也能填 #ff6699；「## 」小標題、「> 」引言、「- 」清單、單獨一行 --- 是分隔符號'
-  - name: refs
-    label: 設定圖
-    type: object
-    list: true
-    description: 角色的設定圖、參考圖，會顯示在角色頁的「設定圖」區塊
-    fields:
-    - name: image
-      label: 圖片
-      type: image
+      description: 打開後，讀者要先確認年齡才能閱讀
     - name: imageUrl
-      label: 圖片網址（外部圖庫）
+      label: 封面圖網址
       type: string
-      description: 貼上 R2 圖片網址，有填的話優先使用
+      description: 選填。顯示在標題下方、內文之前。到上傳頁傳好圖片後，按「複製網址」貼到這裡
+      pattern:
+        regex: ^(|https?://\S+|/\S+)$
+        message: 請貼上 https:// 開頭的圖片網址（前後不要有空白）
+    - name: imageSize
+      label: 封面圖顯示大小
+      type: select
+      options:
+        values:
+        - 自動
+        - 小
+        - 中
+        - 大
     - name: caption
-      label: 說明
+      label: 封面圖說明
       type: string
-      description: 例如：正面設定、服裝細節
+      description: 選填，顯示在封面圖下方
+    - name: video
+      label: 影片網址
+      type: string
+      description: 選填。貼上 YouTube（含 Shorts）、Vimeo 或 Bilibili 的網址，會嵌在內文上方
+    - name: videoCaption
+      label: 影片說明
+      type: string
+      description: 選填，顯示在影片下方
+    - name: font
+      label: 整篇字型
+      type: select
+      description: 不選就用網站預設
+      options:
+        values:
+        - 預設
+        - 明體
+        - 黑體
+        - 楷體
     - name: size
+      label: 整篇字體大小
+      type: select
+      description: 不選就用網站預設
+      options:
+        values:
+        - 預設
+        - 小
+        - 大
+        - 特大
+  - name: side
+    label: 角色故事
+    description: 主線以外，以某個角色為主角的短篇與番外。
+    type: collection
+    path: content/side-stories
+    format: json
+    filename:
+      template: '{id}.json'
+      field: false
+    view:
+      fields:
+      - title
+      - character
+      - date
+      - adult
+      primary: title
+      sort:
+      - date
+      - title
+      - character
+      search:
+      - title
+      - character
+      - body
+      default:
+        sort: date
+        order: desc
+    fields:
+    - name: title
+      label: 標題
+      type: string
+      required: true
+    - name: character
+      label: 主角
+      type: reference
+      description: 從角色名單裡選
+      required: true
+      options:
+        collection: characters
+        value: '{fields.name}'
+        label: '{fields.name}'
+        search: fields.name,fields.role
+    - name: id
+      label: 網址代號
+      type: string
+      description: 這一篇的網址會用到，建立後盡量不要改。只能用英文、數字和 -，例如 rin-story-2
+      required: true
+      pattern:
+        regex: ^[A-Za-z0-9][A-Za-z0-9_-]*$
+        message: 只能用英文、數字、- 和 _，而且不能有空白
+    - name: date
+      label: 發布日期
+      type: date
+    - name: body
+      label: 內文
+      type: text
+      description: 建議用寫作小幫手寫（在網站上打開這一篇 → 右下角「編輯」→ 用小幫手編輯），寫好按「複製全部」再貼到這裡。空一行是新段落
+    - name: adult
+      label: 成人內容（18+）
+      type: boolean
+      description: 打開後，讀者要先確認年齡才能閱讀
+    - name: imageUrl
+      label: 封面圖網址
+      type: string
+      description: 選填。顯示在標題下方、內文之前。到上傳頁傳好圖片後，按「複製網址」貼到這裡
+      pattern:
+        regex: ^(|https?://\S+|/\S+)$
+        message: 請貼上 https:// 開頭的圖片網址（前後不要有空白）
+    - name: imageSize
+      label: 封面圖顯示大小
+      type: select
+      options:
+        values:
+        - 自動
+        - 小
+        - 中
+        - 大
+    - name: caption
+      label: 封面圖說明
+      type: string
+      description: 選填，顯示在封面圖下方
+    - name: video
+      label: 影片網址
+      type: string
+      description: 選填。貼上 YouTube（含 Shorts）、Vimeo 或 Bilibili 的網址，會嵌在內文上方
+    - name: videoCaption
+      label: 影片說明
+      type: string
+      description: 選填，顯示在影片下方
+    - name: font
+      label: 整篇字型
+      type: select
+      description: 不選就用網站預設
+      options:
+        values:
+        - 預設
+        - 明體
+        - 黑體
+        - 楷體
+    - name: size
+      label: 整篇字體大小
+      type: select
+      description: 不選就用網站預設
+      options:
+        values:
+        - 預設
+        - 小
+        - 大
+        - 特大
+  - name: series
+    label: 故事系列
+    description: 一部作品就是一個系列。先建立系列，再到「故事章節」新增章節。
+    type: collection
+    path: content/series
+    format: json
+    filename:
+      template: series-{year}{month}{day}{hour}{minute}{second}.json
+      field: false
+    view:
+      fields:
+      - title
+      - genre
+      - status
+      - order
+      primary: title
+      sort:
+      - order
+      - title
+      search:
+      - title
+      - genre
+      - description
+      default:
+        sort: order
+        order: asc
+    fields:
+    - name: title
+      label: 系列名稱
+      type: string
+      description: 改名後，這個系列底下的章節要重新選一次「所屬系列」
+      required: true
+    - name: status
+      label: 狀態
+      type: select
+      options:
+        values:
+        - 連載中
+        - 已完結
+        - 短篇集
+        - 暫停中
+    - name: genre
+      label: 類型
+      type: string
+      description: 例如：奇幻、日常、戀愛。顯示在系列名稱上方
+    - name: description
+      label: 簡介
+      type: text
+    - name: coverUrl
+      label: 封面圖網址
+      type: string
+      description: 到上傳頁傳好圖片後，按「複製網址」貼到這裡
+      pattern:
+        regex: ^(|https?://\S+|/\S+)$
+        message: 請貼上 https:// 開頭的圖片網址（前後不要有空白）
+    - name: coverSize
+      label: 封面顯示大小
+      type: select
+      options:
+        values:
+        - 自動
+        - 小
+        - 中
+        - 大
+    - name: order
+      label: 排序
+      type: number
+      description: 故事頁的排列順序，數字小的排前面
+- name: g-world
+  label: 角色與世界觀
+  type: group
+  items:
+  - name: characters
+    label: 角色
+    description: 登場人物。其他地方的「出場角色」「主角」都是從這裡選。
+    type: collection
+    path: content/characters
+    format: json
+    filename:
+      template: char-{year}{month}{day}{hour}{minute}{second}.json
+      field: false
+    view:
+      fields:
+      - name
+      - role
+      - order
+      primary: name
+      sort:
+      - order
+      - name
+      search:
+      - name
+      - role
+      - summary
+      - bio
+      default:
+        sort: order
+        order: asc
+    fields:
+    - name: name
+      label: 名字
+      type: string
+      description: 改名後，用到這個角色的故事、委託圖要重新選一次角色
+      required: true
+    - name: role
+      label: 一句話身分
+      type: string
+      description: 例如：玄城家家主・大咒術師
+    - name: avatarUrl
+      label: 頭像網址
+      type: string
+      description: 到上傳頁傳好圖片後，按「複製網址」貼到這裡
+      pattern:
+        regex: ^(|https?://\S+|/\S+)$
+        message: 請貼上 https:// 開頭的圖片網址（前後不要有空白）
+    - name: avatarSize
+      label: 頭像顯示大小
+      type: select
+      description: 角色個人頁上方的頭像大小
+      options:
+        values:
+        - 自動
+        - 小
+        - 中
+        - 大
+    - name: summary
+      label: 簡短介紹
+      type: text
+      description: 顯示在角色列表的卡片上，一兩句話就好
+    - name: profile
+      label: 基本資料
+      type: object
+      description: 例如 年齡／身高／生日，一列一項
+      list:
+        collapsible:
+          collapsed: false
+          summary: '{label}：{value}'
+      fields:
+      - name: label
+        label: 項目
+        type: string
+        description: 例如：身高
+      - name: value
+        label: 內容
+        type: string
+        description: 例如：182 cm
+    - name: bio
+      label: 詳細介紹
+      type: text
+      description: 建議用寫作小幫手寫（在網站上打開這一篇 → 右下角「編輯」→ 用小幫手編輯），寫好按「複製全部」再貼到這裡。空一行是新段落
+    - name: refs
+      label: 設定圖
+      type: object
+      description: 角色的設定圖、參考圖，會顯示在角色頁的「設定圖」區塊
+      list:
+        collapsible:
+          collapsed: false
+          summary: 第 {index} 張　{caption}
+      fields:
+      - name: imageUrl
+        label: 圖片網址
+        type: string
+        description: 到上傳頁傳好圖片後，按「複製網址」貼到這裡
+        pattern:
+          regex: ^(|https?://\S+|/\S+)$
+          message: 請貼上 https:// 開頭的圖片網址（前後不要有空白）
+      - name: caption
+        label: 說明
+        type: string
+        description: 例如：正面設定、服裝細節
+      - name: size
+        label: 在列表中的大小
+        type: select
+        options:
+          values:
+          - 一般
+          - 加大
+    - name: order
+      label: 排序
+      type: number
+      description: 角色頁的排列順序，數字小的排前面
+  - name: glossary
+    label: 名詞百科
+    description: 故事裡的地名、組織、魔法等名詞。內文出現這些詞時會自動加上虛線，讀者點一下就能看說明。
+    type: collection
+    path: content/glossary
+    format: json
+    filename:
+      template: term-{year}{month}{day}{hour}{minute}{second}.json
+      field: false
+    view:
+      fields:
+      - term
+      - category
+      - order
+      primary: term
+      sort:
+      - order
+      - term
+      search:
+      - term
+      - aliases
+      - short
+      - body
+      default:
+        sort: order
+        order: asc
+    fields:
+    - name: term
+      label: 名詞
+      type: string
+      description: 例如地名、組織、魔法、種族的名字
+      required: true
+    - name: short
+      label: 一句話說明
+      type: text
+      description: 讀者在內文點這個詞時跳出的說明，建議 60 字以內
+    - name: category
+      label: 分類
+      type: string
+      description: 例如：地名、組織、魔法、種族、物品。同分類的會放在一起
+    - name: aliases
+      label: 別名
+      type: string
+      description: 同一個東西的其他叫法，用頓號分開，例如：黑曜石城、黑城。這些詞也會被標示
+    - name: body
+      label: 詳細介紹
+      type: text
+      description: 選填。名詞頁的完整介紹，格式和故事內文一樣
+    - name: imageUrl
+      label: 圖片網址
+      type: string
+      description: 選填，會顯示在名詞頁
+      pattern:
+        regex: ^(|https?://\S+|/\S+)$
+        message: 請貼上 https:// 開頭的圖片網址（前後不要有空白）
+    - name: characters
+      label: 相關角色
+      type: reference
+      description: 從角色名單裡選，可以選很多個；打字可以搜尋
+      options:
+        collection: characters
+        multiple: true
+        value: '{fields.name}'
+        label: '{fields.name}'
+        search: fields.name,fields.role
+    - name: autolink
+      label: 在內文自動標示
+      type: boolean
+      description: 很常見、到處都會出現的詞可以關掉，就只會出現在百科頁
+      default: true
+    - name: order
+      label: 排序
+      type: number
+      description: 數字小的排前面；留空就照名稱排
+- name: g-gallery
+  label: 圖與工具
+  type: group
+  items:
+  - name: commissions
+    label: 委託圖
+    description: 委託繪師畫的圖。有差分的話，全部放在同一筆裡。
+    type: collection
+    path: content/commissions
+    format: json
+    filename:
+      template: comm-{year}{month}{day}{hour}{minute}{second}.json
+      field: false
+    view:
+      fields:
+      - title
+      - artist
+      - type
+      - date
+      - adult
+      primary: title
+      sort:
+      - date
+      - title
+      - artist
+      - type
+      search:
+      - title
+      - artist
+      - characters
+      - description
+      default:
+        sort: date
+        order: desc
+    fields:
+    - name: title
+      label: 作品名稱
+      type: string
+      required: true
+    - name: imageUrl
+      label: 圖片網址（主圖）
+      type: string
+      description: 列表上顯示的那一張。到上傳頁傳好圖片後，按「複製網址」貼到這裡
+      pattern:
+        regex: ^(|https?://\S+|/\S+)$
+        message: 請貼上 https:// 開頭的圖片網址（前後不要有空白）
+    - name: artist
+      label: 繪師
+      type: string
+      required: true
+    - name: artistLink
+      label: 繪師連結
+      type: string
+      description: 選填。繪師的主頁或社群網址，例如 https://x.com/…
+    - name: date
+      label: 完成日期
+      type: date
+    - name: type
+      label: 類型
+      type: select
+      options:
+        values:
+        - 頭像
+        - 半身
+        - 全身
+        - 雙人
+        - 多人
+        - 場景
+        - Q版
+        - 其他
+    - name: characters
+      label: 畫了哪些角色
+      type: reference
+      description: 從角色名單裡選，可以選很多個；打字可以搜尋
+      options:
+        collection: characters
+        multiple: true
+        value: '{fields.name}'
+        label: '{fields.name}'
+        search: fields.name,fields.role
+    - name: description
+      label: 說明
+      type: text
+      description: 選填，點開大圖時顯示
+    - name: variantUrls
+      label: 差分圖（一次貼上多張）
+      type: text
+      description: 一行一張圖片網址，會排在主圖後面，點開時可以左右滑。在上傳頁按「複製全部網址」就能整批貼上。要加說明就在網址後面寫「 | 說明」，例如 https://img.obsidianfirelight.com/xxx.png | 無背景版
+    - name: variants
+      label: 差分圖（逐張新增）
+      type: object
+      description: 想一張一張加、拖曳調整順序時用這裡；會排在上面整批貼上的差分前面
+      list:
+        collapsible:
+          collapsed: false
+          summary: 第 {index} 張　{caption}
+      fields:
+      - name: imageUrl
+        label: 圖片網址
+        type: string
+        description: 到上傳頁傳好圖片後，按「複製網址」貼到這裡
+        pattern:
+          regex: ^(|https?://\S+|/\S+)$
+          message: 請貼上 https:// 開頭的圖片網址（前後不要有空白）
+      - name: caption
+        label: 說明
+        type: string
+        description: 例如：無背景版、閉眼差分，可留空
+    - name: adult
+      label: 成人內容（18+）
+      type: boolean
+      description: 打開後，圖片會先霧化，讀者確認年齡後才看得到
+    - name: imageSize
       label: 在列表中的大小
       type: select
-      options: &id002
+      description: 加大會佔兩格寬
+      options:
         values:
         - 一般
         - 加大
-  view:
+  - name: tools
+    label: 小工具
+    description: 自己做的小工具的介紹頁。
+    type: collection
+    path: content/tools
+    format: json
+    filename:
+      template: '{id}.json'
+      field: false
+    view:
+      fields:
+      - title
+      - status
+      - order
+      - date
+      primary: title
+      sort:
+      - order
+      - date
+      - title
+      search:
+      - title
+      - summary
+      - body
+      default:
+        sort: order
+        order: asc
     fields:
-    - name
-    - role
-    - order
-    primary: name
-    sort:
-    - order
-    - name
-    search:
-    - name
-    - role
-    - summary
-    - bio
-    default:
-      sort: order
-      order: asc
-  filename:
-    template: char-{year}{month}{day}{hour}{minute}{second}.json
-    field: false
-- name: commissions
-  label: 委託圖
-  type: collection
-  path: content/commissions
-  format: json
-  fields:
-  - name: title
-    label: 作品名稱
-    type: string
-    required: true
-  - name: adult
-    label: 成人內容（18+）
-    type: boolean
-    description: 勾選後，訪客要確認年齡（和輸入密碼）才看得到
-  - name: image
-    label: 圖片
-    type: image
-  - name: imageUrl
-    label: 圖片網址（外部圖庫）
-    type: string
-    description: 貼上 Cloudflare R2 等外部圖庫的圖片網址（https://…）。有填的話會優先使用，上面的上傳欄位可以留空
-  - name: imageSize
-    label: 在列表中的大小
-    type: select
-    options: *id002
-    description: 加大＝在電腦版佔兩格寬，適合想特別展示的作品
-  - name: variantUrls
-    label: 差分圖（一次貼上多張）
-    type: text
-    description: 同一張委託的差分、表情變化、有無背景版本等。一行一張圖片網址，會排在主圖後面，點開委託圖時可以左右滑動切換。要加說明就在網址後面寫「 | 說明」，例如 https://img.obsidianfirelight.com/xxx.png | 哭臉差分
-  - name: variants
-    label: 差分圖（逐張新增）
-    type: object
-    list: true
-    description: 想一張一張加、拖曳調整順序時用這裡；會排在上面整批貼上的差分前面
-    fields:
+    - name: title
+      label: 工具名稱
+      type: string
+      required: true
+    - name: id
+      label: 網址代號
+      type: string
+      description: 這一篇的網址會用到，建立後盡量不要改。只能用英文、數字和 -，例如 commission-log
+      required: true
+      pattern:
+        regex: ^[A-Za-z0-9][A-Za-z0-9_-]*$
+        message: 只能用英文、數字、- 和 _，而且不能有空白
+    - name: summary
+      label: 一句話簡介
+      type: text
+      description: 顯示在小工具列表的卡片上
+    - name: link
+      label: 工具網址
+      type: string
+      description: 點「開啟工具」會打開這個網址，例如 https://…github.io/…
+    - name: linkLabel
+      label: 按鈕文字
+      type: string
+      description: 留空會顯示「開啟工具」
+    - name: status
+      label: 狀態
+      type: select
+      options:
+        values:
+        - 使用中
+        - 開發中
+        - 已停止
+    - name: date
+      label: 日期
+      type: date
     - name: imageUrl
-      label: 圖片網址
+      label: 封面圖網址
       type: string
-      description: 貼上 R2 圖片網址
-    - name: caption
-      label: 說明
+      description: 到上傳頁傳好圖片後，按「複製網址」貼到這裡
+      pattern:
+        regex: ^(|https?://\S+|/\S+)$
+        message: 請貼上 https:// 開頭的圖片網址（前後不要有空白）
+    - name: imageSize
+      label: 封面圖顯示大小
+      type: select
+      options:
+        values:
+        - 自動
+        - 小
+        - 中
+        - 大
+    - name: body
+      label: 介紹內文
+      type: text
+      description: 建議用寫作小幫手寫（在網站上打開這一篇 → 右下角「編輯」→ 用小幫手編輯），寫好按「複製全部」再貼到這裡。空一行是新段落
+    - name: cardsTitle
+      label: 教學圖卡標題
       type: string
-      description: 例如：無背景版、閉眼差分，可留空
-  - name: artist
-    label: 繪師
-    type: string
-    required: true
-  - name: artistLink
-    label: 繪師連結
-    type: string
-    description: 繪師的社群或作品集網址，可留空
-  - name: date
-    label: 完成日期
-    type: date
-  - name: type
-    label: 類型
-    type: select
-    options:
-      values:
-      - 頭像
-      - 半身
-      - 全身
-      - 雙人
-      - 多人
-      - 場景
-      - Q版
-      - 其他
-  - name: characters
-    label: 畫了哪些角色
-    type: string
-    list: true
-    description: 填角色名字
-  - name: description
-    label: 說明
-    type: text
-  view:
-    fields:
-    - title
-    - artist
-    - type
-    - date
-    - adult
-    primary: title
-    sort:
-    - date
-    - title
-    - artist
-    - type
-    search:
-    - title
-    - artist
-    - characters
-    - description
-    default:
-      sort: date
-      order: desc
-  filename:
-    template: comm-{year}{month}{day}{hour}{minute}{second}.json
-    field: false
-- name: tools
-  label: 小工具
-  type: collection
-  path: content/tools
-  format: json
-  view:
-    fields:
-    - title
-    - status
-    - order
-    - date
-    primary: title
-    sort:
-    - order
-    - date
-    - title
-    search:
-    - title
-    - summary
-    - body
-    default:
-      sort: order
-      order: asc
-  filename:
-    template: '{id}.json'
-    field: false
-  fields:
-  - name: id
-    label: 網址代號
-    type: string
-    required: true
-    description: 用英文或數字，不能重複，例如 commission-log
-  - name: title
-    label: 工具名稱
-    type: string
-    required: true
-  - name: order
-    label: 排序
-    type: number
-    description: 小工具頁的排列順序，數字小的排前面
-  - name: date
-    label: 日期
-    type: date
-  - name: status
-    label: 狀態
-    type: select
-    options:
-      values:
-      - 使用中
-      - 開發中
-      - 已停止
-  - name: image
-    label: 封面圖
-    type: image
-  - name: imageUrl
-    label: 封面圖網址（外部圖庫）
-    type: string
-    description: 貼上 R2 圖片網址，有填的話優先使用
-  - name: imageSize
-    label: 封面圖顯示大小
-    type: select
-    options:
-      values:
-      - 自動
-      - 小
-      - 中
-      - 大
-  - name: summary
-    label: 一句話簡介
-    type: text
-    description: 顯示在小工具列表的卡片上
-  - name: link
-    label: 工具網址
-    type: string
-    description: 點「開啟工具」會打開這個網址，例如 https://…github.io/…
-  - name: linkLabel
-    label: 按鈕文字
-    type: string
-    description: 留空會顯示「開啟工具」
-  - name: cardsTitle
-    label: 教學圖卡標題
-    type: string
-    description: 顯示在圖卡上方，留空會顯示「使用教學」
-  - name: cardUrls
-    label: 教學圖卡（一次貼上多張）
-    type: text
-    description: 一行一張圖片網址，照順序排成可以左右滑的圖卡。可以在上傳頁按「複製全部網址」直接整批貼上。要加說明就在網址後面寫「 | 說明」，例如 https://img.obsidianfirelight.com/xxx.png | 第一步：建立委託
-  - name: cards
-    label: 教學圖卡（逐張新增）
-    type: object
-    list: true
-    description: 想一張一張加、拖曳調整順序時用這裡；會排在上面整批貼上的圖卡前面
-    fields:
-    - name: imageUrl
-      label: 圖片網址
+      description: 顯示在圖卡上方，留空會顯示「使用教學」
+    - name: cardUrls
+      label: 教學圖卡（一次貼上多張）
+      type: text
+      description: 一行一張圖片網址，照順序排成可以左右滑的圖卡。在上傳頁按「複製全部網址」就能整批貼上。要加說明就在網址後面寫「 | 說明」
+    - name: cards
+      label: 教學圖卡（逐張新增）
+      type: object
+      description: 想一張一張加、拖曳調整順序時用這裡；會排在上面整批貼上的圖卡前面
+      list:
+        collapsible:
+          collapsed: false
+          summary: 第 {index} 張　{caption}
+      fields:
+      - name: imageUrl
+        label: 圖片網址
+        type: string
+        description: 到上傳頁傳好圖片後，按「複製網址」貼到這裡
+        pattern:
+          regex: ^(|https?://\S+|/\S+)$
+          message: 請貼上 https:// 開頭的圖片網址（前後不要有空白）
+      - name: caption
+        label: 說明
+        type: string
+        description: 顯示在這張圖卡下方，可留空
+    - name: video
+      label: 介紹影片網址
       type: string
-      description: 貼上 R2 圖片網址
-    - name: caption
-      label: 說明
+      description: 選填。貼上 YouTube（含 Shorts）、Vimeo 或 Bilibili 的網址
+    - name: videoCaption
+      label: 影片說明
       type: string
-      description: 顯示在這張圖卡下方，可留空
-  - name: video
-    label: 介紹影片網址
-    type: string
-    description: 貼上 YouTube（含 Shorts）、Vimeo 或 Bilibili 的影片網址，會嵌入在頁面上；留空就不顯示
-  - name: videoCaption
-    label: 影片說明
-    type: string
-    description: 顯示在影片下方，可留空
-  - name: body
-    label: 介紹內文
-    type: text
-    description: '建議先到「你的網域/editor.html」用寫作小幫手編輯再貼過來。空一行是新段落。格式：插圖用 ![說明](圖片網址)；影片直接貼 YouTube／Vimeo／Bilibili 網址成一段，或寫 ![說明](影片網址) 單獨放一段，要縮小寫 ![說明|小](圖片網址)（小／中／大）；**粗體**、*淺色*、~~刪除線~~、==螢光標記==、[文字](網址)；顏色字型大小用 {紅|文字}、{大|文字}、{楷體|文字}，可合併成
-      {藍,大|文字}，顏色也能填 #ff6699；「## 」小標題、「> 」引言、「- 」清單、單獨一行 --- 是分隔符號'
-- name: glossary
-  label: 名詞百科
-  type: collection
-  path: content/glossary
-  format: json
-  view:
-    fields:
-    - term
-    - category
-    - order
-    primary: term
-    sort:
-    - order
-    - term
-    search:
-    - term
-    - aliases
-    - short
-    - body
-    default:
-      sort: order
-      order: asc
-  filename:
-    template: term-{year}{month}{day}{hour}{minute}{second}.json
-    field: false
-  fields:
-  - name: term
-    label: 名詞
-    type: string
-    required: true
-    description: 例如地名、組織、魔法、種族的名字。內文出現這個詞時會自動標示
-  - name: aliases
-    label: 別名
-    type: string
-    description: 同一個東西的其他叫法，用頓號或逗號分開，例如：黑曜石城、黑城。這些詞也會被標示
-  - name: category
-    label: 分類
-    type: string
-    description: 例如：地名、組織、魔法、種族、物品。同分類的會在百科頁放在一起
-  - name: short
-    label: 一句話說明
-    type: text
-    description: 讀者在內文點這個詞時跳出的簡短說明，建議 60 字以內
-  - name: body
-    label: 詳細介紹
-    type: text
-    description: 名詞頁的完整介紹，可以留空。格式和故事內文一樣，可以插圖、加粗、換顏色
-  - name: imageUrl
-    label: 圖片網址（外部圖庫）
-    type: string
-    description: 貼上 R2 圖片網址，會顯示在名詞頁
-  - name: characters
-    label: 相關角色
-    type: string
-    list: true
-    description: 填角色名字，要和角色資料裡的名字一樣
-  - name: order
-    label: 排序
-    type: number
-    description: 百科頁的排列順序，數字小的排前面；留空就照名稱排
-  - name: autolink
-    label: 在內文自動標示
-    type: boolean
-    default: true
-    description: 關掉的話這個詞只會出現在百科頁，不會在故事裡加虛線（適合很常見、會到處出現的詞）
+      description: 選填，顯示在影片下方
+    - name: order
+      label: 排序
+      type: number
+      description: 小工具頁的排列順序，數字小的排前面
 - name: notes
   label: 文章
+  description: 創作心得、世界觀和角色的設定雜記。
   type: collection
   path: content/notes
   format: json
-  fields:
-  - name: id
-    label: 網址代號
-    type: string
-    required: true
-    description: 用英文或數字，不能重複
-  - name: category
-    label: 分類
-    type: select
-    options:
-      values:
-      - 創作心得
-      - 設定雜記
-  - name: title
-    label: 標題
-    type: string
-    required: true
-  - name: adult
-    label: 成人內容（18+）
-    type: boolean
-    description: 勾選後，訪客要確認年齡（和輸入密碼）才看得到
-  - name: date
-    label: 日期
-    type: date
-  - name: characters
-    label: 相關角色
-    type: string
-    list: true
-  - name: font
-    label: 整篇字型
-    type: select
-    options:
-      values:
-      - 預設
-      - 明體
-      - 黑體
-      - 楷體
-  - name: size
-    label: 整篇字體大小
-    type: select
-    options:
-      values:
-      - 預設
-      - 小
-      - 大
-      - 特大
-  - name: excerpt
-    label: 摘要
-    type: text
-    description: 顯示在文章列表上的一兩句話
-  - name: video
-    label: 影片網址
-    type: string
-    description: 貼上 YouTube（含 Shorts）、Vimeo 或 Bilibili 的影片網址，會嵌入在頁面上；留空就不顯示
-  - name: videoCaption
-    label: 影片說明
-    type: string
-    description: 顯示在影片下方，可留空
-  - name: body
-    label: 內文
-    type: text
-    description: '建議先到「你的網域/editor.html」用寫作小幫手編輯再貼過來。空一行是新段落。格式：插圖用 ![說明](圖片網址)；影片直接貼 YouTube／Vimeo／Bilibili 網址成一段，或寫 ![說明](影片網址) 單獨放一段，要縮小寫 ![說明|小](圖片網址)（小／中／大）；**粗體**、*淺色*、~~刪除線~~、==螢光標記==、[文字](網址)；顏色字型大小用 {紅|文字}、{大|文字}、{楷體|文字}，可合併成
-      {藍,大|文字}，顏色也能填 #ff6699；「## 」小標題、「> 」引言、「- 」清單、單獨一行 --- 是分隔符號'
+  filename:
+    template: '{id}.json'
+    field: false
   view:
     fields:
     - title
@@ -980,6 +772,379 @@ content:
     default:
       sort: date
       order: desc
-  filename:
-    template: '{id}.json'
-    field: false
+  fields:
+  - name: title
+    label: 標題
+    type: string
+    required: true
+  - name: category
+    label: 分類
+    type: select
+    options:
+      values:
+      - 創作心得
+      - 設定雜記
+  - name: id
+    label: 網址代號
+    type: string
+    description: 這一篇的網址會用到，建立後盡量不要改。只能用英文、數字和 -，例如 note-3
+    required: true
+    pattern:
+      regex: ^[A-Za-z0-9][A-Za-z0-9_-]*$
+      message: 只能用英文、數字、- 和 _，而且不能有空白
+  - name: date
+    label: 日期
+    type: date
+  - name: excerpt
+    label: 摘要
+    type: text
+    description: 顯示在文章列表上，一兩句話就好
+  - name: body
+    label: 內文
+    type: text
+    description: 建議用寫作小幫手寫（在網站上打開這一篇 → 右下角「編輯」→ 用小幫手編輯），寫好按「複製全部」再貼到這裡。空一行是新段落
+  - name: characters
+    label: 相關角色
+    type: reference
+    description: 從角色名單裡選，可以選很多個；打字可以搜尋
+    options:
+      collection: characters
+      multiple: true
+      value: '{fields.name}'
+      label: '{fields.name}'
+      search: fields.name,fields.role
+  - name: adult
+    label: 成人內容（18+）
+    type: boolean
+    description: 打開後，讀者要先確認年齡才能閱讀
+  - name: video
+    label: 影片網址
+    type: string
+    description: 選填。貼上 YouTube（含 Shorts）、Vimeo 或 Bilibili 的網址，會嵌在內文上方
+  - name: videoCaption
+    label: 影片說明
+    type: string
+    description: 選填，顯示在影片下方
+  - name: font
+    label: 整篇字型
+    type: select
+    description: 不選就用網站預設
+    options:
+      values:
+      - 預設
+      - 明體
+      - 黑體
+      - 楷體
+  - name: size
+    label: 整篇字體大小
+    type: select
+    description: 不選就用網站預設
+    options:
+      values:
+      - 預設
+      - 小
+      - 大
+      - 特大
+- name: g-site
+  label: 網站設定
+  type: group
+  items:
+  - name: site
+    label: 首頁與基本資料
+    description: 網站名稱和首頁上方的內容。
+    type: file
+    path: data/site.json
+    format: json
+    fields:
+    - name: siteName
+      label: 網站名稱
+      type: string
+      required: true
+    - name: author
+      label: 作者名稱
+      type: string
+      description: 顯示在頁尾
+    - name: heroEyebrow
+      label: 首頁小標
+      type: string
+      description: 大標題上方的一行小字
+    - name: heroTitle
+      label: 首頁大標題
+      type: string
+    - name: heroText
+      label: 首頁介紹文字
+      type: text
+    - name: heroImageUrl
+      label: 首頁主圖網址
+      type: string
+      description: 到上傳頁傳好圖片後，按「複製網址」貼到這裡
+      pattern:
+        regex: ^(|https?://\S+|/\S+)$
+        message: 請貼上 https:// 開頭的圖片網址（前後不要有空白）
+    - name: heroImageSize
+      label: 首頁主圖顯示大小
+      type: select
+      description: 小：圖片佔比較少、文字比較多；大：圖片佔比較多
+      options:
+        values:
+        - 自動
+        - 小
+        - 中
+        - 大
+    - name: heroFit
+      label: 主圖顯示方式
+      type: select
+      description: 裁切填滿：圖片填滿框框，邊緣可能被切掉；完整顯示：整張圖都看得到
+      options:
+        values:
+        - 裁切填滿
+        - 完整顯示
+    - name: heroSlides
+      label: 首頁輪播圖片
+      type: text
+      description: '一行一張圖片網址，會接在主圖後面輪流播放；只有一張就不會輪播。網址後面可以加「 | 說明」或「 | 連結」，例如 https://img.obsidianfirelight.com/a.png | 大咒術師與小龍妻 | #stories'
+    - name: heroInterval
+      label: 輪播秒數
+      type: number
+      description: 每張停留幾秒，2～60，留空是 5 秒
+      options:
+        min: 2
+        max: 60
+    - name: heroEffect
+      label: 輪播效果
+      type: select
+      options:
+        values:
+        - 淡入淡出
+        - 左右滑動
+    - name: heroOrder
+      label: 輪播順序
+      type: select
+      options:
+        values:
+        - 依順序
+        - 隨機
+  - name: site-about
+    label: 關於頁與頁尾
+    description: 「關於」頁的內容、聯絡方式和每一頁最下面的文字。
+    type: file
+    path: data/site.json
+    format: json
+    fields:
+    - name: about
+      label: 關於頁內容
+      type: text
+      description: 建議用寫作小幫手寫（在網站上打開「關於」頁 → 右下角「編輯」→ 用小幫手編輯），寫好按「複製全部」再貼到這裡。空一行是新段落
+    - name: contact
+      label: 聯絡方式
+      type: string
+      description: 可以直接貼網址，或寫 [顯示文字](網址)
+    - name: footer
+      label: 頁尾文字
+      type: string
+      description: 例如：文字與圖像未經同意請勿轉載
+  - name: site-theme
+    label: 外觀
+    description: 網站的配色、背景圖和段落縮排。只有這裡能改網站的顏色。
+    type: file
+    path: data/site.json
+    format: json
+    fields:
+    - name: theme
+      label: 外觀設定
+      type: object
+      fields:
+      - name: defaultTheme
+        label: 顯示模式
+        type: select
+        options:
+          values:
+          - 跟隨裝置
+          - 固定淺色
+          - 固定深色
+      - name: accentColor
+        label: 主題色（按鈕、連結）
+        type: string
+        description: '填色碼，例如 #3a4ea6；留空用預設。會自動調整到看得清楚的深淺'
+        pattern:
+          regex: ^(|#[0-9a-fA-F]{3}|#[0-9a-fA-F]{6})$
+          message: '請填 # 開頭的色碼，例如 #3a4ea6'
+      - name: indent
+        label: 段落縮排
+        type: select
+        options:
+          values:
+          - 不縮排
+          - 每一行都縮排
+          - 只有段落第一行縮排
+      - name: bgImageUrl
+        label: 背景圖網址
+        type: string
+        description: 選填。整個網站的背景圖
+        pattern:
+          regex: ^(|https?://\S+|/\S+)$
+          message: 請貼上 https:// 開頭的圖片網址（前後不要有空白）
+      - name: bgFit
+        label: 背景圖顯示方式
+        type: select
+        options:
+          values:
+          - 填滿畫面
+          - 重複拼貼
+      - name: bgOverlay
+        label: 背景圖遮罩
+        type: select
+        description: 遮罩越濃，文字越清楚、背景圖越淡
+        options:
+          values:
+          - 無
+          - 淡
+          - 中
+          - 濃
+      - name: lightBg
+        label: 淺色模式・背景顏色
+        type: string
+        description: 填色碼，留空用預設
+        pattern:
+          regex: ^(|#[0-9a-fA-F]{3}|#[0-9a-fA-F]{6})$
+          message: '請填 # 開頭的色碼，例如 #3a4ea6'
+      - name: lightText
+        label: 淺色模式・文字顏色
+        type: string
+        description: 填色碼，留空用預設
+        pattern:
+          regex: ^(|#[0-9a-fA-F]{3}|#[0-9a-fA-F]{6})$
+          message: '請填 # 開頭的色碼，例如 #3a4ea6'
+      - name: darkBg
+        label: 深色模式・背景顏色
+        type: string
+        description: 填色碼，留空用預設
+        pattern:
+          regex: ^(|#[0-9a-fA-F]{3}|#[0-9a-fA-F]{6})$
+          message: '請填 # 開頭的色碼，例如 #3a4ea6'
+      - name: darkText
+        label: 深色模式・文字顏色
+        type: string
+        description: 填色碼，留空用預設
+        pattern:
+          regex: ^(|#[0-9a-fA-F]{3}|#[0-9a-fA-F]{6})$
+          message: '請填 # 開頭的色碼，例如 #3a4ea6'
+  - name: site-safety
+    label: 成人內容與圖片保護
+    description: 18+ 內容的年齡確認，以及防止圖片被另存的設定。
+    type: file
+    path: data/site.json
+    format: json
+    fields:
+    - name: adult
+      label: 成人內容設定
+      type: object
+      fields:
+      - name: notice
+        label: 年齡確認的提醒文字
+        type: text
+        description: 留空會顯示預設的提醒
+      - name: preview
+        label: 鎖住時的圖片預覽
+        type: select
+        options:
+          values:
+          - 霧化預覽
+          - 完全隱藏
+      - name: passwordHash
+        label: 密碼代碼
+        type: string
+        description: 選填。想加密碼的話，到寫作小幫手按「？」產生代碼再貼到這裡；留空就只要確認年齡
+    - name: protect
+      label: 圖片保護
+      type: object
+      fields:
+      - name: enabled
+        label: 擋掉右鍵和長按另存圖片
+        type: boolean
+        default: true
+      - name: hideOriginal
+        label: 隱藏「開啟原圖」連結
+        type: boolean
+        default: true
+      - name: watermark
+        label: 浮水印文字
+        type: string
+        description: 例如網站名稱或你的帳號，會斜斜地鋪滿網站上的圖片；留空就不顯示
+      - name: watermarkOpacity
+        label: 浮水印濃度
+        type: select
+        options:
+          values:
+          - 淡
+          - 中
+          - 明顯
+  - name: site-advanced
+    label: 進階設定
+    description: NEW 標記、名詞百科標示、縮圖。平常不太需要動。
+    type: file
+    path: data/site.json
+    format: json
+    fields:
+    - name: newDays
+      label: NEW 標記天數
+      type: number
+      description: 幾天內的新內容會加上「NEW」（讀者讀過就不再顯示）。留空是 14 天，填 0 就關閉
+      options:
+        min: 0
+    - name: glossaryMode
+      label: 名詞百科在內文的標示方式
+      type: select
+      description: 留空是「每篇第一次」
+      options:
+        values:
+        - 每篇第一次
+        - 全部標示
+        - 關閉
+    - name: useThumbs
+      label: 列表使用縮圖
+      type: boolean
+      description: 打開後，委託圖、頭像、封面等列表會改用小縮圖，載入比較快。請先到上傳頁的「圖庫」按「產生縮圖」再打開
+      default: false
+    - name: showDemoBanner
+      label: 顯示頂部「範例網站」提示
+      type: boolean
+  - name: history
+    label: 網站歷程
+    description: 首頁下方的時間軸，記錄網站的大事。
+    type: collection
+    path: content/history
+    format: json
+    filename:
+      template: hist-{year}{month}{day}{hour}{minute}{second}.json
+      field: false
+    view:
+      fields:
+      - date
+      - title
+      primary: title
+      sort:
+      - date
+      - title
+      search:
+      - title
+      - description
+      default:
+        sort: date
+        order: desc
+    fields:
+    - name: date
+      label: 日期
+      type: date
+      required: true
+    - name: title
+      label: 標題
+      type: string
+      required: true
+    - name: description
+      label: 說明
+      type: text
+    - name: link
+      label: 連結
+      type: string
+      description: '選填。可以填站內位置（例如 #read-lg-1）或 https:// 網址，標題會變成連結'
