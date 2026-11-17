@@ -1,5 +1,5 @@
 # Pages CMS 後台設定
-# 網站歷程、故事系列、章節、角色故事、角色、委託圖、自繪插圖、文章 是「集合」：一筆一個檔案，存在 content/ 底下，可以搜尋和排序
+# 網站歷程、故事系列、章節、角色故事、角色、委託圖、小工具、名詞百科、文章 是「集合」：一筆一個檔案，存在 content/ 底下，可以搜尋和排序
 # 網站設定 是單一檔案，存在 data/ 底下
 media:
   input: images
@@ -108,6 +108,24 @@ content:
       label: 密碼代碼
       type: string
       description: 到寫作小幫手按「？」→「產生密碼代碼」，把代碼貼在這裡（不是直接填密碼）。留空就只需要確認年齡
+  - name: newDays
+    label: NEW 標記天數
+    type: number
+    description: 幾天內的新內容會加上「NEW」標記（讀者讀過就不再顯示）。留空是 14 天，填 0 就關閉
+  - name: glossaryMode
+    label: 名詞百科在內文的標示方式
+    type: select
+    options:
+      values:
+      - 每篇第一次
+      - 全部標示
+      - 關閉
+    description: 故事和文章裡出現百科的名詞時，加上虛線讓讀者點開看說明。留空是「每篇第一次」
+  - name: useThumbs
+    label: 列表使用縮圖
+    type: boolean
+    default: false
+    description: 打開後，委託圖、角色頭像、系列封面等列表會改用小縮圖，載入比較快。請先到上傳頁的「圖庫」幫舊圖產生縮圖再打開；之後新上傳的圖會自動產生縮圖。沒有縮圖的圖片會自動改用原圖
   - name: protect
     label: 圖片保護
     type: object
@@ -792,6 +810,71 @@ content:
     type: text
     description: '建議先到「你的網域/editor.html」用寫作小幫手編輯再貼過來。空一行是新段落。格式：插圖用 ![說明](圖片網址)；影片直接貼 YouTube／Vimeo／Bilibili 網址成一段，或寫 ![說明](影片網址) 單獨放一段，要縮小寫 ![說明|小](圖片網址)（小／中／大）；**粗體**、*淺色*、~~刪除線~~、==螢光標記==、[文字](網址)；顏色字型大小用 {紅|文字}、{大|文字}、{楷體|文字}，可合併成
       {藍,大|文字}，顏色也能填 #ff6699；「## 」小標題、「> 」引言、「- 」清單、單獨一行 --- 是分隔符號'
+- name: glossary
+  label: 名詞百科
+  type: collection
+  path: content/glossary
+  format: json
+  view:
+    fields:
+    - term
+    - category
+    - order
+    primary: term
+    sort:
+    - order
+    - term
+    search:
+    - term
+    - aliases
+    - short
+    - body
+    default:
+      sort: order
+      order: asc
+  filename:
+    template: term-{year}{month}{day}{hour}{minute}{second}.json
+    field: false
+  fields:
+  - name: term
+    label: 名詞
+    type: string
+    required: true
+    description: 例如地名、組織、魔法、種族的名字。內文出現這個詞時會自動標示
+  - name: aliases
+    label: 別名
+    type: string
+    description: 同一個東西的其他叫法，用頓號或逗號分開，例如：黑曜石城、黑城。這些詞也會被標示
+  - name: category
+    label: 分類
+    type: string
+    description: 例如：地名、組織、魔法、種族、物品。同分類的會在百科頁放在一起
+  - name: short
+    label: 一句話說明
+    type: text
+    description: 讀者在內文點這個詞時跳出的簡短說明，建議 60 字以內
+  - name: body
+    label: 詳細介紹
+    type: text
+    description: 名詞頁的完整介紹，可以留空。格式和故事內文一樣，可以插圖、加粗、換顏色
+  - name: imageUrl
+    label: 圖片網址（外部圖庫）
+    type: string
+    description: 貼上 R2 圖片網址，會顯示在名詞頁
+  - name: characters
+    label: 相關角色
+    type: string
+    list: true
+    description: 填角色名字，要和角色資料裡的名字一樣
+  - name: order
+    label: 排序
+    type: number
+    description: 百科頁的排列順序，數字小的排前面；留空就照名稱排
+  - name: autolink
+    label: 在內文自動標示
+    type: boolean
+    default: true
+    description: 關掉的話這個詞只會出現在百科頁，不會在故事裡加虛線（適合很常見、會到處出現的詞）
 - name: notes
   label: 文章
   type: collection
