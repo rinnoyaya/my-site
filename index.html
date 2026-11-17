@@ -147,6 +147,10 @@ main{max-width:1040px;margin:0 auto;padding:28px 20px 64px}
 :root.ind-all .prose p .ln,:root.ind-all .notebody p .ln{text-indent:2em}
 :root.ind-first .prose p .ln:first-child,:root.ind-first .notebody p .ln:first-child{text-indent:2em}
 .rich p .ln .inline-fig{text-indent:0}
+/* 單篇的「段落縮排」設定，優先於網站的整體設定 */
+.pi-none p .ln{text-indent:0!important}
+.pi-all p .ln{text-indent:2em!important}
+.pi-first p .ln{text-indent:0!important}.pi-first p .ln:first-child{text-indent:2em!important}
 .prose figure{margin:2em 0}
 .prose figure .art{border-radius:10px;overflow:hidden;aspect-ratio:16/10}
 .prose figcaption{font-family:var(--f-body);font-size:13px;color:var(--muted);text-align:center;margin-top:8px}
@@ -782,8 +786,8 @@ function blocks(text){
   });
 }
 /* 列表摘要用：去掉格式符號 */
-const FONT={"明體":"f-serif","黑體":"f-sans","楷體":"f-kai"},SIZE={"小":"sz-small","大":"sz-big","特大":"sz-huge"};
-const wrapCls=x=>[FONT[x.font],SIZE[x.size]].filter(Boolean).join(" ");
+const FONT={"明體":"f-serif","黑體":"f-sans","楷體":"f-kai"},SIZE={"小":"sz-small","大":"sz-big","特大":"sz-huge"},IND={"不縮排":"pi-none","每一行都縮排":"pi-all","只有段落第一行縮排":"pi-first"};
+const wrapCls=x=>[FONT[x.font],SIZE[x.size],IND[x.indent]].filter(Boolean).join(" ");
 const plain=t=>String(t||"").replace(/!\[[^\]]*\]\([^)]*\)/g,"").replace(/\{[^|{}\n]{1,40}\|([^{}]+?)\}/g,"$1").replace(/\[([^\]]+)\]\([^)]*\)/g,"$1").replace(/\*\*|~~|==|\*/g,"").replace(/^(##|>|-)\s/gm,"");
 const $=s=>document.querySelector(s);
 
@@ -844,7 +848,7 @@ function newDays(){const v=SITE.newDays;if(v===undefined||v===null||v==="")retur
 function isNew(x){const d=newDays();if(!d||!x||!x.date)return false;const t=Date.parse(String(x.date).slice(0,10)+"T00:00:00+08:00");if(isNaN(t))return false;const age=Date.now()-t;return age>-864e5&&age<d*864e5;}
 const newBadge=x=>isNew(x)?`<span class="new-badge" title="最近更新">NEW</span>`:"";
 
-const SITE_VERSION="2026-11-17 v1.8";
+const SITE_VERSION="2026-11-17 v1.9";
 const BROKEN=[];
 async function load(){
   const files=["site.json","series.json","chapters.json","side-stories.json","characters.json","commissions.json","tools.json","notes.json","history.json","glossary.json"];

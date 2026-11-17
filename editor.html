@@ -150,6 +150,10 @@ main{max-width:1040px;margin:0 auto;padding:28px 20px 64px}
 :root.ind-all .prose p .ln,:root.ind-all .notebody p .ln{text-indent:2em}
 :root.ind-first .prose p .ln:first-child,:root.ind-first .notebody p .ln:first-child{text-indent:2em}
 .rich p .ln .inline-fig{text-indent:0}
+/* 單篇的「段落縮排」設定，優先於網站的整體設定 */
+.pi-none p .ln{text-indent:0!important}
+.pi-all p .ln{text-indent:2em!important}
+.pi-first p .ln{text-indent:0!important}.pi-first p .ln:first-child{text-indent:2em!important}
 .prose figure{margin:2em 0}
 .prose figure .art{border-radius:10px;overflow:hidden;aspect-ratio:16/10}
 .prose figcaption{font-family:var(--f-body);font-size:13px;color:var(--muted);text-align:center;margin-top:8px}
@@ -574,9 +578,10 @@ body{display:flex;flex-direction:column}
   #draftSel{max-width:28vw;font-size:13px}
   .pane-h .lbl{display:none}
   .pane-h{padding:6px 12px;justify-content:flex-start}
-  .pane-prev .pane-h > .row{width:100%;justify-content:space-between;flex-wrap:nowrap}
-  .pane-prev .tabs{order:-1}
-  #pvFont,#pvSize{font-size:13px;max-width:30vw}
+  /* 手機：第一行是「編輯／預覽」切換，第二行是三個預覽選項 */
+  .pane-prev .pane-h > .row{width:100%;flex-wrap:wrap;row-gap:6px}
+  .pane-prev .tabs{order:-1;flex:0 0 100%}
+  #pvFont,#pvSize,#pvInd{font-size:13px;flex:1 1 0;min-width:0;max-width:none}
   #src{padding:14px 16px 40vh}
   .foot{gap:6px;padding:8px 12px}
   .foot .btn{padding:8px 12px;font-size:14px}
@@ -685,6 +690,7 @@ body{display:flex;flex-direction:column}
       <span class="row" style="gap:6px">
         <select id="pvFont" aria-label="整篇字型"><option value="">預設字型</option><option>明體</option><option>黑體</option><option>楷體</option></select>
         <select id="pvSize" aria-label="整篇大小"><option value="">預設大小</option><option>小</option><option>大</option><option>特大</option></select>
+        <select id="pvInd" aria-label="段落縮排" title="段落縮排"><option value="">縮排：跟隨網站</option><option value="不縮排">不縮排</option><option value="每一行都縮排">每行都縮排</option><option value="只有段落第一行縮排">段落首行縮排</option></select>
         <span class="tabs"><button class="tb" type="button" data-tab="edit">編輯</button><button class="tb on" type="button" data-tab="prev">預覽</button></span>
       </span></div>
     <div id="prev"><div class="prose rich"><div id="prevInner"></div></div></div>
@@ -846,8 +852,8 @@ function blocks(text){
   });
 }
 /* 列表摘要用：去掉格式符號 */
-const FONT={"明體":"f-serif","黑體":"f-sans","楷體":"f-kai"},SIZE={"小":"sz-small","大":"sz-big","特大":"sz-huge"};
-const wrapCls=x=>[FONT[x.font],SIZE[x.size]].filter(Boolean).join(" ");
+const FONT={"明體":"f-serif","黑體":"f-sans","楷體":"f-kai"},SIZE={"小":"sz-small","大":"sz-big","特大":"sz-huge"},IND={"不縮排":"pi-none","每一行都縮排":"pi-all","只有段落第一行縮排":"pi-first"};
+const wrapCls=x=>[FONT[x.font],SIZE[x.size],IND[x.indent]].filter(Boolean).join(" ");
 const plain=t=>String(t||"").replace(/!\[[^\]]*\]\([^)]*\)/g,"").replace(/\{[^|{}\n]{1,40}\|([^{}]+?)\}/g,"$1").replace(/\[([^\]]+)\]\([^)]*\)/g,"$1").replace(/\*\*|~~|==|\*/g,"").replace(/^(##|>|-)\s/gm,"");
 const $=s=>document.querySelector(s);
 
@@ -894,7 +900,7 @@ function fillSel(){
   $("#draftSel").innerHTML=[...store.list].sort((a,b)=>(b.updated||0)-(a.updated||0)).map(d=>`<option value="${d.id}"${d.id===store.cur?" selected":""}>${esc(draftName(d))}</option>`).join("");
 }
 function newDraft(text=""){
-  const d={id:"d"+Date.now()+Math.random().toString(36).slice(2,5),text,updated:Date.now()};store.list.unshift(d);store.cur=d.id;save();fillSel();src.value=text;render();src.focus();
+  const d={id:"d"+Date.now()+Math.random().toString(36).slice(2,5),text,updated:Date.now()};store.list.unshift(d);store.cur=d.id;save();fillSel();src.value=text;pvSet(d);render();src.focus();
 }
 if(!store.list.length){const d={id:"d"+Date.now(),text:"",updated:Date.now()};store.list.push(d);store.cur=d.id;}
 else if(!cur())store.cur=[...store.list].sort((a,b)=>(b.updated||0)-(a.updated||0))[0].id;
@@ -913,7 +919,7 @@ function showTarget(){
   $("#siteLink").textContent=linked?"回到這頁":"回網站";
   $("#target").classList.toggle("diff",!!(linked&&d.remoteDiff));
   if(linked)$("#targetText").innerHTML=(d.remoteDiff?"⚠ 網站上的版本和這份草稿不一樣（可能在後台改過）。要用網站上的版本就按右邊的按鈕。<br>":"")+
-    `寫完要貼回：後台 › <b>${esc(d.label.split("｜")[0])}</b> › <b>${esc(d.label.split("｜")[1]||"")}</b> › ${esc(d.field||"內文")}`;
+    `寫完要貼回：後台 › <b>${esc(d.label.split("｜")[0])}</b> › <b>${esc(d.label.split("｜")[1]||"")}</b> › ${esc(d.field||"內文")}`+styleHint(d);
 }
 /* 預覽：內容很長時不要每打一個字就整篇重畫；手機上預覽沒打開時先不畫 */
 let saveT,pvT,pvDirty=true;
@@ -923,7 +929,7 @@ function renderPreview(){
   if(!previewShown()){pvDirty=true;return;}
   pvDirty=false;
   $("#prevInner").innerHTML=blocks(src.value).join("")||`<p class="soft">預覽會顯示在這裡。</p>`;
-  $("#prevInner").className=[FONT[$("#pvFont").value],SIZE[$("#pvSize").value]].filter(Boolean).join(" ");
+  $("#prevInner").className=[FONT[$("#pvFont").value],SIZE[$("#pvSize").value],IND[$("#pvInd").value]].filter(Boolean).join(" ");
 }
 function render(now){
   showTarget();
@@ -935,8 +941,22 @@ function flush(){clearTimeout(saveT);saveT=0;const d=cur();if(d&&d.text!==src.va
 src.addEventListener("input",()=>{render();clearTimeout(saveT);saveT=setTimeout(flush,400);});
 /* 關掉分頁、切到別的 App 前先存好 */
 addEventListener("pagehide",flush);document.addEventListener("visibilitychange",()=>{if(document.hidden)flush();});
-$("#pvFont").onchange=()=>render(true);$("#pvSize").onchange=()=>render(true);
-$("#draftSel").onchange=e=>{flush();store.cur=e.target.value;save();src.value=cur().text;render(true);src.scrollTop=0;};
+/* 整篇字型、大小、縮排：每份草稿各自記住 */
+const STYLE_TYPES=["chapters","side","notes"]; /* 後台有「整篇字型／大小／段落縮排」欄位的內容 */
+function pvGet(){return {font:$("#pvFont").value,size:$("#pvSize").value,indent:$("#pvInd").value};}
+function pvSet(d){const v=(d&&d.pv)||{};$("#pvFont").value=v.font||"";$("#pvSize").value=v.size||"";$("#pvInd").value=v.indent||"";}
+["#pvFont","#pvSize","#pvInd"].forEach(id=>$(id).onchange=()=>{const d=cur();if(d){d.pv=pvGet();d.updated=Date.now();save();}render(true);});
+/* 有連到網站上某一篇時，提醒要到後台改哪些設定 */
+function styleHint(d){
+  if(!d||!d.src)return "";
+  const t=d.src.slice(0,d.src.indexOf(":")),pv=d.pv||{},site=d.siteStyle||{};
+  const names={font:["整篇字型","預設"],size:["整篇字體大小","預設"],indent:["段落縮排","跟隨網站設定"]};
+  const diff=Object.keys(names).filter(k=>(pv[k]||"")!==(site[k]||""));
+  if(!diff.length)return "";
+  if(!STYLE_TYPES.includes(t))return "<br>（這類內容的字型、大小和縮排都跟著網站的整體設定，上面的選項只影響預覽）";
+  return "<br>記得在後台這一篇把 "+diff.map(k=>`「${names[k][0]}」改成「${esc(pv[k]||names[k][1])}」`).join("、");
+}
+$("#draftSel").onchange=e=>{flush();store.cur=e.target.value;save();src.value=cur().text;pvSet(cur());render(true);src.scrollTop=0;};
 $("#newDraft").onclick=()=>{flush();const d=cur();if(d&&!d.src&&!d.text.trim()){src.focus();toast("目前這份就是空白草稿");return;}newDraft();toast("開了一份新草稿");};
 /* 電腦：編輯區捲動時，預覽跟著捲到差不多的位置 */
 src.addEventListener("scroll",()=>{if(narrow.matches)return;const p=$("#prev"),max=src.scrollHeight-src.clientHeight;if(max>0)p.scrollTop=src.scrollTop/max*(p.scrollHeight-p.clientHeight);},{passive:true});
@@ -952,7 +972,7 @@ $("#cmYes").onclick=()=>{$("#confirmModal").classList.remove("on");if(cmCb)cmCb(
 $("#delDraft").onclick=()=>ask("刪除這份草稿？",`「${draftName(cur())}」刪除後無法復原。`,"刪除",()=>{
   clearTimeout(saveT);DELETED.add(store.cur);
   store.list=store.list.filter(d=>d.id!==store.cur);
-  if(!store.list.length){newDraft();}else{store.cur=[...store.list].sort((a,b)=>(b.updated||0)-(a.updated||0))[0].id;save();fillSel();src.value=cur().text;render(true);}toast("草稿已刪除");});
+  if(!store.list.length){newDraft();}else{store.cur=[...store.list].sort((a,b)=>(b.updated||0)-(a.updated||0))[0].id;save();fillSel();src.value=cur().text;pvSet(cur());render(true);}toast("草稿已刪除");});
 
 /* 插入文字（盡量保留瀏覽器的復原功能） */
 function put(text,selStart,selEnd){
@@ -1200,7 +1220,8 @@ async function fetchSrc(key){
   const t=await r.text();const data=t.trim()?JSON.parse(t):[];
   if(type==="site")return {label:"網站設定｜關於頁",field:cfg.fieldLabel,text:data[cfg.field]||""};
   const item=(Array.isArray(data)?data:[]).find(x=>x&&cfg.key(x)===id);if(!item)throw new Error("網站上找不到這篇內容");
-  return {label:`${cfg.label}｜${item.title||item.name||item.term}`,field:cfg.fieldLabel,text:item[cfg.field]||"",file:item._file||""};
+  return {label:`${cfg.label}｜${item.title||item.name||item.term}`,field:cfg.fieldLabel,text:item[cfg.field]||"",file:item._file||"",
+    style:{font:FONT[item.font]?item.font:"",size:SIZE[item.size]?item.size:"",indent:IND[item.indent]?item.indent:""}};
 }
 const same=(a,b)=>String(a||"").replace(/\r\n?/g,"\n").trim()===String(b||"").replace(/\r\n?/g,"\n").trim();
 async function openFromHash(){
@@ -1210,11 +1231,11 @@ async function openFromHash(){
   flush();
   const old=store.list.find(d=>d.src===key);
   if(old){
-    store.cur=old.id;save();fillSel();src.value=old.text;render(true);
+    store.cur=old.id;save();fillSel();src.value=old.text;pvSet(old);render(true);
     /* 這篇之前開過：和網站上現在的版本比一比，避免把舊草稿貼回去蓋掉新內容 */
     try{
       const r=await fetchSrc(key);if(cur()!==old)return;
-      old.label=r.label;old.field=r.field;old.file=r.file;
+      old.label=r.label;old.field=r.field;old.file=r.file;old.siteStyle=r.style;if(!old.pv){old.pv={...r.style};pvSet(old);}
       if(same(r.text,old.text)){old.base=r.text;old.remoteDiff=false;toast("接續上次這篇的草稿");}
       else if(old.base===undefined||same(old.base,old.text)){old.text=r.text;old.base=r.text;old.remoteDiff=false;old.updated=Date.now();src.value=r.text;toast("已更新成網站上的最新版本");}
       else if(same(old.base,r.text)){old.remoteDiff=false;toast("接續上次還沒貼回去的草稿");}
@@ -1225,13 +1246,13 @@ async function openFromHash(){
   }
   try{
     const r=await fetchSrc(key);
-    const nd={id:"d"+Date.now(),text:r.text,base:r.text,updated:Date.now(),src:key,label:r.label,field:r.field,file:r.file};
-    store.list.unshift(nd);store.cur=nd.id;save();fillSel();src.value=r.text;render(true);src.scrollTop=0;toast("已帶入網站上的內容");
+    const nd={id:"d"+Date.now(),text:r.text,base:r.text,updated:Date.now(),src:key,label:r.label,field:r.field,file:r.file,siteStyle:r.style,pv:{...r.style}};
+    store.list.unshift(nd);store.cur=nd.id;save();fillSel();src.value=r.text;pvSet(nd);render(true);src.scrollTop=0;toast("已帶入網站上的內容");
   }catch(e){toast("帶入失敗："+e.message);}
 }
 $("#reloadSrc").onclick=()=>{const d=cur();if(!d||!d.src)return;
   ask("重新載入網站上的版本？","這份草稿目前的修改會被網站上的版本取代。","重新載入",async()=>{
-    try{const r=await fetchSrc(d.src);clearTimeout(saveT);d.text=r.text;d.base=r.text;d.remoteDiff=false;d.label=r.label;d.file=r.file;d.updated=Date.now();save();fillSel();src.value=r.text;render(true);toast("已載入網站上的版本");}catch(e){toast("載入失敗："+e.message);}
+    try{const r=await fetchSrc(d.src);clearTimeout(saveT);d.text=r.text;d.base=r.text;d.remoteDiff=false;d.label=r.label;d.file=r.file;d.siteStyle=r.style;d.pv={...r.style};pvSet(d);d.updated=Date.now();save();fillSel();src.value=r.text;render(true);toast("已載入網站上的版本");}catch(e){toast("載入失敗："+e.message);}
   });};
 addEventListener("hashchange",openFromHash);
 /* 成人內容密碼代碼（SHA-256，和網站用同一個前綴） */
@@ -1247,7 +1268,7 @@ fetch("data/site.json",{cache:"no-cache"}).then(r=>r.ok?r.json():{}).then(d=>{
   const ind=({"每一行都縮排":"ind-all","只有段落第一行縮排":"ind-first"})[((d&&d.theme)||{}).indent]||"";
   if(ind)document.documentElement.classList.add(ind);
 }).catch(()=>{});
-render(true);setSaveState();openFromHash();
+pvSet(cur());render(true);setSaveState();openFromHash();
 </script>
 </body>
 </html>
