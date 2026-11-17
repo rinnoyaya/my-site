@@ -144,7 +144,12 @@ def build_share_pages():
                 desc, image = "成人內容（18+），未滿 18 歲請勿閱覽。", origin + "/icon.png"
             else:
                 desc = plain(x.get(desc_field)) or plain(x.get("body")) or site.get("heroText") or site_name
-                image = absolute(img_of(x, img_field), origin) or default_img
+                image = absolute(img_of(x, img_field), origin)
+                if not image and kind == "tool":  # 小工具沒封面就用第一張教學圖卡
+                    first = [c for c in (x.get("cards") or []) if isinstance(c, dict) and img_of(c, "image")]
+                    lines = [l.split("|")[0].split("｜")[0].strip() for l in str(x.get("cardUrls") or "").splitlines() if l.strip()]
+                    image = absolute(img_of(first[0], "image") if first else (lines[0] if lines else ""), origin)
+                image = image or default_img
             url = f"{origin}/s/{kind}/{slug}/"
             e = lambda v: html.escape(str(v), quote=True)
             page = f"""<!DOCTYPE html>
