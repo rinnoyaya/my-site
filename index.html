@@ -2,6 +2,8 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' https: data: blob:; connect-src 'self'; frame-src https://www.youtube-nocookie.com https://player.vimeo.com https://player.bilibili.com; media-src 'self' https:; object-src 'none'; base-uri 'self'; form-action 'none'; upgrade-insecure-requests">
+<meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noai, noimageai">
 <title>我的網站</title>
@@ -837,7 +839,9 @@ function placeholder(key){
 }
 /* 有圖片就顯示圖片，沒有就顯示示意圖 */
 /* 圖片來源：「…網址」欄位（外部圖庫，例如 Cloudflare R2）優先，其次是上傳到 repo 的圖片 */
-const imgOf=(x,f)=>x?String(x[f+"Url"]||x[f]||"").trim():"";
+/* 圖片網址只接受 https:// 或站內路徑，其他（例如 javascript:）一律當成沒填 */
+const safeImg=u=>{u=String(u||"").trim();return /^(https?:\/\/|\/(?!\/)|images\/)/i.test(u)&&!/[\s"<>`]/.test(u)?u:"";};
+const imgOf=(x,f)=>x?safeImg(x[f+"Url"]||x[f]):"";
 const pic=(src,key,alt)=>src?`<img src="${esc(src)}" alt="${esc(alt||"")}" loading="lazy">`:placeholder(key);
 /* 縮圖：列表用小圖（R2 的 thumbs/原檔名.webp），沒有縮圖會自動改用原圖 */
 const IMG_HOST="img.obsidianfirelight.com";
@@ -875,7 +879,7 @@ function newDays(){const v=SITE.newDays;if(v===undefined||v===null||v==="")retur
 function isNew(x){const d=newDays();if(!d||!x||!x.date)return false;const t=Date.parse(String(x.date).slice(0,10)+"T00:00:00+08:00");if(isNaN(t))return false;const age=Date.now()-t;return age>-864e5&&age<d*864e5;}
 const newBadge=(x,k)=>isNew(x)&&!(k&&seenAt(k))?`<span class="new-badge" title="最近更新">NEW</span>`:"";
 
-const SITE_VERSION="2026-11-17 v1.6";
+const SITE_VERSION="2026-11-17 v1.7";
 const BROKEN=[];
 async function load(){
   const files=["site.json","series.json","chapters.json","side-stories.json","characters.json","commissions.json","tools.json","notes.json","history.json","glossary.json"];
@@ -1466,7 +1470,7 @@ document.addEventListener("click",async e=>{
 function openLb(artHtml,title,desc,meta){
   $("#lbArt").innerHTML=artHtml;
   const img=$("#lbArt img"),car=$("#lbArt .cards");$("#lbArt").classList.toggle("full",!!img&&!car);$("#lbArt").classList.toggle("lb-cards",!!car);
-  if(img&&(SITE.protect||{}).hideOriginal===false)meta=(meta||"")+`<a class="lb-orig" href="${img.getAttribute("src")}" target="_blank" rel="noopener">開啟原圖 ↗</a>`;$("#lbTitle").textContent=title||"";$("#lbDesc").innerHTML=inline(desc||"");$("#lbMeta").innerHTML=meta||"";
+  if(img&&(SITE.protect||{}).hideOriginal===false)meta=(meta||"")+`<a class="lb-orig" href="${esc(safeImg(img.getAttribute("src")))}" target="_blank" rel="noopener">開啟原圖 ↗</a>`;$("#lbTitle").textContent=title||"";$("#lbDesc").innerHTML=inline(desc||"");$("#lbMeta").innerHTML=meta||"";
   lbReturn=document.activeElement;$("#lb").classList.add("on");$("#lbClose").focus();
   if(car){initCards($("#lbArt"));$("#lb .lb-in").scrollTop=0;}
 }
