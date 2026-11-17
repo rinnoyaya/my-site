@@ -29,5 +29,6 @@
     "bgImageUrl": "https://img.obsidianfirelight.com/commissions/img-20261116-223850.png",
     "bgFit": "填滿畫面",
     "bgOverlay": "淡"
-  }
+  },
+  "useThumbs": true
 }
