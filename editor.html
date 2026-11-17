@@ -77,6 +77,27 @@ main{max-width:1040px;margin:0 auto;padding:28px 20px 64px}
 .hero h1{font-size:clamp(30px,5vw,44px);margin:6px 0 12px}
 .hero p{color:var(--muted);margin:0 0 18px;max-width:34em}
 .hero .art{border-radius:12px;overflow:hidden;aspect-ratio:4/3}
+/* 首頁主圖輪播 */
+#heroArt.hslides{position:relative;touch-action:pan-y}
+.hslide{position:absolute;inset:0;opacity:0;visibility:hidden;transition:opacity .9s ease,transform .7s ease,visibility 0s linear .9s;display:block}
+.hslide.on{opacity:1;visibility:visible;transition:opacity .9s ease,transform .7s ease,visibility 0s}
+.fx-slide .hslide{opacity:1;transform:translateX(100%);transition:transform .7s cubic-bezier(.4,0,.2,1),visibility 0s linear .7s}
+.fx-slide .hslide.on{transform:none;transition:transform .7s cubic-bezier(.4,0,.2,1),visibility 0s}
+.fx-slide .hslide.out{visibility:visible;transform:translateX(-100%);transition:transform .7s cubic-bezier(.4,0,.2,1)}
+.fx-slide.rev .hslide{transform:translateX(-100%)}.fx-slide.rev .hslide.on{transform:none}.fx-slide.rev .hslide.out{transform:translateX(100%)}
+.fx-slide.nofx .hslide{transition:none}
+.hfit-contain .hslide img,#heroArt.hfit-contain>img{object-fit:contain;object-position:center}
+.hfit-contain{background:var(--card)}
+.hslide figcaption,.hslide .hcap{position:absolute;left:0;right:0;bottom:0;padding:28px 14px 30px;background:linear-gradient(transparent,rgba(0,0,0,.6));color:#fff;font-size:14px;line-height:1.5;text-shadow:0 1px 3px rgba(0,0,0,.5);z-index:2;pointer-events:none}
+.hdots{position:absolute;left:0;right:0;bottom:6px;display:flex;justify-content:center;z-index:3}
+.hdots button{width:24px;height:24px;padding:0;border:0;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.hdots button::before{content:"";width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.55);box-shadow:0 0 3px rgba(0,0,0,.5);transition:all .25s}
+.hdots button.on::before{background:#fff;width:18px;border-radius:4px}
+@media (pointer:coarse){.hdots button{width:28px;height:28px}}
+.harrow{position:absolute;top:50%;transform:translateY(-50%);z-index:3;width:36px;height:36px;border-radius:50%;border:0;background:rgba(0,0,0,.35);color:#fff;font-size:20px;line-height:1;cursor:pointer;opacity:0;transition:opacity .2s;display:flex;align-items:center;justify-content:center}
+.harrow.prev{left:8px}.harrow.next{right:8px}
+#heroArt:hover .harrow,.harrow:focus-visible{opacity:1}
+@media (hover:none){.harrow{display:none}}
 .btn{display:inline-block;background:var(--accent);color:var(--card);padding:9px 18px;border-radius:8px;font-weight:500}
 .btn:hover{text-decoration:none;opacity:.9}
 .btn.ghost{background:none;color:var(--accent);border:1px solid var(--line)}
