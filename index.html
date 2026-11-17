@@ -9,7 +9,11 @@
 <link rel="apple-touch-icon" href="icon.png?v=2">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=LXGW+WenKai+TC:wght@400;700&family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@400;600&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://img.obsidianfirelight.com">
+<meta name="theme-color" content="#191d2a">
+<!-- 字型不擋住畫面：先顯示內容，字型載好再換上 -->
+<link href="https://fonts.googleapis.com/css2?family=LXGW+WenKai+TC:wght@400;700&family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@400;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=LXGW+WenKai+TC:wght@400;700&family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@400;600&display=swap" rel="stylesheet"></noscript>
 <style>
 /* 版面概念：夜裡的一盞燈。冷調紙白＋靛藍，燈火金點綴；閱讀頁以襯線字、窄欄為主 */
 :root{
@@ -40,15 +44,28 @@
 }
 *{box-sizing:border-box}
 html,body{margin:0}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 body{background:var(--paper);color:var(--ink);font-family:var(--f-body);line-height:1.7;-webkit-font-smoothing:antialiased}
 a{color:var(--accent);text-decoration:none}
 a:hover{text-decoration:underline}
 :focus-visible{outline:2px solid var(--lamp);outline-offset:2px;border-radius:4px}
 img,svg{max-width:100%;display:block}
-h1,h2,h3{font-family:var(--f-display);font-weight:700;line-height:1.3;text-wrap:balance;margin:0}
+h1,h2,h3{font-family:var(--f-display);font-weight:700;line-height:1.3;text-wrap:balance;margin:0;overflow-wrap:anywhere}
 
 .demo{background:var(--lamp);color:#1c1606;font-size:13px;text-align:center;padding:6px 16px}
-header{border-bottom:1px solid var(--line);background:var(--card)}
+header{border-bottom:1px solid var(--line);background:var(--card);position:sticky;top:0;z-index:6;transition:transform .25s ease}
+header.hide{transform:translateY(-100%)}
+.skip{position:absolute;left:8px;top:-60px;z-index:50;background:var(--ink);color:var(--paper);border:0;border-radius:8px;padding:8px 14px;font:inherit;font-size:14px;cursor:pointer}
+.skip:focus{top:8px}
+main:focus{outline:none}
+#readBar{position:fixed;left:0;top:0;height:3px;width:100%;transform-origin:0 50%;transform:scaleX(0);background:var(--lamp);z-index:7;pointer-events:none;opacity:0;transition:opacity .2s}
+#readBar.on{opacity:1}
+#toTop{position:fixed;right:16px;bottom:16px;z-index:7;width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:var(--card);color:var(--ink);font-size:18px;line-height:1;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.2);opacity:0;visibility:hidden;transform:translateY(8px);transition:opacity .2s,transform .2s,visibility 0s linear .2s}
+#toTop.on{opacity:.92;visibility:visible;transform:none;transition:opacity .2s,transform .2s}
+body:has(.owner:not([hidden])) #toTop{bottom:70px}
+html.modal-lock,html.modal-lock body{overflow:hidden}
+.img-miss{width:100%;height:100%;min-height:90px;display:flex;align-items:center;justify-content:center;text-align:center;padding:10px;color:var(--muted);font-size:13px;background:var(--paper)}
+.utxt{min-width:0}
 .bar{max-width:1040px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
 .logo{font-family:var(--f-display);font-size:22px;color:var(--ink);display:flex;align-items:center;gap:8px}
 .logo:hover{text-decoration:none}
@@ -152,7 +169,8 @@ main{max-width:1040px;margin:0 auto;padding:28px 20px 64px}
 
 .lb{position:fixed;inset:0;background:rgba(8,10,18,.86);display:none;align-items:center;justify-content:center;padding:20px;z-index:10}
 .lb.on{display:flex}
-.lb-in{background:var(--card);border-radius:12px;max-width:1000px;width:100%;max-height:100%;overflow:auto}
+.lb-in{background:var(--card);border-radius:12px;max-width:1000px;width:100%;max-height:100%;overflow:auto;overscroll-behavior:contain}
+#lbArt.full img{max-height:max(240px,calc(100dvh - 230px))}
 .lb-in .art{aspect-ratio:4/3}
 /* 縮圖：裁切成整齊的格子，優先保留上半部 */
 .art img{width:100%;height:100%;object-fit:cover;object-position:center top}
@@ -180,21 +198,6 @@ main{max-width:1040px;margin:0 auto;padding:28px 20px 64px}
 /* 關於 */
 .about{max-width:640px}
 .about p{margin:0 0 1em}
-
-/* 後台示意 */
-.cms{display:grid;grid-template-columns:200px 1fr;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--card)}
-.cms aside{background:var(--paper);border-right:1px solid var(--line);padding:16px;font-size:14px}
-.cms aside b{display:block;font-size:12px;color:var(--muted);margin:12px 0 6px;letter-spacing:.06em}
-.cms aside b:first-child{margin-top:0}
-.cms aside div{padding:6px 10px;border-radius:6px;color:var(--muted)}
-.cms aside div.on{background:var(--card);color:var(--ink);font-weight:500}
-.cms form{padding:20px;display:grid;gap:14px}
-.cms label{display:grid;gap:4px;font-size:14px;color:var(--muted)}
-.cms input,.cms select,.cms textarea{font:inherit;color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
-.cms textarea{min-height:160px;font-family:var(--f-read);line-height:1.8}
-.cms .two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.drop{border:1.5px dashed var(--line);border-radius:8px;padding:18px;text-align:center;color:var(--muted);font-size:14px}
-.saved{color:var(--accent);font-size:14px;min-height:1.5em}
 
 /* 委託圖 */
 .stats{display:flex;gap:28px;flex-wrap:wrap;margin:0 0 20px;padding:14px 18px;background:var(--card);border:1px solid var(--line);border-radius:12px}
@@ -491,14 +494,48 @@ footer{border-top:1px solid var(--line);color:var(--muted);font-size:13px;text-a
   nav::-webkit-scrollbar{display:none}
   nav a{white-space:nowrap;flex:none}
 }
-@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+/* 電腦（滑鼠）：卡片浮起、鍵盤換篇提示 */
+@media (hover:hover) and (pointer:fine){
+  .piece,.scard,.gcard,.tcard,.char,.ncard,.continue{transition:border-color .15s,transform .15s,box-shadow .15s}
+  .piece:hover,.scard:hover,.gcard:hover,.tcard:hover,.continue:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(0,0,0,.12)}
+  .pager a:not(.next) small::before{content:"← "}
+  .pager a.next small::after{content:" →"}
+  .chlist li a{padding-left:6px;padding-right:6px;border-radius:6px}
+  .chlist li a:hover{background:color-mix(in srgb,var(--accent) 8%,transparent)}
+}
+/* 寬螢幕 */
+@media (min-width:1200px){
+  .bar,main{max-width:1120px}
+  .grid{grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:18px}
+}
+/* 手機 */
+@media (max-width:720px){
+  main{padding:22px 16px 56px}
+  nav{-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 14px,#000 calc(100% - 28px),transparent);mask-image:linear-gradient(90deg,transparent 0,#000 14px,#000 calc(100% - 28px),transparent)}
+  nav a{padding:8px 10px}
+  .sec{margin:32px 0 12px}.sec h2{font-size:21px}
+  .series{padding:16px;gap:16px}
+  .stats{gap:18px 24px;padding:12px 16px}
+  .lb{padding:10px}
+  .lb-body{padding:14px 16px 16px}
+  .grid{grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:12px}
+  .piece div.cap{padding:8px 10px}
+  .rtools{margin-bottom:20px}
+  .prose{line-height:1.95;letter-spacing:.01em}
+  .site-toast{bottom:calc(20px + env(safe-area-inset-bottom))}
+}
+@media (max-width:400px){.char{grid-template-columns:64px 1fr;padding:14px;gap:12px}.char .art{width:64px;height:64px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+@media print{header,footer,.owner,#toTop,#readBar,.rtools .share,.pager,.resume,[data-fs]{display:none!important}body{background:#fff;color:#000}main{max-width:none;padding:0}}
 </style>
 </head>
 <body>
 <div class="bg-layer" id="bgLayer" aria-hidden="true"></div>
 <style id="customTheme"></style>
 <div class="demo" id="demoBanner" hidden>這是範例網站，內容都是示意，可以在後台換成你的作品；「網站設定」裡可以關掉這條提示</div>
-<header>
+<button type="button" class="skip" id="skipBtn">跳到主要內容</button>
+<div id="readBar" aria-hidden="true"></div>
+<header id="hdr">
   <div class="bar">
     <a class="logo" href="#home"><img src="favicon.png?v=2" alt="" width="32" height="32"><span id="siteName">　</span></a>
     <nav id="nav">
@@ -515,7 +552,8 @@ footer{border-top:1px solid var(--line);color:var(--muted);font-size:13px;text-a
   </div>
 </header>
 
-<main>
+<main id="main" tabindex="-1">
+  <noscript><p>這個網站需要開啟 JavaScript 才能顯示內容。</p></noscript>
   <p id="loading" style="color:var(--muted)">載入中…</p>
 
   <section class="view" id="v-home">
@@ -651,10 +689,11 @@ footer{border-top:1px solid var(--line);color:var(--muted);font-size:13px;text-a
   </div>
 </div>
 <footer id="footer"></footer>
+<button type="button" id="toTop" aria-label="回到頁面最上方" title="回到最上方">↑</button>
 <div class="owner" id="owner" hidden>
   <div class="omenu" id="omenu" role="menu" aria-label="擁有者選單">
     <div class="osec" id="oThis"></div>
-    <div class="olabel">後台分類</div>
+    <div class="olabel">後台的每一類</div>
     <div class="ogrid" id="oAll"></div>
     <a class="oitem" href="editor.html" role="menuitem">✎ 寫作小幫手（空白草稿）</a>
     <a class="oitem" href="upload.html" role="menuitem">⬆ 上傳圖片到圖庫</a>
@@ -836,7 +875,7 @@ function newDays(){const v=SITE.newDays;if(v===undefined||v===null||v==="")retur
 function isNew(x){const d=newDays();if(!d||!x||!x.date)return false;const t=Date.parse(String(x.date).slice(0,10)+"T00:00:00+08:00");if(isNaN(t))return false;const age=Date.now()-t;return age>-864e5&&age<d*864e5;}
 const newBadge=(x,k)=>isNew(x)&&!(k&&seenAt(k))?`<span class="new-badge" title="最近更新">NEW</span>`:"";
 
-const SITE_VERSION="2026-11-17 v1.4";
+const SITE_VERSION="2026-11-17 v1.6";
 const BROKEN=[];
 async function load(){
   const files=["site.json","series.json","chapters.json","side-stories.json","characters.json","commissions.json","tools.json","notes.json","history.json","glossary.json"];
@@ -844,7 +883,7 @@ async function load(){
   const get=async f=>{
     const empty=f==="site.json"?{}:[];
     try{
-      const r=await fetch("data/"+f+"?v="+Date.now());
+      const r=await fetch("data/"+f,{cache:"no-cache"}); /* 每次都跟伺服器確認有沒有新版，沒變就直接用快取 */
       if(!r.ok){if(r.status===404&&optional.includes(f))return empty;throw new Error(r.status===404?"找不到這個檔案":"讀取失敗（"+r.status+"）");}
       const t=await r.text();
       if(!t.trim())return empty; /* 後台刪光所有項目時會存成空白檔案，當作沒有內容 */
@@ -921,6 +960,7 @@ function renderSite(){
   document.title=SITE.siteName||"我的網站";
   $("#siteName").textContent=SITE.siteName||"";
   $("#demoBanner").hidden=!SITE.showDemoBanner;
+  requestAnimationFrame(syncThemeColor);
   $("#heroEyebrow").textContent=SITE.heroEyebrow||"";
   $("#heroTitle").textContent=SITE.heroTitle||"";
   $("#heroText").innerHTML=inline(SITE.heroText||"");
@@ -938,7 +978,7 @@ function renderSite(){
     ...NOTES.map(n=>({d:n.date,t:"文章",cls:"",txt:n.title,href:"#note-"+enc(chId(n)),x:n,k:"note:"+chId(n)})),
     ...TOOLS.map(t=>({d:t.date,t:"小工具",cls:"",txt:t.title,href:"#tool-"+enc(toolId(t)),x:t}))
   ].filter(u=>u.d).sort((a,b)=>String(b.d).localeCompare(String(a.d))).slice(0,6);
-  $("#updates").innerHTML=ups.map(u=>`<li><time>${esc(u.d)}</time><span class="tag ${u.cls}">${u.t}</span><a href="${u.href}">${esc(u.txt)}</a>${badge(u.x)}${newBadge(u.x,u.k)}</li>`).join("");
+  $("#updates").innerHTML=ups.map(u=>`<li><time>${esc(u.d)}</time><span class="tag ${u.cls}">${u.t}</span><span class="utxt"><a href="${u.href}">${esc(u.txt)}</a>${badge(u.x)}${newBadge(u.x,u.k)}</span></li>`).join("");
   renderContinue();
   $("#navGloss").hidden=!GLOSS.length;
 }
@@ -1025,7 +1065,7 @@ function renderSeries(){
 /* ---------- 閱讀頁（主線與角色故事共用） ---------- */
 function renderReader(id,side){
   const pool=side?SIDE:CHAPTERS;
-  const c=pool.find(x=>chId(x)===id); if(!c){location.hash=side?"side":"stories";return;}
+  const c=pool.find(x=>chId(x)===id); if(!c){location.replace(side?"#side":"#stories");return;}
   const list=side?SIDE.filter(x=>x.character===c.character).sort((a,b)=>String(a.date).localeCompare(String(b.date))):chaptersOf(c.series);
   const i=list.indexOf(c),prev=list[i-1],next=list[i+1],pre=side?"#side-":"#read-";
   const crumb=side?`<a href="#side">角色故事</a> ／ ${charLink(c.character)}`:`<a href="#stories">故事</a> ／ ${esc(c.series)}`;
@@ -1042,7 +1082,7 @@ function renderReader(id,side){
   $("#reader").innerHTML=`<div class="crumb">${crumb}</div>
     <h1>${esc(c.title)}${badge(c)}</h1>
     <div class="rtools"><span class="row">${esc(c.date)}　${who.map(charLink).join("")}</span>
-      <span class="row">${shareButtons(c.title)}<button class="tbtn" type="button" data-fs="-1">字小一點</button><button class="tbtn" type="button" data-fs="1">字大一點</button></span></div>
+      <span class="row">${shareButtons(c.title)}<button class="tbtn" type="button" data-fs="-1" aria-label="字小一點" title="字小一點">A−</button><button class="tbtn" type="button" data-fs="1" aria-label="字大一點" title="字大一點">A＋</button></span></div>
     ${cover}
     ${vid}
     <div class="prose rich"><div class="${wrapCls(c)}">${ps.join("")}</div></div>
@@ -1072,7 +1112,7 @@ function trackProgress(k,el,after){
 let pgT=0;
 addEventListener("scroll",()=>{if(!PG_CUR||pgT)return;pgT=setTimeout(()=>{pgT=0;if(!PG_CUR||!PG_CUR.el.isConnected||!PG_CUR.el.offsetParent)return;
   const r=proseRatio(PG_CUR.el),k=PG_CUR.k,old=PG.pos[k]||0;
-  if(Math.abs(r-old)>=.01||(r>=.95&&old<.95)){PG.pos[k]=old>=.95&&r<old?old:r;if(r>=.95)PG.pos[k]=1;pgSave();}
+  if(r>=old+.01||(r>=.95&&old<1)){PG.pos[k]=r>=.95?1:r;pgSave();}
 },400);},{passive:true});
 let fs=18; try{fs=+localStorage.getItem("fs")||18}catch(e){}
 function setFs(d){fs=Math.min(24,Math.max(15,fs+d));document.documentElement.style.setProperty("--read-size",fs+"px");try{localStorage.setItem("fs",fs)}catch(e){}}
@@ -1096,7 +1136,7 @@ function renderChars(){
   <a href="#char-${enc(n)}">看完整介紹 →</a></div></div>`}).join("");
 }
 function renderCharPage(n){
-  const h=charOf(n); if(!h){location.hash="characters";return;}
+  const h=charOf(n); if(!h){location.replace("#characters");return;}
   const cm=commOf(n),sd=sideOf(n),nt=notesOf(n),ap=CHAPTERS.filter(c=>(c.characters||[]).includes(n));
   const refs=(h.refs||[]).map(r=>({src:imgOf(r,"image"),caption:r.caption||"",size:r.size||""})).filter(r=>r.src);
   $("#charPage").innerHTML=`<div class="crumb"><a href="#characters">角色</a> ／ ${esc(n)}</div>
@@ -1139,7 +1179,7 @@ function bindComm(root){
     const artist=m.artistLink?`<a class="tag warm" href="${esc(m.artistLink)}" target="_blank" rel="noopener">繪師：${esc(m.artist)} ↗</a>`:`<span class="tag warm">繪師：${esc(m.artist)}</span>`;
     const imgs=commImages(m);
     openLb(imgs.length>1?cardsHtml(imgs,"","in-lb",m.title):pic(imgOf(m,"image"),"comm-"+m.title,m.title),m.title,m.description,
-      `<span class="tag">${esc(m.date)}</span>${m.type?`<span class="tag">${esc(m.type)}</span>`:""}${artist}${(m.characters||[]).map(charLink).join("")}`);
+      `<span class="tag">${esc(m.date)}</span>${m.type?`<span class="tag">${esc(m.type)}</span>`:""}${artist}${(m.characters||[]).map(charLink).join("")}${OWNER?`<a class="tag" href="${cmsEdit("commissions",m)}" target="_blank" rel="noopener">✎ 到後台編輯這張 ↗</a>`:""}`);
   });
 }
 function renderComm(){
@@ -1164,7 +1204,7 @@ function renderTools(){
       <div class="tact">${toolLink(t,"btn")}<a class="btn ghost" href="#tool-${enc(toolId(t))}">看介紹</a></div></div></div>`).join("")||`<p style="color:var(--muted)">還沒有小工具。</p>`;
 }
 function renderTool(id){
-  const t=TOOLS.find(x=>toolId(x)===id); if(!t){location.hash="tools";return;}
+  const t=TOOLS.find(x=>toolId(x)===id); if(!t){location.replace("#tools");return;}
   const cover=imgOf(t,"image"),csz=szOf(t.imageSize),cards=cardsOf(t);
   $("#toolPage").innerHTML=`<div class="crumb"><a href="#tools">小工具</a></div>
     <h1>${esc(t.title)}</h1>
@@ -1195,6 +1235,7 @@ function heroSlidesOf(){
 function renderHeroSlides(){
   clearInterval(heroTimer);heroTimer=null;
   const box=$("#heroArt"),fit=SITE.heroFit==="完整顯示";
+  if(box._ac)box._ac.abort();box._ac=new AbortController();const sig={signal:box._ac.signal};
   let list=heroSlidesOf();
   box.className="art"+(fit?" hfit-contain":"");box.onmouseenter=box.onmouseleave=null;box.ontouchstart=box.ontouchend=null;
   if(list.length<=1){const x=list[0];box.innerHTML=x?(x.link?`<a href="${esc(x.link)}" style="display:block;width:100%;height:100%">${pic(x.src,"hero",x.cap)}</a>`:pic(x.src,"hero",x.cap)):pic("","hero","");return;}
@@ -1221,11 +1262,11 @@ function renderHeroSlides(){
   box.querySelector(".next").onclick=e=>{e.preventDefault();go(cur+1,1);start();};
   dots.forEach((d,j)=>d.onclick=e=>{e.preventDefault();go(j,j>cur?1:-1);start();});
   box.onmouseenter=()=>paused=true;box.onmouseleave=()=>paused=false;
-  box.addEventListener("focusin",()=>paused=true);box.addEventListener("focusout",()=>paused=false);
+  box.addEventListener("focusin",()=>paused=true,sig);box.addEventListener("focusout",()=>paused=false,sig);
   let tx=0,ty=0,swiped=false;
   box.ontouchstart=e=>{tx=e.touches[0].clientX;ty=e.touches[0].clientY;swiped=false;};
   box.ontouchend=e=>{const dx=e.changedTouches[0].clientX-tx,dy=e.changedTouches[0].clientY-ty;if(Math.abs(dx)>40&&Math.abs(dx)>Math.abs(dy)*1.3){swiped=true;go(cur+(dx<0?1:-1),dx<0?1:-1);start();}};
-  box.addEventListener("click",e=>{if(swiped){e.preventDefault();swiped=false;}},true);
+  box.addEventListener("click",e=>{if(swiped){e.preventDefault();swiped=false;}},{capture:true,signal:sig.signal});
   start();
 }
 /* ---------- 教學圖卡：左右滑動 ---------- */
@@ -1262,6 +1303,7 @@ function setCardsFs(box,on){
   (on?box.querySelector(".cards-track"):box.querySelector(".cards-fs")).focus({preventScroll:true});
 }
 function initCards(root){
+  if(root._ac)root._ac.abort();root._ac=new AbortController();const sig={signal:root._ac.signal};
   root.querySelectorAll(".cards").forEach(box=>{
     const tr=box.querySelector(".cards-track"),slides=[...tr.children],n=slides.length;
     const cnt=box.querySelector(".cards-count"),pv=box.querySelector(".prev"),nx=box.querySelector(".next"),dots=[...box.querySelectorAll(".cards-dots button")];
@@ -1276,10 +1318,10 @@ function initCards(root){
     /* 滑鼠拖曳（電腦） */
     let sx=0,sl=0,moved=false,down=false;
     tr.addEventListener("pointerdown",e=>{if(e.pointerType!=="mouse"||e.button)return;down=true;moved=false;sx=e.clientX;sl=tr.scrollLeft;});
-    addEventListener("pointermove",e=>{if(!down)return;const dx=e.clientX-sx;if(Math.abs(dx)>5){moved=true;tr.classList.add("drag");}if(moved)tr.scrollLeft=sl-dx;});
-    addEventListener("pointerup",e=>{if(!down)return;down=false;if(!moved)return;tr.classList.remove("drag");const dx=e.clientX-sx,w=tr.clientWidth;let i=Math.round(sl/w);if(dx<-w*.12)i++;else if(dx>w*.12)i--;box._go(i);});
+    addEventListener("pointermove",e=>{if(!down)return;const dx=e.clientX-sx;if(Math.abs(dx)>5){moved=true;tr.classList.add("drag");}if(moved)tr.scrollLeft=sl-dx;},sig);
+    addEventListener("pointerup",e=>{if(!down)return;down=false;if(!moved)return;tr.classList.remove("drag");const dx=e.clientX-sx,w=tr.clientWidth;let i=Math.round(sl/w);if(dx<-w*.12)i++;else if(dx>w*.12)i--;box._go(i);},sig);
     tr.addEventListener("click",e=>{if(moved){moved=false;e.preventDefault();return;}if(e.target.closest(".card-slide")&&!box.classList.contains("fs"))setCardsFs(box,true);});
-    let rt;addEventListener("resize",()=>{clearTimeout(rt);rt=setTimeout(()=>{if(box.isConnected)box._go(box._cur,false);},120);});
+    let rt;addEventListener("resize",()=>{clearTimeout(rt);rt=setTimeout(()=>{if(box.isConnected)box._go(box._cur,false);},120);},sig);
   });
 }
 document.addEventListener("keydown",e=>{
@@ -1300,7 +1342,7 @@ function renderNotes(){
 }
 function renderNote(id){
   const list=[...NOTES].sort((a,b)=>String(a.date).localeCompare(String(b.date)));
-  const n=list.find(x=>chId(x)===id); if(!n){location.hash="notes";return;}
+  const n=list.find(x=>chId(x)===id); if(!n){location.replace("#notes");return;}
   const i=list.indexOf(n),prev=list[i-1],next=list[i+1];
   if(locked(n)){$("#noteReader").innerHTML=`<div class="crumb"><a href="#notes">文章</a> ／ ${esc(n.category)}</div><h1>${esc(n.title)}${badge(n)}</h1>${gatePanel()}`;return;}
   const body=blocks(n.body).join("");
@@ -1375,7 +1417,7 @@ function renderGlossary(){
 }
 $("#gsearch").addEventListener("input",()=>renderGlossary());
 function renderTerm(k){
-  const g=termOf(k);if(!g){location.hash="glossary";return;}
+  const g=termOf(k);if(!g){location.replace("#glossary");return;}
   const names=[termKey(g),...aliasesOf(g)].map(x=>x.toLowerCase());
   const has=x=>{if(locked(x))return false;const t=String((x.title||"")+" "+(x.body||"")).toLowerCase();return names.some(n=>t.includes(n));};
   const seen=[...CHAPTERS.filter(has).map(c=>({h:"#read-"+enc(chId(c)),t:`${c.series}・${c.title}`,d:c.date})),...SIDE.filter(has).map(c=>({h:"#side-"+enc(chId(c)),t:`${c.character}・${c.title}`,d:c.date})),...NOTES.filter(has).map(n=>({h:"#note-"+enc(chId(n)),t:n.title,d:n.date}))].slice(0,12);
@@ -1443,21 +1485,36 @@ document.addEventListener("keydown",e=>{const c=$("#lb").classList.contains("on"
 let OWNER=false;try{OWNER=localStorage.getItem("owner-mode")==="1";}catch(e){}
 /* 後台網址：app.pagescms.org/帳號/repo/分支 */
 const CMS="https://app.pagescms.org/rinnoyaya/my-site/main";
-const CMS_ENTRIES=[["site","網站設定"],["history","網站歷程"],["series","故事系列"],["chapters","故事章節"],["side","角色故事"],["characters","角色"],["commissions","委託圖"],["tools","小工具"],["notes","文章"],["glossary","名詞百科"]];
-const CMS_COLLECTIONS=["history","series","chapters","side","characters","commissions","tools","notes","glossary"];
-const cmsUrl=name=>CMS+(CMS_COLLECTIONS.includes(name)?"/collection/":"/file/")+name;
+const CMS_ENTRIES=[["chapters","故事章節"],["side","角色故事"],["series","故事系列"],["characters","角色"],["glossary","名詞百科"],["commissions","委託圖"],["tools","小工具"],["notes","文章"],["history","網站歷程"],["site","首頁與基本"],["site-about","關於頁與頁尾"],["site-theme","外觀"],["site-safety","成人與圖片保護"],["site-advanced","進階設定"]];
+const CMS_FILES=["site","site-about","site-theme","site-safety","site-advanced"];
+const CMS_DIR={chapters:"content/chapters",side:"content/side-stories",series:"content/series",characters:"content/characters",glossary:"content/glossary",commissions:"content/commissions",tools:"content/tools",notes:"content/notes",history:"content/history"};
+const cmsName=k=>(CMS_ENTRIES.find(e=>e[0]===k)||[])[1]||"";
+const cmsUrl=name=>CMS+(CMS_FILES.includes(name)?"/file/":"/collection/")+name;
+const cmsNew=name=>CMS+"/collection/"+name+"/new";
+/* 直接打開後台的那一筆（要有 _file，建置時會自動加上）；沒有就打開那一類的列表 */
+const cmsEdit=(name,x)=>x&&x._file&&CMS_DIR[name]?CMS+"/collection/"+name+"/edit/"+enc(CMS_DIR[name]+"/"+x._file+".json"):cmsUrl(name);
 function updateFab(pre,arg,v){
   const box=$("#owner");if(!OWNER){box.hidden=true;return;}
   const map={"read-":"chapters","side-":"side","note-":"notes","char-":"characters","tool-":"tools","term-":"glossary"};
-  let key=pre&&map[pre]?map[pre]+":"+arg:v==="about"?"site:about":"";
-  if(key&&pre==="term-"&&!termOf(arg))key="";
-  if(key&&pre!=="char-"&&pre!=="term-"){const pool=pre==="read-"?CHAPTERS:pre==="side-"?SIDE:pre==="tool-"?TOOLS:NOTES;if(!pool.find(x=>chId(x)===arg))key="";}
-  const viewEntry={stories:"series",side:"side",characters:"characters",commissions:"commissions",tools:"tools",notes:"notes",about:"site",home:"site",glossary:"glossary"};
-  const entry=pre?map[pre]:viewEntry[v];
-  const name=(CMS_ENTRIES.find(e=>e[0]===entry)||[])[1];
-  const ext=' target="_blank" rel="noopener"';
-  $("#oThis").innerHTML=(key?`<a class="oitem main" href="editor.html#edit=${enc(key)}" role="menuitem">✎ 用小幫手編輯這頁</a>`:"")+
-    (name?`<a class="oitem" href="${cmsUrl(entry)}"${ext} role="menuitem">⚙ 到後台編輯「${name}」 ↗</a>`:"");
+  const item=pre==="read-"?CHAPTERS.find(x=>chId(x)===arg):pre==="side-"?SIDE.find(x=>chId(x)===arg):pre==="note-"?NOTES.find(x=>chId(x)===arg):pre==="char-"?charOf(arg):pre==="tool-"?TOOLS.find(x=>toolId(x)===arg):pre==="term-"?termOf(arg):null;
+  const ext=' target="_blank" rel="noopener" role="menuitem"';
+  const viewEntry={stories:"chapters",side:"side",characters:"characters",commissions:"commissions",tools:"tools",notes:"notes",glossary:"glossary"};
+  let h="";
+  if(pre&&item){
+    const e=map[pre];
+    h+=`<a class="oitem main" href="editor.html#edit=${enc(e+":"+arg)}" role="menuitem">✎ 用小幫手編輯內文</a>`
+      +`<a class="oitem" href="${cmsEdit(e,item)}"${ext}>⚙ 到後台編輯這一篇（標題、圖片、設定）↗</a>`
+      +`<a class="oitem" href="${cmsNew(e)}"${ext}>＋ 新增一筆「${cmsName(e)}」↗</a>`;
+  }else if(v==="about"){
+    h+=`<a class="oitem main" href="editor.html#edit=${enc("site:about")}" role="menuitem">✎ 用小幫手編輯關於頁</a><a class="oitem" href="${cmsUrl("site-about")}"${ext}>⚙ 到後台編輯「關於頁與頁尾」↗</a>`;
+  }else if(v==="home"){
+    h+=`<a class="oitem main" href="${cmsUrl("site")}"${ext}>⚙ 編輯首頁（標題、主圖、輪播）↗</a><a class="oitem" href="${cmsNew("history")}"${ext}>＋ 新增一筆「網站歷程」↗</a>`;
+  }else if(viewEntry[v]){
+    const e=viewEntry[v];
+    h+=`<a class="oitem main" href="${cmsNew(e)}"${ext}>＋ 新增一筆「${cmsName(e)}」↗</a><a class="oitem" href="${cmsUrl(e)}"${ext}>⚙ 到後台管理「${cmsName(e)}」↗</a>`;
+    if(v==="stories")h+=`<a class="oitem" href="${cmsUrl("series")}"${ext}>⚙ 管理「故事系列」↗</a>`;
+  }
+  $("#oThis").innerHTML=h;
   box.hidden=false;closeOwner();
 }
 function closeOwner(){$("#owner").classList.remove("open");$("#fab").setAttribute("aria-expanded","false");}
@@ -1469,7 +1526,14 @@ document.addEventListener("keydown",e=>{if(e.key==="Escape")closeOwner();});
 $("#omenu").addEventListener("click",e=>{if(e.target.closest("a"))closeOwner();});
 
 /* ---------- 換頁 ---------- */
+/* 上一頁／下一頁時回到原本捲到的位置；點連結進新頁面則從頭開始 */
+try{history.scrollRestoration="manual";}catch(e){}
+let NAV={m:0,s:{}},NAV_I=0,firstRoute=true;
+try{const o=JSON.parse(sessionStorage.getItem("nav-scroll")||"{}");NAV={m:+o.m||0,s:o.s||{}};}catch(e){}
+function navSave(){const ks=Object.keys(NAV.s);if(ks.length>60)ks.sort((a,b)=>a-b).slice(0,ks.length-60).forEach(k=>delete NAV.s[k]);try{sessionStorage.setItem("nav-scroll",JSON.stringify(NAV));}catch(e){}}
 function route(){
+  const st=history.state,trav=!!(st&&typeof st.i==="number");
+  if(trav){NAV_I=st.i;NAV.m=Math.max(NAV.m,NAV_I);}else{NAV_I=++NAV.m;try{history.replaceState({i:NAV_I},"");}catch(e){}}
   let h="home";try{h=decodeURIComponent(location.hash.slice(1))||"home";}catch(e){}
   const pre=["read-","side-","char-","note-","tool-","term-"].find(p=>h.startsWith(p));
   const arg=pre?h.slice(pre.length):"";
@@ -1478,7 +1542,7 @@ function route(){
   closeLb();closeGlPop();PG_CUR=null;
   document.querySelectorAll(".view").forEach(x=>x.classList.toggle("on",x.id==="v-"+v));
   const navKey=pre==="read-"?"stories":pre==="side-"?"side":pre==="char-"?"characters":pre==="note-"?"notes":pre==="tool-"?"tools":pre==="term-"?"glossary":v;
-  document.querySelectorAll("#nav a").forEach(a=>a.classList.toggle("on",a.getAttribute("href")==="#"+navKey));
+  document.querySelectorAll("#nav a").forEach(a=>{const on=a.getAttribute("href")==="#"+navKey;a.classList.toggle("on",on);if(on)a.setAttribute("aria-current","page");else a.removeAttribute("aria-current");});
   const on=$("#nav a.on");if(on&&$("#nav").scrollWidth>$("#nav").clientWidth)$("#nav").scrollTo({left:on.offsetLeft-$("#nav").clientWidth/2+on.offsetWidth/2});
   if(pre==="read-")renderReader(arg,false);
   if(pre==="side-")renderReader(arg,true);
@@ -1497,8 +1561,64 @@ function route(){
   const h1=document.querySelector(".view.on h1");
   const sub=pre?(h1?h1.textContent.replace(/18\+$/,"").trim():""):(names[v]||"");
   document.title=(sub?sub+"｜":"")+(SITE.siteName||"");
-  window.scrollTo(0,0);
+  const y=trav?(+NAV.s[NAV_I]||0):0;
+  window.scrollTo(0,y);
+  if(y)setTimeout(()=>{if(NAV_I===(history.state||{}).i&&Math.abs(scrollY-y)>40&&document.documentElement.scrollHeight-innerHeight>=y-40)window.scrollTo(0,y);},250);
+  $("#hdr").classList.remove("hide");lastY=y;
+  BAR_EL=document.querySelector(".view.on .prose, .view.on #noteReader .notebody");
+  if(!firstRoute)$("#main").focus({preventScroll:true});firstRoute=false;
+  onScroll();
 }
+
+/* ---------- 捲動時：閱讀進度條、回到最上方、手機自動收起選單 ---------- */
+let lastY=0,BAR_EL=null,scT=0,navT=0;
+const isPhone=matchMedia("(max-width:720px)");
+function onScroll(){
+  scT=0;const y=scrollY;
+  NAV.s[NAV_I]=Math.round(y);if(!navT)navT=setTimeout(()=>{navT=0;navSave();},500);
+  $("#toTop").classList.toggle("on",y>innerHeight*1.2);
+  const bar=$("#readBar");
+  if(BAR_EL&&BAR_EL.isConnected&&BAR_EL.offsetHeight>innerHeight*.6){const r=BAR_EL.getBoundingClientRect(),total=BAR_EL.offsetHeight-innerHeight*.6;const pct=Math.max(0,Math.min(1,(-r.top+innerHeight*.3)/Math.max(1,total)));bar.style.transform=`scaleX(${pct})`;bar.classList.add("on");}
+  else bar.classList.remove("on");
+  const hdr=$("#hdr"),modal=document.documentElement.classList.contains("modal-lock")||cardsFsEl;
+  if(!modal){
+    if(!isPhone.matches||y<120)hdr.classList.remove("hide");
+    else if(y>lastY+6)hdr.classList.add("hide");
+    else if(y<lastY-6)hdr.classList.remove("hide");
+  }
+  lastY=y;
+}
+addEventListener("scroll",()=>{if(!scT)scT=requestAnimationFrame(onScroll);},{passive:true});
+addEventListener("resize",()=>{if(!scT)scT=requestAnimationFrame(onScroll);});
+addEventListener("pagehide",navSave);
+$("#toTop").onclick=()=>window.scrollTo({top:0,behavior:matchMedia("(prefers-reduced-motion:reduce)").matches?"auto":"smooth"});
+$("#skipBtn").onclick=()=>{$("#main").focus();$("#main").scrollIntoView();};
+$("#hdr").addEventListener("focusin",()=>$("#hdr").classList.remove("hide"));
+
+/* 開著大圖或年齡確認時，後面的頁面不要跟著捲動 */
+new MutationObserver(()=>document.documentElement.classList.toggle("modal-lock",$("#lb").classList.contains("on")||$("#gate").classList.contains("on")))
+  .observe(document.body,{subtree:true,attributes:true,attributeFilter:["class"]});
+
+/* 電腦：← → 鍵換上一篇／下一篇 */
+document.addEventListener("keydown",e=>{
+  if(e.defaultPrevented||e.altKey||e.ctrlKey||e.metaKey||e.shiftKey||(e.key!=="ArrowLeft"&&e.key!=="ArrowRight"))return;
+  if($("#lb").classList.contains("on")||$("#gate").classList.contains("on")||cardsFsEl||!$("#glPop").hidden)return;
+  if(e.target.closest&&e.target.closest("input,textarea,select,[contenteditable],.cards-track,#heroArt"))return;
+  const a=document.querySelector(".view.on .pager a"+(e.key==="ArrowRight"?".next":":not(.next)"));
+  if(a)location.hash=a.getAttribute("href");
+});
+
+/* 圖片讀不到時顯示提示，不要留下破圖 */
+document.addEventListener("error",e=>{
+  const im=e.target;if(!(im instanceof HTMLImageElement)||im.closest(".cards,.hslide,.logo"))return;
+  if(im.dataset.full&&im.getAttribute("src")!==im.dataset.full)return; /* 縮圖失敗會先改用原圖 */
+  if(!im.closest(".art,.inline-fig"))return;
+  const d=document.createElement("div");d.className="img-miss";d.textContent="圖片讀取失敗";im.replaceWith(d);
+},true);
+
+/* 手機瀏覽器上方的顏色跟著網站配色 */
+function syncThemeColor(){const m=document.querySelector('meta[name="theme-color"]');if(m)m.content=getComputedStyle($("#hdr")).backgroundColor;}
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change",()=>setTimeout(syncThemeColor,50));
 
 load().then(()=>{
   $("#loading").remove();
