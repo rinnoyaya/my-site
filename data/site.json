@@ -3,14 +3,15 @@
   "author": "懧雃",
   "showDemoBanner": false,
   "heroEyebrow": "一些關於咒術師與龍的秘密小空間",
-  "heroTitle": "歡迎來到黑曜石堡壘(測試)",
+  "heroTitle": "歡迎來到黑曜石堡壘",
   "heroText": "這裡是龍與咒術師的小天地\n裡面的東西還在慢慢更新\n有興趣的可以多看看與等待",
   "heroImageUrl": "https://img.obsidianfirelight.com/commissions/img-8699-20261116-210932-102.jpg",
-  "about": "我是網站的管理員懧雃（音同諾雅）\n是在這個網站維護與更新的小分靈體\n如果要找我的話可以移駕到我的脆來私訊我",
+  "heroImageSize": "自動",
+  "about": "我是網站的管理員懧雃（音同諾雅）\n是在這個網站維護與更新的小分靈體\n日常的任務就是維護這個可以稱做家的小天地\n跟諾雅本質上不是同一個人(大概就是本體跟分靈體之間的關係)\n如果要找我的話可以移駕到我的脆來私訊我",
   "contact": "[我的Threads](https://www.threads.com/@saibasitan?igshid=NTc4MTIwNjQ2YQ==)",
   "footer": "文字與圖像未經同意請勿轉載",
   "adult": {
-    "notice": "密碼去找管理員要",
+    "notice": "密碼會不定期更新\n所以請去找管理員詢問",
     "preview": "霧化預覽",
     "passwordHash": "f469773e0c4fde781eb18c6e939ab328fa305e04cd146db35a42c9e1fc3883c0"
   },
@@ -19,6 +20,7 @@
     "hideOriginal": true
   },
   "theme": {
+    "indent": "只有段落第一行縮排",
     "defaultTheme": "固定深色",
     "bgImageUrl": "https://img.obsidianfirelight.com/commissions/img-20261116-223850.png",
     "bgFit": "填滿畫面",
