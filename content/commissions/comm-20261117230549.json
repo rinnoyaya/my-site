@@ -9,5 +9,6 @@
   ],
   "description": "米畫師",
   "adult": false,
-  "imageSize": "一般"
+  "imageSize": "一般",
+  "type": "全身"
 }
