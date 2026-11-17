@@ -110,8 +110,8 @@ main{max-width:1040px;margin:0 auto;padding:28px 20px 64px}
 .prose figure{margin:2em 0}
 .prose figure .art{border-radius:10px;overflow:hidden;aspect-ratio:16/10}
 .prose figcaption{font-family:var(--f-body);font-size:13px;color:var(--muted);text-align:center;margin-top:8px}
-.pager{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:40px}
-.pager a,.pager span{border:1px solid var(--line);border-radius:10px;padding:12px 14px;background:var(--card);color:var(--ink);font-size:15px}
+.pager{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;margin-top:40px;align-items:start}
+.pager a,.pager span{overflow-wrap:anywhere;min-width:0;border:1px solid var(--line);border-radius:10px;padding:12px 14px;background:var(--card);color:var(--ink);font-size:15px}
 .pager a:hover{text-decoration:none;border-color:var(--accent)}
 .pager small{display:block;color:var(--muted);font-size:12px}
 .pager .next{text-align:right}
@@ -314,12 +314,28 @@ body.has-bg{background:var(--paper)}
 .tstat.dev{color:var(--c-orange);border-color:var(--c-orange)}
 .tool-open{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:0 0 26px}
 .tool-open .btn{font-size:16px;padding:11px 22px}
+@media (max-width:480px){.pager{grid-template-columns:1fr}.pager .next{text-align:left}}
+/* 手機：連結和按鈕的可點範圍至少 32px */
+@media (pointer:coarse){
+  .crumb a{display:inline-block;padding:6px 2px;margin:-6px 0}
+  .rtools .tag,.meta .tag,.who .tag{padding:4px 10px}
+  .sec>a,.char a:not(.art):not(.cardlink){display:inline-block;padding:6px 0}
+  .tbtn{min-height:34px}
+}
 /* 分享 */
 .share{display:inline-flex;gap:6px;flex-wrap:wrap}
 .share .tbtn{display:inline-flex;align-items:center;gap:4px}
 .share-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
 .site-toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:9px 18px;border-radius:99px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:40;max-width:90vw;text-align:center}
 .site-toast.on{opacity:1}
+/* 嵌入影片 */
+.video-fig{margin:1.8em 0;text-indent:0}
+.video-box{position:relative;width:100%;aspect-ratio:16/9;border-radius:10px;overflow:hidden;background:#000}
+.video-box.tall{aspect-ratio:9/16;max-width:360px;margin:0 auto}
+.video-box iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.video-fig figcaption{font-family:var(--f-body);font-size:13px;color:var(--muted);text-align:center;margin-top:8px;text-indent:0}
+.video-fig .vlink{display:block;text-align:center;font-family:var(--f-body);font-size:13px;margin-top:6px}
+.vcard{display:inline-flex;align-items:center;gap:6px}
 /* 內文插圖 */
 .rich .body-fig{margin:1.8em 0;text-indent:0}
 .rich .body-fig .art{border-radius:10px;overflow:hidden;cursor:zoom-in}
@@ -553,6 +569,28 @@ function linkHtml(u,text){
   return `<a href="${u}"${internal?"":' target="_blank" rel="noopener"'}>${text}</a>`;
 }
 function shortUrl(u){let d=u.replace(/^https?:\/\//i,"").replace(/^www\./i,"").replace(/\/$/,"");return d.length>42?d.slice(0,40)+"…":d;}
+/* ---------- 嵌入影片：YouTube（含 Shorts）、Vimeo、Bilibili ---------- */
+function videoOf(raw){
+  let u;try{u=new URL(String(raw||"").trim());}catch(e){return null;}
+  if(!/^https?:$/.test(u.protocol))return null;
+  const host=u.hostname.replace(/^(www|m|music)\./,""),path=u.pathname;
+  const t=u.searchParams.get("t")||u.searchParams.get("start")||"";
+  const sec=/^\d+$/.test(t)?t:(t.match(/^(?:(\d+)h)?(?:(\d+)m)?(?:(\d+)s)?$/)||[]).slice(1).reduce((a,v,i)=>a+(+v||0)*[3600,60,1][i],0)||"";
+  const yt=(id,tall)=>/^[\w-]{6,20}$/.test(id)?{src:`https://www.youtube-nocookie.com/embed/${id}?rel=0${sec?"&start="+sec:""}`,site:"YouTube",tall:!!tall}:null;
+  if(host==="youtu.be")return yt(path.slice(1).split("/")[0]);
+  if(host==="youtube.com"||host==="youtube-nocookie.com"){
+    if(path==="/watch")return yt(u.searchParams.get("v")||"");
+    const m=path.match(/^\/(embed|shorts|live|v)\/([\w-]+)/);if(m)return yt(m[2],m[1]==="shorts");
+  }
+  if(host==="vimeo.com"||host==="player.vimeo.com"){const m=path.match(/(\d{5,})/);if(m)return {src:`https://player.vimeo.com/video/${m[1]}`,site:"Vimeo"};}
+  if(host==="bilibili.com"||host==="b23.tv"){const m=path.match(/\/video\/(BV[\w]+)/i);if(m)return {src:`https://player.bilibili.com/player.html?bvid=${m[1]}&autoplay=0&high_quality=1`,site:"Bilibili"};}
+  return null;
+}
+function videoHtml(raw,cap,sz){
+  const v=videoOf(raw);if(!v)return "";
+  return `<figure class="video-fig${sz?" sz-"+sz:""}"><div class="video-box${v.tall?" tall":""}"><iframe src="${esc(v.src)}" title="${esc(cap||v.site+" 影片")}" loading="lazy" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div>${cap?`<figcaption>${inline(cap)}</figcaption>`:""}<a class="vlink" href="${esc(String(raw).trim())}" target="_blank" rel="noopener">在 ${v.site} 上觀看 ↗</a></figure>`;
+}
+
 /* 「顯示大小」選項 → class */
 const SZ={"小":"s","中":"m","大":"l","滿版":"l"};
 const szOf=v=>SZ[String(v||"").trim()]||"";
@@ -565,13 +603,16 @@ function splitCap(raw){
 }
 function figHtml(url,rawCap){
   const [cap,sz]=splitCap(rawCap);
+  if(videoOf(url))return videoHtml(url,cap,sz);
   const u=esc(url),c=esc(cap||"");
   return `<figure class="body-fig${sz?" sz-"+sz:""}"><div class="art full" data-zoom="${u}" data-cap="${c}">${`<img src="${u}" alt="${c}" loading="lazy">`}</div>${c?`<figcaption>${inline(cap)}</figcaption>`:""}</figure>`;
 }
 function inline(t){
   const L=[],tok=html=>(L.push(html),`\u0000${L.length-1}\u0000`);
   let h=esc(t);
-  h=h.replace(new RegExp(IMG_RE.source,"g"),(m,a,u)=>{const [cap,sz]=splitCap(a);return tok(`<span class="inline-fig${sz?" sz-"+sz:""}" data-zoom="${u}" data-cap="${cap}"><img src="${u}" alt="${cap}" loading="lazy"></span>`);});
+  h=h.replace(new RegExp(IMG_RE.source,"g"),(m,a,u)=>{const [cap,sz]=splitCap(a);
+    if(videoOf(u.replace(/&amp;/g,"&")))return tok(`<a class="vcard" href="${u}" target="_blank" rel="noopener">▶ ${cap||"觀看影片"}</a>`);
+    return tok(`<span class="inline-fig${sz?" sz-"+sz:""}" data-zoom="${u}" data-cap="${cap}"><img src="${u}" alt="${cap}" loading="lazy"></span>`);});
   h=h.replace(/\[([^\]\n]+)\]\(\s*((?:https?:\/\/|www\.|#|\/)[^)\s]*)\s*\)/gi,(m,a,u)=>tok(linkHtml(u,a)));
   h=h.replace(/(?:https?:\/\/|www\.)[^\s<>"'\u0000　-〿㐀-鿿＀-￯{}|]+/gi,m=>{
     let rest="";const cut=m.search(/&(?:quot|#39|lt|gt);/);if(cut>=0){rest=m.slice(cut);m=m.slice(0,cut);}
@@ -594,6 +635,7 @@ function blocks(text){
     if(p.startsWith("> "))return `<blockquote>${inline(p.split("\n").map(l=>l.replace(/^>\s?/,"")).join("\n"))}</blockquote>`;
     /* 一段只有圖片（可以一行一張）→ 獨立插圖 */
     const lines=p.split("\n").map(l=>l.trim()).filter(Boolean);
+    if(lines.length&&lines.every(l=>videoOf(l)))return lines.map(l=>videoHtml(l,"","")).join("");
     if(lines.length&&lines.every(l=>IMG_LINE.test(l)))return lines.map(l=>{const m=l.match(IMG_LINE);return figHtml(m[2],m[1]);}).join("");
     if(/^[-・] /.test(p))return `<ul>${p.split("\n").map(l=>`<li>${inline(l.replace(/^[-・]\s?/,""))}</li>`).join("")}</ul>`;
     /* 每一行各自成一行，縮排才會整齊 */
@@ -643,7 +685,7 @@ const commOf=n=>COMM.filter(m=>(m.characters||[]).includes(n));
 const notesOf=n=>NOTES.filter(x=>(x.characters||[]).includes(n));
 const charLink=n=>charOf(n)?`<a class="tag story" href="#char-${enc(n)}">${esc(n)}</a>`:`<span class="tag">${esc(n)}</span>`;
 
-const SITE_VERSION="2026-11-17 v25";
+const SITE_VERSION="2026-11-17 v26";
 const BROKEN=[];
 async function load(){
   const files=["site.json","series.json","chapters.json","side-stories.json","characters.json","commissions.json","tools.json","notes.json","history.json"];
@@ -817,6 +859,7 @@ function renderReader(id,side){
     $("#reader").innerHTML=`<div class="crumb">${crumb}</div><h1>${esc(c.title)}${badge(c)}</h1>${gatePanel()}`;return;
   }
   const ps=blocks(c.body);
+  const vid=c.video?videoHtml(c.video,c.videoCaption||"",""):"";
   /* 封面圖：有圖才顯示，放在標題下方、內文之前 */
   const coverSrc=imgOf(c,"image");
   const csz=szOf(c.imageSize);
@@ -826,6 +869,7 @@ function renderReader(id,side){
     <div class="rtools"><span class="row">${esc(c.date)}　${who.map(charLink).join("")}</span>
       <span class="row">${shareButtons(c.title)}<button class="tbtn" type="button" data-fs="-1">字小一點</button><button class="tbtn" type="button" data-fs="1">字大一點</button></span></div>
     ${cover}
+    ${vid}
     <div class="prose rich"><div class="${wrapCls(c)}">${ps.join("")}</div></div>
     <nav class="pager" aria-label="章節導覽">
       ${prev?`<a href="${pre}${enc(chId(prev))}"><small>上一篇</small>${esc(prev.title)}</a>`:`<span><small>上一篇</small>已經是第一篇</span>`}
@@ -841,7 +885,7 @@ let curSide="all";
 function sideCard(c){return `<a class="scard" href="#side-${enc(chId(c))}"><div class="art">${avatarOf(c.character)}</div><div>
   <small>${esc(c.character)}　${esc(c.date)}</small><h3>${esc(c.title)}${badge(c)}</h3><p>${locked(c)?"成人內容，點進去確認年齡後閱讀。":esc(plain(paras(c.body).find(p=>!/^(-{3,}|##|!\[)/.test(p.trim())&&plain(p).trim())||""))}</p></div></a>`;}
 function renderSide(){
-  $("#sfilters").innerHTML=[["all","全部角色"],...CHARS.map(h=>[h.name,h.name])].map(([k,l])=>`<button type="button" class="chip${k===curSide?" on":""}" data-k="${esc(k)}">${esc(l)}</button>`).join("");
+  $("#sfilters").innerHTML=[["all","全部角色"],...CHARS.filter(h=>SIDE.some(x=>x.character===h.name)).map(h=>[h.name,h.name])].map(([k,l])=>`<button type="button" class="chip${k===curSide?" on":""}" data-k="${esc(k)}">${esc(l)}</button>`).join("");
   $("#sfilters").querySelectorAll(".chip").forEach(b=>b.onclick=()=>{curSide=b.dataset.k;renderSide();});
   $("#slist").innerHTML=SIDE.filter(c=>curSide==="all"||c.character===curSide).sort(byDateDesc).map(sideCard).join("")||`<p style="color:var(--muted)">還沒有角色故事。</p>`;
 }
@@ -895,7 +939,7 @@ function renderComm(){
   const artists={};COMM.forEach(m=>{const a=artists[m.artist]=artists[m.artist]||{n:0,last:"",link:m.artistLink};a.n++;if(String(m.date)>a.last)a.last=m.date;if(m.artistLink)a.link=m.artistLink;});
   $("#cstats").innerHTML=`<div><b>${COMM.length}</b><small>張委託圖</small></div><div><b>${Object.keys(artists).length}</b><small>位繪師</small></div><div><b>${new Set(COMM.flatMap(m=>m.characters||[])).size}</b><small>個角色</small></div>`;
   $("#artists").innerHTML=Object.entries(artists).map(([n,a])=>`<li><span><b>${a.link?`<a href="${esc(a.link)}" target="_blank" rel="noopener">${esc(n)}</a>`:esc(n)}</b></span><small>${a.n} 張・最近 ${esc(a.last)}</small></li>`).join("");
-  $("#cfilters").innerHTML=[["all","全部角色"],...CHARS.map(h=>[h.name,h.name])].map(([k,l])=>`<button type="button" class="chip${k===curChar?" on":""}" data-k="${esc(k)}">${esc(l)}</button>`).join("");
+  $("#cfilters").innerHTML=[["all","全部角色"],...CHARS.filter(h=>COMM.some(m=>(m.characters||[]).includes(h.name))).map(h=>[h.name,h.name])].map(([k,l])=>`<button type="button" class="chip${k===curChar?" on":""}" data-k="${esc(k)}">${esc(l)}</button>`).join("");
   $("#cfilters").querySelectorAll(".chip").forEach(b=>b.onclick=()=>{curChar=b.dataset.k;renderComm();});
   $("#cgrid").innerHTML=COMM.filter(m=>curChar==="all"||(m.characters||[]).includes(curChar)).sort(byDateDesc).map(commCard).join("")||`<p style="color:var(--muted)">還沒有委託圖。</p>`;
   bindComm($("#cgrid"));
@@ -920,6 +964,7 @@ function renderTool(id){
     <div class="rtools"><span class="row">${esc(t.date||"")}${t.status?`　<span class="tstat ${STAT[t.status]||""}">${esc(t.status)}</span>`:""}</span>${shareButtons(t.title)}</div>
     ${cover?`<figure class="cover-fig${csz?" sz-"+csz:""}"><div class="art full" data-zoom="${esc(cover)}" data-cap="${esc(t.title)}" style="cursor:zoom-in">${pic(cover,"tool",t.title)}</div></figure>`:""}
     ${t.link?`<div class="tool-open">${toolLink(t,"btn")}</div>`:""}
+    ${t.video?videoHtml(t.video,t.videoCaption||"",""):""}
     <div class="notebody rich">${blocks(t.body).join("")}</div>`;
 }
 
@@ -941,6 +986,7 @@ function renderNote(id){
   $("#noteReader").innerHTML=`<div class="crumb"><a href="#notes">文章</a> ／ ${esc(n.category)}</div>
     <h1>${esc(n.title)}${badge(n)}</h1>
     <div class="rtools"><span class="row">${esc(n.date)}　${(n.characters||[]).map(charLink).join("")}</span>${shareButtons(n.title)}</div>
+    ${n.video?videoHtml(n.video,n.videoCaption||"",""):""}
     <div class="notebody rich"><div class="${wrapCls(n)}">${body}</div></div>
     <nav class="pager" aria-label="文章導覽">
       ${prev?`<a href="#note-${enc(chId(prev))}"><small>較舊</small>${esc(prev.title)}</a>`:`<span><small>較舊</small>沒有了</span>`}
@@ -983,9 +1029,10 @@ function openLb(artHtml,title,desc,meta){
   $("#lbArt").innerHTML=artHtml;
   const img=$("#lbArt img");$("#lbArt").classList.toggle("full",!!img);
   if(img&&(SITE.protect||{}).hideOriginal===false)meta=(meta||"")+`<a class="lb-orig" href="${img.getAttribute("src")}" target="_blank" rel="noopener">開啟原圖 ↗</a>`;$("#lbTitle").textContent=title||"";$("#lbDesc").innerHTML=inline(desc||"");$("#lbMeta").innerHTML=meta||"";
-  $("#lb").classList.add("on");$("#lbClose").focus();
+  lbReturn=document.activeElement;$("#lb").classList.add("on");$("#lbClose").focus();
 }
-const closeLb=()=>$("#lb").classList.remove("on");
+let lbReturn=null;
+const closeLb=()=>{if(!$("#lb").classList.contains("on"))return;$("#lb").classList.remove("on");if(lbReturn&&lbReturn.focus&&document.contains(lbReturn))lbReturn.focus({preventScroll:true});lbReturn=null;};
 $("#lbClose").onclick=closeLb;
 document.addEventListener("click",e=>{
   const z=e.target.closest("[data-zoom]");if(!z||!z.closest(".reader,.bio,.about"))return;
@@ -1040,6 +1087,11 @@ function route(){
   if(pre==="note-")renderNote(arg);
   if(pre==="tool-")renderTool(arg);
   updateFab(pre,arg,v);
+  /* 分頁標題：例如「第一章｜黑曜石堡壘」 */
+  const names={stories:"故事",side:"角色故事",characters:"角色",commissions:"委託圖",tools:"小工具",notes:"文章",about:"關於"};
+  const h1=document.querySelector(".view.on h1");
+  const sub=pre?(h1?h1.textContent.replace(/18\+$/,"").trim():""):(names[v]||"");
+  document.title=(sub?sub+"｜":"")+(SITE.siteName||"");
   window.scrollTo(0,0);
 }
 

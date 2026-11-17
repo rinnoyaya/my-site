@@ -115,8 +115,8 @@ main{max-width:1040px;margin:0 auto;padding:28px 20px 64px}
 .prose figure{margin:2em 0}
 .prose figure .art{border-radius:10px;overflow:hidden;aspect-ratio:16/10}
 .prose figcaption{font-family:var(--f-body);font-size:13px;color:var(--muted);text-align:center;margin-top:8px}
-.pager{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:40px}
-.pager a,.pager span{border:1px solid var(--line);border-radius:10px;padding:12px 14px;background:var(--card);color:var(--ink);font-size:15px}
+.pager{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;margin-top:40px;align-items:start}
+.pager a,.pager span{overflow-wrap:anywhere;min-width:0;border:1px solid var(--line);border-radius:10px;padding:12px 14px;background:var(--card);color:var(--ink);font-size:15px}
 .pager a:hover{text-decoration:none;border-color:var(--accent)}
 .pager small{display:block;color:var(--muted);font-size:12px}
 .pager .next{text-align:right}
@@ -319,12 +319,28 @@ body.has-bg{background:var(--paper)}
 .tstat.dev{color:var(--c-orange);border-color:var(--c-orange)}
 .tool-open{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:0 0 26px}
 .tool-open .btn{font-size:16px;padding:11px 22px}
+@media (max-width:480px){.pager{grid-template-columns:1fr}.pager .next{text-align:left}}
+/* 手機：連結和按鈕的可點範圍至少 32px */
+@media (pointer:coarse){
+  .crumb a{display:inline-block;padding:6px 2px;margin:-6px 0}
+  .rtools .tag,.meta .tag,.who .tag{padding:4px 10px}
+  .sec>a,.char a:not(.art):not(.cardlink){display:inline-block;padding:6px 0}
+  .tbtn{min-height:34px}
+}
 /* 分享 */
 .share{display:inline-flex;gap:6px;flex-wrap:wrap}
 .share .tbtn{display:inline-flex;align-items:center;gap:4px}
 .share-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
 .site-toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:9px 18px;border-radius:99px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:40;max-width:90vw;text-align:center}
 .site-toast.on{opacity:1}
+/* 嵌入影片 */
+.video-fig{margin:1.8em 0;text-indent:0}
+.video-box{position:relative;width:100%;aspect-ratio:16/9;border-radius:10px;overflow:hidden;background:#000}
+.video-box.tall{aspect-ratio:9/16;max-width:360px;margin:0 auto}
+.video-box iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.video-fig figcaption{font-family:var(--f-body);font-size:13px;color:var(--muted);text-align:center;margin-top:8px;text-indent:0}
+.video-fig .vlink{display:block;text-align:center;font-family:var(--f-body);font-size:13px;margin-top:6px}
+.vcard{display:inline-flex;align-items:center;gap:6px}
 /* 內文插圖 */
 .rich .body-fig{margin:1.8em 0;text-indent:0}
 .rich .body-fig .art{border-radius:10px;overflow:hidden;cursor:zoom-in}
@@ -403,8 +419,9 @@ body{display:flex;flex-direction:column}
 #prev{flex:1;overflow:auto;padding:18px 24px 40vh;background:var(--paper)}
 #prev .prose{max-width:640px;margin:0 auto}
 .target{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:8px 16px;font-size:13px;background:var(--mark);color:var(--ink);border-bottom:1px solid var(--line)}
+.target[hidden]{display:none}
 .target b{font-weight:600}
-.target .tbtn{font-size:12px;padding:2px 8px;margin-left:auto}
+.target .tbtn{font-size:12px;padding:4px 10px;margin-left:auto;min-height:30px}
 .foot a.tbtn{text-decoration:none}
 .foot{display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:8px 16px;border-top:1px solid var(--line);background:var(--card)}
 .foot .btn{border:0;font:inherit;cursor:pointer}
@@ -474,6 +491,7 @@ body{display:flex;flex-direction:column}
   <button class="tb" type="button" data-line="- " title="清單">清單</button>
   <button class="tb" type="button" id="hrBtn" title="場景分隔">＊＊＊</button>
   <button class="tb" type="button" id="imBtn" title="插入圖片">圖片</button>
+  <button class="tb" type="button" id="vdBtn" title="嵌入影片（YouTube、Vimeo、Bilibili）">影片</button>
   <button class="tb" type="button" data-pop="popLink" id="linkBtn" title="插入連結（Ctrl+K）">連結</button>
   <span class="sep"></span>
   <button class="tb" type="button" id="clearBtn" title="清除選取文字的格式">清除格式</button>
@@ -502,6 +520,13 @@ body{display:flex;flex-direction:column}
       <div id="imLib" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:6px;max-height:240px;overflow:auto"></div>
       <div id="imMsg" style="font-size:12px;color:var(--muted);margin-top:6px"></div>
     </div>
+  </div>
+  <div class="pop" id="popVid" style="width:min(420px,calc(100vw - 32px))">
+    <label for="vdUrl" style="margin-top:0;flex-direction:column;align-items:stretch;gap:4px">影片網址<input id="vdUrl" class="lk" placeholder="https://www.youtube.com/watch?v=…"></label>
+    <div id="vdMsg" style="font-size:12px;color:var(--muted);margin-top:4px">支援 YouTube（含 Shorts）、Vimeo、Bilibili</div>
+    <label for="vdCap" style="flex-direction:column;align-items:stretch;gap:4px">影片說明（可留空）<input id="vdCap" class="lk" placeholder="例如：角色設定介紹影片"></label>
+    <label for="vdSize" style="flex-direction:column;align-items:stretch;gap:4px">顯示大小<select id="vdSize" class="lk"><option value="">自動（和內文同寬）</option><option>小</option><option>中</option><option>大</option></select></label>
+    <div class="row" style="margin-top:10px;gap:6px"><button class="tb on" type="button" id="vdOk">嵌入影片</button><button class="tb" type="button" id="vdCancel">取消</button></div>
   </div>
   <div class="pop" id="popSize"><div class="row">
     <button class="tb" type="button" data-sty="小"><span class="s-small">小字</span></button>
@@ -564,6 +589,7 @@ body{display:flex;flex-direction:column}
       <tr><td><code>{楷體|文字}</code></td><td>字型：明體、黑體、楷體</td></tr>
       <tr><td><code>{藍,大|文字}</code></td><td>用逗號合併多種樣式</td></tr>
       <tr><td><code>![說明](圖片網址)</code></td><td>插入圖片，單獨放一段；說明可留空。按工具列的「圖片」可以直接從圖庫選</td></tr>
+      <tr><td><code>https://youtu.be/…</code></td><td>影片網址單獨放一段就會嵌入播放器；支援 YouTube（含 Shorts）、Vimeo、Bilibili。也可以寫 <code>![說明|中](影片網址)</code> 加上說明和大小，或按工具列的「影片」</td></tr>
       <tr><td><code>![說明|小](圖片網址)</code></td><td>指定圖片大小：小、中、大</td></tr>
       <tr><td><code>[文字](網址)</code></td><td>自訂文字的連結；直接貼上網址也會自動變成連結。網址填 <code>#char-角色名</code> 可以連到網站內的頁面</td></tr>
       <tr><td><code>## 標題</code></td><td>段落開頭：小標題</td></tr>
@@ -611,6 +637,28 @@ function linkHtml(u,text){
   return `<a href="${u}"${internal?"":' target="_blank" rel="noopener"'}>${text}</a>`;
 }
 function shortUrl(u){let d=u.replace(/^https?:\/\//i,"").replace(/^www\./i,"").replace(/\/$/,"");return d.length>42?d.slice(0,40)+"…":d;}
+/* ---------- 嵌入影片：YouTube（含 Shorts）、Vimeo、Bilibili ---------- */
+function videoOf(raw){
+  let u;try{u=new URL(String(raw||"").trim());}catch(e){return null;}
+  if(!/^https?:$/.test(u.protocol))return null;
+  const host=u.hostname.replace(/^(www|m|music)\./,""),path=u.pathname;
+  const t=u.searchParams.get("t")||u.searchParams.get("start")||"";
+  const sec=/^\d+$/.test(t)?t:(t.match(/^(?:(\d+)h)?(?:(\d+)m)?(?:(\d+)s)?$/)||[]).slice(1).reduce((a,v,i)=>a+(+v||0)*[3600,60,1][i],0)||"";
+  const yt=(id,tall)=>/^[\w-]{6,20}$/.test(id)?{src:`https://www.youtube-nocookie.com/embed/${id}?rel=0${sec?"&start="+sec:""}`,site:"YouTube",tall:!!tall}:null;
+  if(host==="youtu.be")return yt(path.slice(1).split("/")[0]);
+  if(host==="youtube.com"||host==="youtube-nocookie.com"){
+    if(path==="/watch")return yt(u.searchParams.get("v")||"");
+    const m=path.match(/^\/(embed|shorts|live|v)\/([\w-]+)/);if(m)return yt(m[2],m[1]==="shorts");
+  }
+  if(host==="vimeo.com"||host==="player.vimeo.com"){const m=path.match(/(\d{5,})/);if(m)return {src:`https://player.vimeo.com/video/${m[1]}`,site:"Vimeo"};}
+  if(host==="bilibili.com"||host==="b23.tv"){const m=path.match(/\/video\/(BV[\w]+)/i);if(m)return {src:`https://player.bilibili.com/player.html?bvid=${m[1]}&autoplay=0&high_quality=1`,site:"Bilibili"};}
+  return null;
+}
+function videoHtml(raw,cap,sz){
+  const v=videoOf(raw);if(!v)return "";
+  return `<figure class="video-fig${sz?" sz-"+sz:""}"><div class="video-box${v.tall?" tall":""}"><iframe src="${esc(v.src)}" title="${esc(cap||v.site+" 影片")}" loading="lazy" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div>${cap?`<figcaption>${inline(cap)}</figcaption>`:""}<a class="vlink" href="${esc(String(raw).trim())}" target="_blank" rel="noopener">在 ${v.site} 上觀看 ↗</a></figure>`;
+}
+
 /* 「顯示大小」選項 → class */
 const SZ={"小":"s","中":"m","大":"l","滿版":"l"};
 const szOf=v=>SZ[String(v||"").trim()]||"";
@@ -623,13 +671,16 @@ function splitCap(raw){
 }
 function figHtml(url,rawCap){
   const [cap,sz]=splitCap(rawCap);
+  if(videoOf(url))return videoHtml(url,cap,sz);
   const u=esc(url),c=esc(cap||"");
   return `<figure class="body-fig${sz?" sz-"+sz:""}"><div class="art full" data-zoom="${u}" data-cap="${c}">${`<img src="${u}" alt="${c}" loading="lazy">`}</div>${c?`<figcaption>${inline(cap)}</figcaption>`:""}</figure>`;
 }
 function inline(t){
   const L=[],tok=html=>(L.push(html),`\u0000${L.length-1}\u0000`);
   let h=esc(t);
-  h=h.replace(new RegExp(IMG_RE.source,"g"),(m,a,u)=>{const [cap,sz]=splitCap(a);return tok(`<span class="inline-fig${sz?" sz-"+sz:""}" data-zoom="${u}" data-cap="${cap}"><img src="${u}" alt="${cap}" loading="lazy"></span>`);});
+  h=h.replace(new RegExp(IMG_RE.source,"g"),(m,a,u)=>{const [cap,sz]=splitCap(a);
+    if(videoOf(u.replace(/&amp;/g,"&")))return tok(`<a class="vcard" href="${u}" target="_blank" rel="noopener">▶ ${cap||"觀看影片"}</a>`);
+    return tok(`<span class="inline-fig${sz?" sz-"+sz:""}" data-zoom="${u}" data-cap="${cap}"><img src="${u}" alt="${cap}" loading="lazy"></span>`);});
   h=h.replace(/\[([^\]\n]+)\]\(\s*((?:https?:\/\/|www\.|#|\/)[^)\s]*)\s*\)/gi,(m,a,u)=>tok(linkHtml(u,a)));
   h=h.replace(/(?:https?:\/\/|www\.)[^\s<>"'\u0000　-〿㐀-鿿＀-￯{}|]+/gi,m=>{
     let rest="";const cut=m.search(/&(?:quot|#39|lt|gt);/);if(cut>=0){rest=m.slice(cut);m=m.slice(0,cut);}
@@ -652,6 +703,7 @@ function blocks(text){
     if(p.startsWith("> "))return `<blockquote>${inline(p.split("\n").map(l=>l.replace(/^>\s?/,"")).join("\n"))}</blockquote>`;
     /* 一段只有圖片（可以一行一張）→ 獨立插圖 */
     const lines=p.split("\n").map(l=>l.trim()).filter(Boolean);
+    if(lines.length&&lines.every(l=>videoOf(l)))return lines.map(l=>videoHtml(l,"","")).join("");
     if(lines.length&&lines.every(l=>IMG_LINE.test(l)))return lines.map(l=>{const m=l.match(IMG_LINE);return figHtml(m[2],m[1]);}).join("");
     if(/^[-・] /.test(p))return `<ul>${p.split("\n").map(l=>`<li>${inline(l.replace(/^[-・]\s?/,""))}</li>`).join("")}</ul>`;
     /* 每一行各自成一行，縮排才會整齊 */
@@ -756,7 +808,7 @@ $("#tools").addEventListener("click",e=>{
   else return;
   render();
 });
-function closePops(){const ib=document.getElementById("imBtn");if(ib)ib.classList.remove("on");document.querySelectorAll(".pop.on").forEach(p=>p.classList.remove("on"));document.querySelectorAll("[data-pop].on").forEach(b=>b.classList.remove("on"));}
+function closePops(){const ib=document.getElementById("imBtn");if(ib)ib.classList.remove("on");const vb=document.getElementById("vdBtn");if(vb)vb.classList.remove("on");document.querySelectorAll(".pop.on").forEach(p=>p.classList.remove("on"));document.querySelectorAll("[data-pop].on").forEach(b=>b.classList.remove("on"));}
 document.addEventListener("click",e=>{if(!e.target.closest(".pop")&&!e.target.closest("[data-pop]"))closePops();});
 $("#swatches").innerHTML=Object.entries(STY).filter(([k,v])=>v.startsWith("c-")).map(([k,v])=>`<button type="button" class="sw" data-sty="${k}" title="${k}" style="background:var(--${v==="c-gray"?"muted":v})" aria-label="${k}色"></button>`).join("");
 $("#applyCustom").onclick=()=>{sty($("#customColor").value);closePops();render();};
@@ -824,6 +876,30 @@ function insertImage(){
 }
 $("#imOk").onclick=insertImage;$("#imCancel").onclick=()=>{closePops();src.focus();};
 $("#popImg").addEventListener("keydown",e=>{if(e.key==="Enter"&&e.target.tagName==="INPUT"){e.preventDefault();insertImage();}});
+
+/* ---------- 嵌入影片 ---------- */
+let vdRange=[0,0];
+function vdCheck(){const v=videoOf($("#vdUrl").value);$("#vdMsg").textContent=!$("#vdUrl").value.trim()?"支援 YouTube（含 Shorts）、Vimeo、Bilibili":v?`✓ 認得這是 ${v.site} 影片${v.tall?"（直式）":""}`:"✗ 不是支援的影片網址";$("#vdMsg").style.color=v||!$("#vdUrl").value.trim()?"var(--muted)":"var(--c-red)";}
+$("#vdUrl").addEventListener("input",vdCheck);
+$("#vdBtn").addEventListener("click",e=>{
+  e.stopPropagation();
+  if($("#popVid").classList.contains("on")){closePops();return;}
+  vdRange=[src.selectionStart,src.selectionEnd];const sel=src.value.slice(vdRange[0],vdRange[1]).trim();
+  $("#vdUrl").value=videoOf(sel)?sel:"";$("#vdCap").value="";$("#vdSize").value="";vdCheck();
+  closePops();$("#popVid").classList.add("on");$("#vdBtn").classList.add("on");$("#vdUrl").focus();
+},true);
+function insertVideo(){
+  const u=$("#vdUrl").value.trim();if(!videoOf(u)){toast("請貼 YouTube、Vimeo 或 Bilibili 的影片網址");$("#vdUrl").focus();return;}
+  const sz=$("#vdSize").value,cap=$("#vdCap").value.trim().replace(/[\[\]|｜]/g,"");
+  const text=cap||sz?`![${cap}${sz?"|"+sz:""}](${u})`:u;
+  src.focus();src.setSelectionRange(vdRange[0],vdRange[1]);
+  const v=src.value,before=v.slice(0,vdRange[0]),after=v.slice(vdRange[1]);
+  const pre=!before||before.endsWith("\n\n")?"":before.endsWith("\n")?"\n":"\n\n";
+  const post=!after?"\n\n":after.startsWith("\n\n")?"":after.startsWith("\n")?"\n":"\n\n";
+  put(pre+text+post);closePops();render();toast("已嵌入影片");
+}
+$("#vdOk").onclick=insertVideo;$("#vdCancel").onclick=()=>{closePops();src.focus();};
+$("#popVid").addEventListener("keydown",e=>{if(e.key==="Enter"&&e.target.tagName==="INPUT"){e.preventDefault();insertVideo();}});
 
 /* 選取文字後貼上網址 → 自動變成連結 */
 src.addEventListener("paste",e=>{

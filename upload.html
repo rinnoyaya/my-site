@@ -114,8 +114,8 @@ main{max-width:1040px;margin:0 auto;padding:28px 20px 64px}
 .prose figure{margin:2em 0}
 .prose figure .art{border-radius:10px;overflow:hidden;aspect-ratio:16/10}
 .prose figcaption{font-family:var(--f-body);font-size:13px;color:var(--muted);text-align:center;margin-top:8px}
-.pager{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:40px}
-.pager a,.pager span{border:1px solid var(--line);border-radius:10px;padding:12px 14px;background:var(--card);color:var(--ink);font-size:15px}
+.pager{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;margin-top:40px;align-items:start}
+.pager a,.pager span{overflow-wrap:anywhere;min-width:0;border:1px solid var(--line);border-radius:10px;padding:12px 14px;background:var(--card);color:var(--ink);font-size:15px}
 .pager a:hover{text-decoration:none;border-color:var(--accent)}
 .pager small{display:block;color:var(--muted);font-size:12px}
 .pager .next{text-align:right}
@@ -318,12 +318,28 @@ body.has-bg{background:var(--paper)}
 .tstat.dev{color:var(--c-orange);border-color:var(--c-orange)}
 .tool-open{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:0 0 26px}
 .tool-open .btn{font-size:16px;padding:11px 22px}
+@media (max-width:480px){.pager{grid-template-columns:1fr}.pager .next{text-align:left}}
+/* 手機：連結和按鈕的可點範圍至少 32px */
+@media (pointer:coarse){
+  .crumb a{display:inline-block;padding:6px 2px;margin:-6px 0}
+  .rtools .tag,.meta .tag,.who .tag{padding:4px 10px}
+  .sec>a,.char a:not(.art):not(.cardlink){display:inline-block;padding:6px 0}
+  .tbtn{min-height:34px}
+}
 /* 分享 */
 .share{display:inline-flex;gap:6px;flex-wrap:wrap}
 .share .tbtn{display:inline-flex;align-items:center;gap:4px}
 .share-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
 .site-toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:9px 18px;border-radius:99px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:40;max-width:90vw;text-align:center}
 .site-toast.on{opacity:1}
+/* 嵌入影片 */
+.video-fig{margin:1.8em 0;text-indent:0}
+.video-box{position:relative;width:100%;aspect-ratio:16/9;border-radius:10px;overflow:hidden;background:#000}
+.video-box.tall{aspect-ratio:9/16;max-width:360px;margin:0 auto}
+.video-box iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.video-fig figcaption{font-family:var(--f-body);font-size:13px;color:var(--muted);text-align:center;margin-top:8px;text-indent:0}
+.video-fig .vlink{display:block;text-align:center;font-family:var(--f-body);font-size:13px;margin-top:6px}
+.vcard{display:inline-flex;align-items:center;gap:6px}
 /* 內文插圖 */
 .rich .body-fig{margin:1.8em 0;text-indent:0}
 .rich .body-fig .art{border-radius:10px;overflow:hidden;cursor:zoom-in}
