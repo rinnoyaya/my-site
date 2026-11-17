@@ -47,6 +47,36 @@ content:
       - 中
       - 大
     description: 小：圖片佔比較少、文字比較多；大：圖片佔比較多
+  - name: heroSlides
+    label: 首頁輪播圖片
+    type: text
+    description: 一行一張圖片網址，會接在上面的首頁主圖後面輪流播放；只有一張就不會輪播。網址後面可以加「 | 說明」或「 | 連結」，兩個都要就寫「網址 | 說明 | 連結」，例如 https://img.obsidianfirelight.com/a.png | 大咒術師與小龍妻 | #stories。連結可以填站內的 #read-lg-1，或外部 https:// 網址
+  - name: heroInterval
+    label: 輪播秒數
+    type: number
+    description: 每張停留幾秒，2～60，留空是 5 秒。滑鼠移到圖上時會暫停
+  - name: heroEffect
+    label: 輪播效果
+    type: select
+    options:
+      values:
+      - 淡入淡出
+      - 左右滑動
+  - name: heroOrder
+    label: 輪播順序
+    type: select
+    options:
+      values:
+      - 依順序
+      - 隨機
+  - name: heroFit
+    label: 主圖顯示方式
+    type: select
+    options:
+      values:
+      - 裁切填滿
+      - 完整顯示
+    description: 裁切填滿：圖片填滿框框，邊緣可能被切掉；完整顯示：整張圖都看得到，旁邊可能留底色
   - name: about
     label: 關於頁內容
     type: text
