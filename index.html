@@ -201,6 +201,18 @@ main{max-width:1040px;margin:0 auto;padding:28px 20px 64px}
 .stats div{display:grid}
 .stats b{font-family:var(--f-display);font-size:26px;font-variant-numeric:tabular-nums;line-height:1.2}
 .stats small{color:var(--muted);font-size:13px}
+.cvar{position:absolute;top:8px;right:8px;background:rgba(10,12,20,.72);color:#fff;font-size:12px;padding:1px 8px;border-radius:99px;font-variant-numeric:tabular-nums}
+.cards-sp{flex:1}
+#lbArt.lb-cards{aspect-ratio:auto!important;display:block;background:#0b0d14}
+.cards.in-lb{margin:0;padding:10px 10px 4px}
+.cards.in-lb .cards-head{margin-bottom:6px}
+.cards.in-lb .cards-count,.cards.in-lb .cards-fs{color:#ddd;border-color:#444}
+.cards.in-lb .cards-track{border:0;background:transparent;border-radius:8px}
+.cards.in-lb .card-slide{padding:4px}
+.cards.in-lb .card-slide img{max-height:max(240px,min(66vh,calc(100dvh - 320px)));border-radius:4px}
+.cards.in-lb .card-slide figcaption{color:#bbb}
+.cards.in-lb .cards-hint{color:#999}
+.cards.in-lb.fs{padding:max(10px,env(safe-area-inset-top)) 10px max(10px,env(safe-area-inset-bottom))}
 .ctype{position:absolute;top:8px;left:8px;background:rgba(10,12,20,.7);color:#fff;font-size:12px;padding:1px 8px;border-radius:99px}
 .piece .artwrap{position:relative}
 .piece .who{display:flex;gap:4px;flex-wrap:wrap;margin-top:6px}
@@ -824,7 +836,7 @@ function newDays(){const v=SITE.newDays;if(v===undefined||v===null||v==="")retur
 function isNew(x){const d=newDays();if(!d||!x||!x.date)return false;const t=Date.parse(String(x.date).slice(0,10)+"T00:00:00+08:00");if(isNaN(t))return false;const age=Date.now()-t;return age>-864e5&&age<d*864e5;}
 const newBadge=(x,k)=>isNew(x)&&!(k&&seenAt(k))?`<span class="new-badge" title="最近更新">NEW</span>`:"";
 
-const SITE_VERSION="2026-11-17 v1.3";
+const SITE_VERSION="2026-11-17 v1.4";
 const BROKEN=[];
 async function load(){
   const files=["site.json","series.json","chapters.json","side-stories.json","characters.json","commissions.json","tools.json","notes.json","history.json","glossary.json"];
@@ -1108,16 +1120,25 @@ function renderCharPage(n){
 /* ---------- 委託圖 ---------- */
 let curChar="all";
 function commCard(m){
-  return `<button type="button" class="piece${m.imageSize==="加大"?" wide":""}" data-c="${COMM.indexOf(m)}"><div class="artwrap"><div class="art">${locked(m)?lockedThumb(imgOf(m,"image"),"comm-"+m.title,m.title):picT(imgOf(m,"image"),"comm-"+m.title,m.title)}</div>${m.type?`<span class="ctype">${esc(m.type)}</span>`:""}</div>
+  return `<button type="button" class="piece${m.imageSize==="加大"?" wide":""}" data-c="${COMM.indexOf(m)}"><div class="artwrap"><div class="art">${locked(m)?lockedThumb(imgOf(m,"image"),"comm-"+m.title,m.title):picT(imgOf(m,"image"),"comm-"+m.title,m.title)}</div>${m.type?`<span class="ctype">${esc(m.type)}</span>`:""}${(()=>{const k=commImages(m).length;return k>1&&!locked(m)?`<span class="cvar" title="含差分，共 ${k} 張">${k} 張</span>`:"";})()}</div>
   <div class="cap"><b>${esc(m.title)}${badge(m)}${newBadge(m)}</b><small>繪師：${esc(m.artist)}　${esc(m.date)}</small>
   <div class="who">${(m.characters||[]).map(n=>`<span class="tag story">${esc(n)}</span>`).join("")}</div></div></button>`;
+}
+/* 委託圖的所有圖片：主圖＋差分 */
+function commImages(m){
+  const out=[],main=imgOf(m,"image");
+  if(main)out.push({src:main,cap:m.caption||""});
+  (m.variants||[]).forEach(v=>{const src=imgOf(v,"image");if(src)out.push({src,cap:v.caption||""});});
+  String(m.variantUrls||"").split(/\r?\n/).forEach(line=>{line=line.trim();if(!line)return;const x=line.match(/^(\S+)(?:\s*[|｜]\s*(.*))?$/);if(!x)return;const src=imgOf({imageUrl:x[1]},"image");if(src)out.push({src,cap:(x[2]||"").trim()});});
+  return out;
 }
 function bindComm(root){
   root.querySelectorAll("[data-c]").forEach(b=>b.onclick=()=>{
     const m=COMM[+b.dataset.c];
     if(locked(m)){const i=b.dataset.c;openGate(()=>{route();setTimeout(()=>{const t=document.querySelector(`.view.on [data-c="${i}"]`);if(t)t.click();},50);});return;}
     const artist=m.artistLink?`<a class="tag warm" href="${esc(m.artistLink)}" target="_blank" rel="noopener">繪師：${esc(m.artist)} ↗</a>`:`<span class="tag warm">繪師：${esc(m.artist)}</span>`;
-    openLb(pic(imgOf(m,"image"),"comm-"+m.title,m.title),m.title,m.description,
+    const imgs=commImages(m);
+    openLb(imgs.length>1?cardsHtml(imgs,"","in-lb",m.title):pic(imgOf(m,"image"),"comm-"+m.title,m.title),m.title,m.description,
       `<span class="tag">${esc(m.date)}</span>${m.type?`<span class="tag">${esc(m.type)}</span>`:""}${artist}${(m.characters||[]).map(charLink).join("")}`);
   });
 }
@@ -1218,14 +1239,14 @@ function cardsOf(t){
   });
   return out;
 }
-function cardsHtml(list,title){
+function cardsHtml(list,title,cls,label){
   const n=list.length,dots=n>1&&n<=20;
-  return `<section class="cards" aria-roledescription="carousel" aria-label="${esc(title)}">
-    <div class="cards-head"><h2>${esc(title)}</h2><span class="cards-count" aria-live="polite">1 / ${n}</span><button type="button" class="cards-fs">全螢幕</button></div>
+  return `<section class="cards${cls?" "+cls:""}" aria-roledescription="carousel" aria-label="${esc(label||title)}">
+    <div class="cards-head">${title?`<h2>${esc(title)}</h2>`:`<span class="cards-sp"></span>`}<span class="cards-count" aria-live="polite">1 / ${n}</span><button type="button" class="cards-fs">全螢幕</button></div>
     <div class="cards-stage">
       ${n>1?`<button type="button" class="cards-nav prev" aria-label="上一張" disabled>‹</button>`:""}
-      <div class="cards-track" tabindex="0" aria-label="${esc(title)}，可左右滑動或用方向鍵換張">
-        ${list.map((c,i)=>`<figure class="card-slide" aria-roledescription="slide" aria-label="第 ${i+1} 張，共 ${n} 張"><img src="${esc(c.src)}" alt="${esc(c.cap||title+" 第 "+(i+1)+" 張")}" ${i<2?"":`loading="lazy"`} draggable="false" onerror="this.outerHTML='<div class=card-miss>這張圖片讀不到</div>'">${c.cap?`<figcaption>${inline(c.cap)}</figcaption>`:""}</figure>`).join("")}
+      <div class="cards-track" tabindex="0" aria-label="${esc(label||title)}，可左右滑動或用方向鍵換張">
+        ${list.map((c,i)=>`<figure class="card-slide" aria-roledescription="slide" aria-label="第 ${i+1} 張，共 ${n} 張"><img src="${esc(c.src)}" alt="${esc(c.cap||(label||title)+" 第 "+(i+1)+" 張")}" ${i<2?"":`loading="lazy"`} draggable="false" onerror="this.outerHTML='<div class=card-miss>這張圖片讀不到</div>'">${c.cap?`<figcaption>${inline(c.cap)}</figcaption>`:""}</figure>`).join("")}
       </div>
       ${n>1?`<button type="button" class="cards-nav next" aria-label="下一張">›</button>`:""}
     </div>
@@ -1402,18 +1423,20 @@ document.addEventListener("click",async e=>{
 /* ---------- 放大檢視 ---------- */
 function openLb(artHtml,title,desc,meta){
   $("#lbArt").innerHTML=artHtml;
-  const img=$("#lbArt img");$("#lbArt").classList.toggle("full",!!img);
+  const img=$("#lbArt img"),car=$("#lbArt .cards");$("#lbArt").classList.toggle("full",!!img&&!car);$("#lbArt").classList.toggle("lb-cards",!!car);
   if(img&&(SITE.protect||{}).hideOriginal===false)meta=(meta||"")+`<a class="lb-orig" href="${img.getAttribute("src")}" target="_blank" rel="noopener">開啟原圖 ↗</a>`;$("#lbTitle").textContent=title||"";$("#lbDesc").innerHTML=inline(desc||"");$("#lbMeta").innerHTML=meta||"";
   lbReturn=document.activeElement;$("#lb").classList.add("on");$("#lbClose").focus();
+  if(car){initCards($("#lbArt"));$("#lb .lb-in").scrollTop=0;}
 }
 let lbReturn=null;
-const closeLb=()=>{if(!$("#lb").classList.contains("on"))return;$("#lb").classList.remove("on");if(lbReturn&&lbReturn.focus&&document.contains(lbReturn))lbReturn.focus({preventScroll:true});lbReturn=null;};
+const closeLb=()=>{if(!$("#lb").classList.contains("on"))return;if(cardsFsEl&&$("#lb").contains(cardsFsEl)){cardsFsEl.classList.remove("fs");cardsFsEl=null;document.documentElement.classList.remove("cards-lock");}$("#lb").classList.remove("on");if(lbReturn&&lbReturn.focus&&document.contains(lbReturn))lbReturn.focus({preventScroll:true});lbReturn=null;};
 $("#lbClose").onclick=closeLb;
 document.addEventListener("click",e=>{
   const z=e.target.closest("[data-zoom]");if(!z||!z.closest(".reader,.bio,.about"))return;
   openLb(`<img src="${esc(z.dataset.zoom)}" alt="">`,z.dataset.cap||"","","");
 });$("#lb").onclick=e=>{if(e.target.id==="lb")closeLb();};
 document.addEventListener("keydown",e=>{if(e.key==="Escape"){closeLb();$("#gate").classList.remove("on");gateCb=null;}});
+document.addEventListener("keydown",e=>{const c=$("#lb").classList.contains("on")&&$("#lbArt .cards");if(!c||cardsFsEl||e.target.closest(".cards-track"))return;if(e.key==="ArrowRight"){e.preventDefault();c._go(c._cur+1);}else if(e.key==="ArrowLeft"){e.preventDefault();c._go(c._cur-1);}});
 
 
 /* ---------- 編輯按鈕：只在打開過寫作小幫手的裝置上出現 ---------- */
