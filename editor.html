@@ -1101,7 +1101,7 @@ async function loadImLib(){
     const base=(c.base||"").replace(/\/$/,"");
     let objs=d.objects||[];const thumbs=new Set(objs.filter(o=>o.key.startsWith("thumbs/")).map(o=>o.key));
     if(f){try{const r2=await fetch(c.url.replace(/\/$/,"")+"/list?prefix="+encodeURIComponent("thumbs/"+f+"/"),{headers:{"X-Upload-Key":c.key}});const d2=await r2.json();(d2.objects||[]).forEach(o=>thumbs.add(o.key));}catch(e){}}
-    imItems=objs.filter(o=>!o.key.startsWith("thumbs/")).map(o=>({key:o.key,url:base+"/"+o.key,th:thumbs.has("thumbs/"+o.key+".webp")?base+"/thumbs/"+o.key+".webp":"",t:String(o.uploaded)})).sort((a,b)=>b.t.localeCompare(a.t));
+    imItems=objs.filter(o=>!o.key.startsWith("thumbs/")&&/\.(jpe?g|png|webp|gif|avif)$/i.test(o.key)).map(o=>({key:o.key,url:base+"/"+o.key,th:thumbs.has("thumbs/"+o.key+".webp")?base+"/thumbs/"+o.key+".webp":"",t:String(o.uploaded)})).sort((a,b)=>b.t.localeCompare(a.t));
     imLoaded=true;renderImLib();
   }catch(e){$("#imMsg").textContent="圖庫載入失敗："+e.message;}
 }

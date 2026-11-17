@@ -792,9 +792,11 @@ async function loadLib(reset){
 }
 function renderLib(){
   const q=$("#libSearch").value.trim().toLowerCase();
-  const list=LIB.filter(o=>!o.key.startsWith("thumbs/")&&(!q||o.key.toLowerCase().includes(q))).sort((a,b)=>String(b.uploaded).localeCompare(String(a.uploaded)));
+  /* 只列圖片：縮圖、資料夾標記（例如在 Cloudflare 後台建立資料夾時留下的「委託/」）都不顯示 */
+  const isImg=o=>!o.key.startsWith("thumbs/")&&/\.(jpe?g|png|webp|gif|avif)$/i.test(o.key);
+  const list=LIB.filter(o=>isImg(o)&&(!q||o.key.toLowerCase().includes(q))).sort((a,b)=>String(b.uploaded).localeCompare(String(a.uploaded)));
   const base=(cfg.base||"").replace(/\/$/,"");
-  const libN=LIB.filter(o=>!o.key.startsWith("thumbs/")).length;
+  const libN=LIB.filter(isImg).length;
   $("#libInfo").textContent=`共 ${libN} 張${q?`，符合搜尋的 ${list.length} 張`:""}${libCursor?"（還有更多）":""}`;
   $("#lib").innerHTML=list.map(o=>{const u=base+"/"+o.key;return `<div class="li"><img src="${esc(u)}" alt="" loading="lazy"><div class="k">${esc(o.key)}<br>${fmtSize(o.size)}・${esc(String(o.uploaded).slice(0,10))}</div>
     <div class="act"><button class="tb2 primary" type="button" data-cp="${esc(u)}">複製網址</button><button class="tb2 danger" type="button" data-del="${esc(o.key)}" aria-label="刪除">刪</button></div></div>`;}).join("")||`<p class="hint">這個資料夾還沒有圖片。</p>`;
