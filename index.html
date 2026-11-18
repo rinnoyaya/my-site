@@ -848,7 +848,7 @@ function newDays(){const v=SITE.newDays;if(v===undefined||v===null||v==="")retur
 function isNew(x){const d=newDays();if(!d||!x||!x.date)return false;const t=Date.parse(String(x.date).slice(0,10)+"T00:00:00+08:00");if(isNaN(t))return false;const age=Date.now()-t;return age>-864e5&&age<d*864e5;}
 const newBadge=x=>isNew(x)?`<span class="new-badge" title="最近更新">NEW</span>`:"";
 
-const SITE_VERSION="2026-11-18 v1.10";
+const SITE_VERSION="2026-11-18 v1.11";
 const BROKEN=[];
 async function load(){
   const files=["site.json","series.json","chapters.json","side-stories.json","characters.json","commissions.json","tools.json","notes.json","history.json","glossary.json"];
@@ -1452,6 +1452,13 @@ function updateFab(pre,arg,v){
 }
 function closeOwner(){$("#owner").classList.remove("open");$("#fab").setAttribute("aria-expanded","false");}
 $("#oVer").textContent="網站版本 "+SITE_VERSION;
+/* 手機瀏覽器有時會一直用舊版網頁：跟伺服器上的版本號比一比，不一樣就自動換成新版（每次開網站最多重新整理一次） */
+(async()=>{try{
+  const r=await fetch("data/version.json",{cache:"no-store"});if(!r.ok)return;
+  const v=(await r.json()).version;if(!v||v===SITE_VERSION)return;
+  if(sessionStorage.getItem("ver-reload")===v)return;sessionStorage.setItem("ver-reload",v);
+  await fetch(location.pathname,{cache:"reload"});location.reload();
+}catch(e){}})();
 $("#oAll").innerHTML=CMS_ENTRIES.map(([k,l])=>`<a href="${cmsUrl(k)}" target="_blank" rel="noopener" role="menuitem">${l}</a>`).join("");
 $("#fab").onclick=e=>{e.stopPropagation();const o=$("#owner").classList.toggle("open");$("#fab").setAttribute("aria-expanded",String(o));};
 document.addEventListener("click",e=>{if(!e.target.closest("#owner"))closeOwner();});
