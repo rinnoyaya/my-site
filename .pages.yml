@@ -1085,6 +1085,67 @@ content:
         label: 密碼代碼
         type: string
         description: 選填。想加密碼的話，到寫作小幫手按「？」產生代碼再貼到這裡；留空就只要確認年齡
+    - name: penalty
+      label: 猜錯密碼的懲罰
+      type: object
+      description: 有設密碼時才會用到。次數和冷卻只記在讀者自己的瀏覽器，用途是好玩和降低亂猜，不是真正的防護
+      fields:
+      - name: enabled
+        label: 開啟懲罰
+        type: boolean
+        default: false
+      - name: speaker
+        label: 說話的角色
+        type: reference
+        description: 選填。選一個角色，猜錯時會顯示他的頭像和名字
+        options:
+          collection: characters
+          value: '{fields.name}'
+          label: '{fields.name}'
+          search: fields.name
+      - name: lines
+        label: 猜錯時的台詞
+        type: text
+        description: 一行一句，第 1 次猜錯說第 1 句、第 2 次說第 2 句……。可以用 {次數} 代表這是第幾次猜錯，也可以用 **粗體**、{紅|彩色字} 等格式。留空會用預設的三句
+      - name: after
+        label: 台詞用完之後
+        type: select
+        description: 猜錯次數超過台詞數量時怎麼辦。不選就是停在最後一句
+        options:
+          values:
+          - 停在最後一句
+          - 從頭輪流
+          - 隨機
+      - name: effect
+        label: 猜錯時的效果
+        type: select
+        description: 搖晃：視窗抖一下。結冰：輸入框結冰，要點 3 下敲碎才能再輸入
+        options:
+          values:
+          - 無
+          - 搖晃
+          - 結冰
+      - name: cooldownAfter
+        label: 連錯幾次開始冷卻
+        type: number
+        description: 留空是 3 次，填 0 就不冷卻
+        options:
+          min: 0
+      - name: cooldownSeconds
+        label: 第一次冷卻幾秒
+        type: number
+        description: 留空是 30 秒。之後每多錯一次，冷卻時間加倍，最長 5 分鐘
+        options:
+          min: 5
+          max: 300
+      - name: cooldownText
+        label: 冷卻中顯示的文字
+        type: string
+        description: 可以用 {秒} 代表剩幾秒。留空會顯示「咒力回復中，{秒} 秒後才能再試」
+      - name: successLine
+        label: 猜對時的台詞
+        type: string
+        description: 選填。之前猜錯過、最後終於猜對時，畫面下方跳出的一句話，可以用 {次數}
     - name: protect
       label: 圖片保護
       type: object
