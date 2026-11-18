@@ -351,6 +351,15 @@ body:has(.owner:not([hidden])) footer{padding-bottom:76px}
 .ice[data-hit="2"]{background:linear-gradient(135deg,rgba(220,240,255,.7),rgba(170,215,255,.6) 45%,rgba(230,246,255,.7)),repeating-linear-gradient(60deg,transparent 0 9px,rgba(36,82,122,.45) 9px 10px),repeating-linear-gradient(-50deg,transparent 0 12px,rgba(36,82,122,.4) 12px 13px)}
 .ice.crack{animation:iceGone .3s ease forwards}
 @keyframes iceGone{to{opacity:0;transform:scale(1.06)}}
+/* 燃燒：輸入框燒 5 秒（火焰慢慢晃動，不閃爍） */
+.fire{position:absolute;inset:0;border-radius:8px;overflow:hidden;border:1px solid #ff8a3d;background:linear-gradient(0deg,#5a1206,#a3260c 40%,#3a0d05);color:#fff6e0;font-size:13.5px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:6px;user-select:none;-webkit-user-select:none;text-shadow:0 1px 3px rgba(0,0,0,.7);box-shadow:0 0 14px rgba(255,120,40,.55)}
+.fire span{position:relative;z-index:2}
+.fire i{position:absolute;bottom:-14px;width:34px;height:46px;border-radius:50% 50% 40% 40%/60% 60% 40% 40%;background:radial-gradient(ellipse at 50% 80%,#fff3b0 0,#ffd23f 22%,#ff8a1f 48%,rgba(230,60,10,.85) 70%,transparent 72%);transform-origin:50% 100%;animation:flame 1.1s ease-in-out infinite alternate;opacity:.95;z-index:1}
+.fire i:nth-child(2){left:4%;animation-delay:-.3s}.fire i:nth-child(3){left:20%;height:56px;animation-delay:-.7s}.fire i:nth-child(4){left:38%;animation-delay:-.1s}
+.fire i:nth-child(5){left:56%;height:58px;animation-delay:-.5s}.fire i:nth-child(6){left:74%;animation-delay:-.9s}.fire i:nth-child(7){left:88%;height:50px;animation-delay:-.2s}
+@keyframes flame{0%{transform:scale(1,.85) skewX(-4deg)}50%{transform:scale(.9,1.08) skewX(3deg)}100%{transform:scale(1.05,.95) skewX(-2deg)}}
+.fire.out{transition:opacity .4s;opacity:0}
+@media (prefers-reduced-motion:reduce){.fire i{animation:none}}
 .gate-in button:disabled{opacity:.55;cursor:not-allowed}
 @media (prefers-reduced-motion:reduce){.gate-in.shake,.gate-say.pop,.ice.crack{animation:none}}
 .gate-in input[type=password]{font:inherit;color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:9px 11px}
@@ -875,7 +884,7 @@ function newDays(){const v=SITE.newDays;if(v===undefined||v===null||v==="")retur
 function isNew(x){const d=newDays();if(!d||!x||!x.date)return false;const t=Date.parse(String(x.date).slice(0,10)+"T00:00:00+08:00");if(isNaN(t))return false;const age=Date.now()-t;return age>-864e5&&age<d*864e5;}
 const newBadge=x=>isNew(x)?`<span class="new-badge" title="最近更新">NEW</span>`:"";
 
-const SITE_VERSION="2026-11-18 v1.13";
+const SITE_VERSION="2026-11-18 v1.15";
 const BROKEN=[];
 async function load(){
   const files=["site.json","series.json","chapters.json","side-stories.json","characters.json","commissions.json","tools.json","notes.json","history.json","glossary.json"];
@@ -1017,17 +1026,32 @@ function penSay(p,text){
 let penTimer=0;
 function penCooldown(){
   clearInterval(penTimer);const p=penCfg();
-  const lock=on=>{$("#gatePw").disabled=on;$("#gateYes").disabled=on;};
+  const iced=()=>!!$("#gatePw").parentElement.querySelector(".ice:not(.crack),.fire:not(.out)");
+  const lock=on=>{$("#gatePw").disabled=on||iced();$("#gateYes").disabled=on;};
   if(!p){lock(false);return false;}
   const tick=()=>{const left=Math.ceil((penState().until-Date.now())/1000);
-    if(left<=0){clearInterval(penTimer);lock(false);$("#gateErr").textContent="";$("#gateYes").textContent="我已滿 18 歲，進入";if($("#gate").classList.contains("on")&&!$("#gatePwWrap").hidden)$("#gatePw").focus();return;}
+    if(left<=0){clearInterval(penTimer);lock(false);$("#gateErr").textContent="";$("#gateYes").textContent="我已滿 18 歲，進入";if($("#gate").classList.contains("on")&&!$("#gatePwWrap").hidden&&!iced())$("#gatePw").focus();return;}
     lock(true);$("#gateYes").textContent=`請稍候（${left}）`;$("#gateErr").textContent=penFill(p.cooldownText||"咒力回復中，{秒} 秒後才能再試",penState().n,left);};
   if(penState().until>Date.now()){tick();penTimer=setInterval(tick,1000);return true;}
   lock(false);return false;
 }
-function penIce(p){
-  const box=$("#gatePw").parentElement;box.querySelectorAll(".ice").forEach(x=>x.remove());
-  if(p.effect!=="結冰")return;
+let fireTimer=0;
+function penClearFx(){clearInterval(fireTimer);$("#gatePw").parentElement.querySelectorAll(".ice,.fire").forEach(x=>x.remove());}
+/* 燃燒：輸入框燒 5 秒，燒完才能再輸入 */
+function penFire(){
+  penClearFx();
+  const box=$("#gatePw").parentElement,fire=document.createElement("div");fire.className="fire";fire.setAttribute("aria-live","polite");
+  let left=5;const label=()=>`<span>🔥 輸入框燒起來了！${left}</span>`;
+  fire.innerHTML=label()+"<i></i><i></i><i></i><i></i><i></i><i></i>";$("#gatePw").disabled=true;box.append(fire);
+  fireTimer=setInterval(()=>{left--;
+    if(left>0){fire.querySelector("span").outerHTML=label();return;}
+    clearInterval(fireTimer);fire.classList.add("out");
+    setTimeout(()=>{fire.remove();if(!penCooldown()&&$("#gate").classList.contains("on")){$("#gatePw").disabled=false;$("#gatePw").focus();}},400);
+  },1000);
+}
+function penIce(){
+  penClearFx();
+  const box=$("#gatePw").parentElement;
   const ice=document.createElement("div");ice.className="ice";ice.dataset.hit="0";ice.setAttribute("role","button");ice.tabIndex=0;
   ice.innerHTML="❄ 輸入框結冰了，點 3 下敲碎";$("#gatePw").disabled=true;
   const hit=()=>{const k=+ice.dataset.hit+1;ice.dataset.hit=k;if(k>=3){ice.classList.add("crack");ice.textContent="";setTimeout(()=>{ice.remove();if(!penCooldown()){$("#gatePw").disabled=false;$("#gatePw").focus();}},280);}else ice.innerHTML=`❄ 再 ${3-k} 下`;};
@@ -1043,16 +1067,30 @@ function penWrong(){
   penSave(s);
   penSay(p,penFill(penLine(p,s.n),s.n,""));
   $("#gateErr").textContent="";
-  if(p.effect==="搖晃"){const g=$("#gate .gate-in");g.classList.remove("shake");void g.offsetWidth;g.classList.add("shake");}
   $("#gatePw").value="";
-  if(!penCooldown()){if(p.effect==="結冰")penIce(p);else $("#gatePw").focus();}
+  /* 每一次猜錯都套用效果（冷卻中也一樣） */
+  const fx=penEffects(p.effect);
+  if(fx.shake){const g=$("#gate .gate-in");g.classList.remove("shake");void g.offsetWidth;g.classList.add("shake");try{navigator.vibrate&&navigator.vibrate([60,40,60]);}catch(e){}}
+  if(fx.ice)penIce();else if(fx.fire)penFire();
+  if(!penCooldown()&&!fx.ice&&!fx.fire)$("#gatePw").focus();
+}
+/* 「每次隨機」：每次猜錯從三種裡抽一種；沒設定效果時預設搖晃 */
+function penEffects(e){
+  if(e==="無")return {};
+  const pick=a=>a[Math.floor(Math.random()*a.length)];
+  if(e==="結冰")return {ice:1};
+  if(e==="燃燒")return {fire:1,shake:1};
+  if(e==="搖晃＋結冰")return {shake:1,ice:1};
+  if(e==="結冰或燃燒（隨機）")return pick([{ice:1},{fire:1,shake:1}]);
+  if(e==="每次隨機")return pick([{shake:1},{ice:1},{shake:1,ice:1},{fire:1,shake:1}]);
+  return {shake:1};
 }
 let gateCb=null;
 function openGate(cb){
   const cfg=SITE.adult||{},hash=String(cfg.passwordHash||"").trim().toLowerCase();
   gateCb=cb;$("#gateText").textContent=cfg.notice||"以下內容僅限 18 歲以上閱覽。未滿 18 歲請按「離開」。";
   $("#gatePwWrap").hidden=!hash;$("#gatePw").value="";$("#gateErr").textContent="";
-  $("#gateSay").hidden=true;$("#gatePw").parentElement.querySelectorAll(".ice").forEach(x=>x.remove());$("#gate .gate-in").classList.remove("shake");
+  $("#gateSay").hidden=true;penClearFx();$("#gate .gate-in").classList.remove("shake");
   $("#gateYes").textContent="我已滿 18 歲，進入";$("#gatePw").disabled=false;$("#gateYes").disabled=false;
   $("#gate").classList.add("on");
   /* 之前猜錯被罰冷卻、時間還沒到：打開時繼續倒數 */
@@ -1064,6 +1102,9 @@ async function tryUnlock(){
   if($("#gateYes").disabled)return;
   const hash=String((SITE.adult||{}).passwordHash||"").trim().toLowerCase();
   if(hash){
+    /* 輸入框結冰或燒起來時按「進入」不算一次；沒輸入就按也不算猜錯 */
+    if($("#gatePw").disabled)return;
+    if(!$("#gatePw").value){$("#gateErr").textContent="請先輸入密碼";$("#gatePw").focus();return;}
     if(!window.crypto||!crypto.subtle){$("#gateErr").textContent="請用 https:// 開頭的網址開啟網站";return;}
     const h=await sha256("obsidian-gate:"+$("#gatePw").value);
     if(h!==hash){penWrong();return;}
