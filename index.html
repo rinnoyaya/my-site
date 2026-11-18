@@ -334,6 +334,25 @@ body:has(.owner:not([hidden])) footer{padding-bottom:76px}
 .gate-in h2{font-size:22px;margin:12px 0 6px}
 .gate-in p{color:var(--muted);margin:0 0 14px;font-size:15px}
 .gate-in label{display:grid;gap:4px;text-align:left;font-size:14px;color:var(--muted);margin:0 0 10px}
+/* 猜錯密碼的懲罰 */
+.gate-say{display:flex;gap:12px;align-items:flex-start;text-align:left;background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin:0 0 12px}
+.gate-say .gs-av{flex:none;width:44px;height:44px;border-radius:50%;overflow:hidden;background:var(--line)}
+.gate-say .gs-av img{width:100%;height:100%;object-fit:cover;display:block}
+.gate-say b{display:block;font-size:13px;color:var(--accent);margin-bottom:2px}
+.gate-say p{margin:0!important;color:var(--ink)!important;font-size:15px!important;line-height:1.6}
+.gate-say.pop{animation:gsPop .35s ease}
+@keyframes gsPop{0%{transform:scale(.94);opacity:.4}100%{transform:none;opacity:1}}
+.gate-in.shake{animation:gShake .45s ease}
+@keyframes gShake{0%,100%{transform:none}20%{transform:translateX(-10px)}40%{transform:translateX(9px)}60%{transform:translateX(-6px)}80%{transform:translateX(4px)}}
+.pw-box{position:relative;display:block}
+.pw-box input{width:100%;box-sizing:border-box}
+.ice{position:absolute;inset:0;border-radius:8px;border:1px solid #9fd3ff;background:linear-gradient(135deg,rgba(220,240,255,.95),rgba(170,215,255,.9) 45%,rgba(230,246,255,.95));color:#24527a;font-size:13.5px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:6px;cursor:pointer;user-select:none;-webkit-user-select:none;box-shadow:inset 0 0 12px rgba(255,255,255,.8)}
+.ice[data-hit="1"]{background:linear-gradient(135deg,rgba(220,240,255,.85),rgba(170,215,255,.75) 45%,rgba(230,246,255,.85)),repeating-linear-gradient(60deg,transparent 0 18px,rgba(36,82,122,.35) 18px 19px)}
+.ice[data-hit="2"]{background:linear-gradient(135deg,rgba(220,240,255,.7),rgba(170,215,255,.6) 45%,rgba(230,246,255,.7)),repeating-linear-gradient(60deg,transparent 0 9px,rgba(36,82,122,.45) 9px 10px),repeating-linear-gradient(-50deg,transparent 0 12px,rgba(36,82,122,.4) 12px 13px)}
+.ice.crack{animation:iceGone .3s ease forwards}
+@keyframes iceGone{to{opacity:0;transform:scale(1.06)}}
+.gate-in button:disabled{opacity:.55;cursor:not-allowed}
+@media (prefers-reduced-motion:reduce){.gate-in.shake,.gate-say.pop,.ice.crack{animation:none}}
 .gate-in input[type=password]{font:inherit;color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:9px 11px}
 .gate-in .gate-remember{display:flex;align-items:center;gap:8px}
 .gate-in label[hidden]{display:none}
@@ -666,7 +685,8 @@ footer{border-top:1px solid var(--line);color:var(--muted);font-size:13px;text-a
     <div class="gate-icon">18+</div>
     <h2 id="gateTitle">成人內容</h2>
     <p id="gateText"></p>
-    <label id="gatePwWrap" for="gatePw" hidden>請輸入密碼<input id="gatePw" type="password" autocomplete="off"></label>
+    <div class="gate-say" id="gateSay" aria-live="polite" hidden></div>
+    <label id="gatePwWrap" for="gatePw" hidden>請輸入密碼<span class="pw-box"><input id="gatePw" type="password" autocomplete="off"></span></label>
     <label class="gate-remember" for="gateRemember"><input type="checkbox" id="gateRemember"> 在這台裝置記住 30 天</label>
     <p class="gate-err" id="gateErr" aria-live="polite"></p>
     <div class="row"><button class="btn" type="button" id="gateYes">我已滿 18 歲，進入</button><button class="btn ghost" type="button" id="gateNo" style="background:none">離開</button></div>
@@ -855,7 +875,7 @@ function newDays(){const v=SITE.newDays;if(v===undefined||v===null||v==="")retur
 function isNew(x){const d=newDays();if(!d||!x||!x.date)return false;const t=Date.parse(String(x.date).slice(0,10)+"T00:00:00+08:00");if(isNaN(t))return false;const age=Date.now()-t;return age>-864e5&&age<d*864e5;}
 const newBadge=x=>isNew(x)?`<span class="new-badge" title="最近更新">NEW</span>`:"";
 
-const SITE_VERSION="2026-11-18 v1.12";
+const SITE_VERSION="2026-11-18 v1.13";
 const BROKEN=[];
 async function load(){
   const files=["site.json","series.json","chapters.json","side-stories.json","characters.json","commissions.json","tools.json","notes.json","history.json","glossary.json"];
@@ -971,19 +991,84 @@ const lockedThumb=(src,key,alt)=>(SITE.adult&&SITE.adult.preview==="完全隱藏
   `<div class="blurred" style="width:100%;height:100%">${picT(src,key,"")}<div class="blur-veil" aria-label="成人內容，需確認年齡"><span>18+</span><small>點擊確認年齡</small></div></div>`;
 const gatePanel=()=>`<div class="gate-panel"><div class="gate-icon">18+</div><p>這裡是成人內容，未滿 18 歲請勿閱覽。</p><button class="btn" type="button" data-unlock style="border:0;font:inherit;cursor:pointer">我已滿 18 歲，繼續</button></div>`;
 async function sha256(t){const b=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(t));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join("");}
+/* ---------- 猜錯密碼的懲罰（後台：成人內容與圖片保護 › 猜錯密碼的懲罰） ---------- */
+/* 次數和冷卻時間只存在讀者自己的瀏覽器；用途是好玩和降低亂猜，不是真正的防護 */
+const PEN_KEY="gate-penalty";
+const PEN_LINES=["密碼不對。","還是不對喔。","第 {次數} 次了……你真的知道密碼嗎？"];
+function penCfg(){const p=SITE.penalty||{};return p.enabled===true||p.enabled==="true"?p:null;}
+function penState(){let s={};try{s=JSON.parse(localStorage.getItem(PEN_KEY)||"{}")||{};}catch(e){}
+  if(s.last&&Date.now()-s.last>864e5)s={}; /* 一天沒有再猜就重新計算 */
+  return {n:+s.n||0,until:+s.until||0,last:+s.last||0};}
+function penSave(s){try{localStorage.setItem(PEN_KEY,JSON.stringify(s));}catch(e){}}
+function penFill(t,n,sec){return String(t||"").replace(/\{次數\}/g,n).replace(/\{秒\}/g,sec);}
+function penLine(p,n){
+  const lines=String(p.lines||"").split(/\r?\n/).map(x=>x.trim()).filter(Boolean),L=lines.length?lines:PEN_LINES;
+  if(n<=L.length)return L[n-1];
+  if(p.after==="從頭輪流")return L[(n-1)%L.length];
+  if(p.after==="隨機")return L[Math.floor(Math.random()*L.length)];
+  return L[L.length-1];
+}
+function penSay(p,text){
+  const box=$("#gateSay");if(!text){box.hidden=true;return;}
+  const who=String(p.speaker||"").trim(),h=who&&charOf(who),av=h&&imgOf(h,"avatar");
+  box.innerHTML=(who?`<span class="gs-av">${av?`<img src="${esc(av)}" alt="">`:""}</span>`:"")+`<div>${who?`<b>${esc(who)}</b>`:""}<p>${inline(text)}</p></div>`;
+  box.hidden=false;box.classList.remove("pop");void box.offsetWidth;box.classList.add("pop");
+}
+let penTimer=0;
+function penCooldown(){
+  clearInterval(penTimer);const p=penCfg();
+  const lock=on=>{$("#gatePw").disabled=on;$("#gateYes").disabled=on;};
+  if(!p){lock(false);return false;}
+  const tick=()=>{const left=Math.ceil((penState().until-Date.now())/1000);
+    if(left<=0){clearInterval(penTimer);lock(false);$("#gateErr").textContent="";$("#gateYes").textContent="我已滿 18 歲，進入";if($("#gate").classList.contains("on")&&!$("#gatePwWrap").hidden)$("#gatePw").focus();return;}
+    lock(true);$("#gateYes").textContent=`請稍候（${left}）`;$("#gateErr").textContent=penFill(p.cooldownText||"咒力回復中，{秒} 秒後才能再試",penState().n,left);};
+  if(penState().until>Date.now()){tick();penTimer=setInterval(tick,1000);return true;}
+  lock(false);return false;
+}
+function penIce(p){
+  const box=$("#gatePw").parentElement;box.querySelectorAll(".ice").forEach(x=>x.remove());
+  if(p.effect!=="結冰")return;
+  const ice=document.createElement("div");ice.className="ice";ice.dataset.hit="0";ice.setAttribute("role","button");ice.tabIndex=0;
+  ice.innerHTML="❄ 輸入框結冰了，點 3 下敲碎";$("#gatePw").disabled=true;
+  const hit=()=>{const k=+ice.dataset.hit+1;ice.dataset.hit=k;if(k>=3){ice.classList.add("crack");ice.textContent="";setTimeout(()=>{ice.remove();if(!penCooldown()){$("#gatePw").disabled=false;$("#gatePw").focus();}},280);}else ice.innerHTML=`❄ 再 ${3-k} 下`;};
+  ice.onclick=hit;ice.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();hit();}};
+  box.append(ice);
+}
+function penWrong(){
+  const p=penCfg();
+  if(!p){$("#gateErr").textContent="密碼不對，請再試一次";$("#gatePw").select();return;}
+  const s=penState();s.n++;s.last=Date.now();
+  const after=p.cooldownAfter===undefined||p.cooldownAfter===null||p.cooldownAfter===""?3:Math.max(0,+p.cooldownAfter||0);
+  if(after&&s.n>=after){const base=Math.max(5,+p.cooldownSeconds||30);s.until=Date.now()+Math.min(300,base*Math.pow(2,s.n-after))*1000;}
+  penSave(s);
+  penSay(p,penFill(penLine(p,s.n),s.n,""));
+  $("#gateErr").textContent="";
+  if(p.effect==="搖晃"){const g=$("#gate .gate-in");g.classList.remove("shake");void g.offsetWidth;g.classList.add("shake");}
+  $("#gatePw").value="";
+  if(!penCooldown()){if(p.effect==="結冰")penIce(p);else $("#gatePw").focus();}
+}
 let gateCb=null;
 function openGate(cb){
   const cfg=SITE.adult||{},hash=String(cfg.passwordHash||"").trim().toLowerCase();
   gateCb=cb;$("#gateText").textContent=cfg.notice||"以下內容僅限 18 歲以上閱覽。未滿 18 歲請按「離開」。";
   $("#gatePwWrap").hidden=!hash;$("#gatePw").value="";$("#gateErr").textContent="";
-  $("#gate").classList.add("on");(hash?$("#gatePw"):$("#gateYes")).focus();
+  $("#gateSay").hidden=true;$("#gatePw").parentElement.querySelectorAll(".ice").forEach(x=>x.remove());$("#gate .gate-in").classList.remove("shake");
+  $("#gateYes").textContent="我已滿 18 歲，進入";$("#gatePw").disabled=false;$("#gateYes").disabled=false;
+  $("#gate").classList.add("on");
+  /* 之前猜錯被罰冷卻、時間還沒到：打開時繼續倒數 */
+  const p=hash&&penCfg(),st=penState();
+  if(p&&st.n&&st.until>Date.now())penSay(p,penFill(penLine(p,st.n),st.n,""));
+  if(!(hash&&penCooldown()))(hash?$("#gatePw"):$("#gateYes")).focus();
 }
 async function tryUnlock(){
+  if($("#gateYes").disabled)return;
   const hash=String((SITE.adult||{}).passwordHash||"").trim().toLowerCase();
   if(hash){
     if(!window.crypto||!crypto.subtle){$("#gateErr").textContent="請用 https:// 開頭的網址開啟網站";return;}
     const h=await sha256("obsidian-gate:"+$("#gatePw").value);
-    if(h!==hash){$("#gateErr").textContent="密碼不對，請再試一次";$("#gatePw").select();return;}
+    if(h!==hash){penWrong();return;}
+    const p=penCfg(),tried=penState().n;penSave({});
+    if(p&&p.successLine&&tried)setTimeout(()=>siteToast(penFill(p.successLine,tried,"")),200);
   }
   ADULT_OK=true;
   try{sessionStorage.setItem("adult-ok","1");if($("#gateRemember").checked)localStorage.setItem("adult-until",String(Date.now()+30*864e5));}catch(e){}
@@ -993,7 +1078,7 @@ async function tryUnlock(){
 }
 $("#gateYes").onclick=tryUnlock;
 $("#gatePw").addEventListener("keydown",e=>{if(e.key==="Enter")tryUnlock();});
-$("#gateNo").onclick=()=>{$("#gate").classList.remove("on");gateCb=null;};
+$("#gateNo").onclick=()=>{$("#gate").classList.remove("on");gateCb=null;clearInterval(penTimer);};
 document.addEventListener("click",e=>{const b=e.target.closest("[data-unlock]");if(b)openGate(()=>route());});
 
 /* ---------- 網站歷程 ---------- */
