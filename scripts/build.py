@@ -78,6 +78,7 @@ SHARE_TYPES = [
     ("notes.json", "note", "note-", "id", "title", "excerpt", None),
     ("characters.json", "char", "char-", "name", "name", "summary", "avatar"),
     ("tools.json", "tool", "tool-", "id", "title", "summary", "image"),
+    ("commissions.json", "comm", "comm-", "_file", "title", "description", "image"),
 ]
 SAFE_SLUG = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
 
@@ -130,21 +131,23 @@ def build_share_pages():
         for x in items:
             if not isinstance(x, dict):
                 continue
-            slug = x.get("_file") if kind == "char" else (x.get(id_field) or x.get("_file"))
+            slug = x.get("_file") if kind in ("char", "comm") else (x.get(id_field) or x.get("_file"))
             slug = str(slug or "").strip()
             if not SAFE_SLUG.match(slug):
                 print(f"[警告] 分享頁略過：{x.get(title_field)}（網址代號只能用英文、數字、-、_）"); warnings += 1
                 continue
-            key = str(x.get(id_field) or x.get("title") or "")
+            key = slug if kind == "comm" else str(x.get(id_field) or x.get("title") or "")
             target = f"/#{hash_prefix}{key}"  # 相對網址：在任何網址下都能正確跳轉
             title = str(x.get(title_field) or site_name)
             if kind == "read" and x.get("series"):
                 title = f"{x['series']}・{title}"
+            if kind == "comm":
+                title = f"委託圖〈{title}〉"
             adult = x.get("adult") in (True, "true")
             if adult:
                 desc, image = "成人內容（18+），未滿 18 歲請勿閱覽。", origin + "/icon.png"
             else:
-                desc = plain(x.get(desc_field)) or plain(x.get("body")) or site.get("heroText") or site_name
+                desc = plain(x.get(desc_field)) or plain(x.get("body")) or (f"繪師：{x.get('artist')}" if kind == "comm" and x.get("artist") else "") or site.get("heroText") or site_name
                 image = absolute(img_of(x, img_field), origin)
                 if not image and kind == "tool":  # 小工具沒封面就用第一張教學圖卡
                     first = [c for c in (x.get("cards") or []) if isinstance(c, dict) and img_of(c, "image")]
