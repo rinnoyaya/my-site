@@ -111,6 +111,13 @@ main{max-width:1040px;margin:0 auto;padding:28px 20px 64px}
 .hdots button::before{content:"";width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.55);box-shadow:0 0 3px rgba(0,0,0,.5);transition:all .25s}
 .hdots button.on::before{background:#fff;width:18px;border-radius:4px}
 @media (pointer:coarse){.hdots button{width:28px;height:28px}}
+.nowrap{white-space:nowrap}
+@media (pointer:coarse){
+  /* iPhone 點到小於 16px 的輸入框會自動放大整個畫面，所以觸控裝置上一律用 16px */
+  input:not([type=checkbox]):not([type=radio]):not([type=range]),textarea,select{font-size:16px!important}
+  /* 內文裡的連結（例如「關於」頁的社群連結）手指比較好點 */
+  .rich a,.prose a,.bio a,#contact a{padding:5px 0;margin:-5px 0}
+}
 .harrow{position:absolute;top:50%;transform:translateY(-50%);z-index:3;width:36px;height:36px;border-radius:50%;border:0;background:rgba(0,0,0,.35);color:#fff;font-size:20px;line-height:1;cursor:pointer;opacity:0;transition:opacity .2s;display:flex;align-items:center;justify-content:center}
 .harrow.prev{left:8px}.harrow.next{right:8px}
 #heroArt:hover .harrow,.harrow:focus-visible{opacity:1}
@@ -690,7 +697,7 @@ body{display:flex;flex-direction:column}
       <span class="row" style="gap:6px">
         <select id="pvFont" aria-label="整篇字型"><option value="">預設字型</option><option>明體</option><option>黑體</option><option>楷體</option></select>
         <select id="pvSize" aria-label="整篇大小"><option value="">預設大小</option><option>小</option><option>大</option><option>特大</option></select>
-        <select id="pvInd" aria-label="段落縮排" title="段落縮排"><option value="">縮排：跟隨網站</option><option value="不縮排">不縮排</option><option value="每一行都縮排">每行都縮排</option><option value="只有段落第一行縮排">段落首行縮排</option></select>
+        <select id="pvInd" aria-label="段落縮排" title="段落縮排"><option value="">預設縮排</option><option value="不縮排">不縮排</option><option value="每一行都縮排">每行都縮排</option><option value="只有段落第一行縮排">段落首行縮排</option></select>
         <span class="tabs"><button class="tb" type="button" data-tab="edit">編輯</button><button class="tb on" type="button" data-tab="prev">預覽</button></span>
       </span></div>
     <div id="prev"><div class="prose rich"><div id="prevInner"></div></div></div>

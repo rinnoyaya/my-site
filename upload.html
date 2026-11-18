@@ -110,6 +110,13 @@ main{max-width:1040px;margin:0 auto;padding:28px 20px 64px}
 .hdots button::before{content:"";width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.55);box-shadow:0 0 3px rgba(0,0,0,.5);transition:all .25s}
 .hdots button.on::before{background:#fff;width:18px;border-radius:4px}
 @media (pointer:coarse){.hdots button{width:28px;height:28px}}
+.nowrap{white-space:nowrap}
+@media (pointer:coarse){
+  /* iPhone 點到小於 16px 的輸入框會自動放大整個畫面，所以觸控裝置上一律用 16px */
+  input:not([type=checkbox]):not([type=radio]):not([type=range]),textarea,select{font-size:16px!important}
+  /* 內文裡的連結（例如「關於」頁的社群連結）手指比較好點 */
+  .rich a,.prose a,.bio a{padding:5px 0;margin:-5px 0}
+}
 .harrow{position:absolute;top:50%;transform:translateY(-50%);z-index:3;width:36px;height:36px;border-radius:50%;border:0;background:rgba(0,0,0,.35);color:#fff;font-size:20px;line-height:1;cursor:pointer;opacity:0;transition:opacity .2s;display:flex;align-items:center;justify-content:center}
 .harrow.prev{left:8px}.harrow.next{right:8px}
 #heroArt:hover .harrow,.harrow:focus-visible{opacity:1}
@@ -564,6 +571,7 @@ footer{border-top:1px solid var(--line);color:var(--muted);font-size:13px;text-a
 .modal-in h2{font-size:20px;margin-bottom:8px}
 .modal-in .btn{border:0;font:inherit;cursor:pointer}
 @media (max-width:560px){.up-top h1 span{display:none}}
+@media (pointer:coarse){input:not([type=checkbox]):not([type=radio]):not([type=file]),textarea,select{font-size:16px!important}}
 </style>
 </head>
 <body>
