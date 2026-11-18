@@ -42,7 +42,14 @@ def main():
     for folder, (outname, key, reverse) in COLLECTIONS.items():
         path = os.path.join(ROOT, "content", folder)
         if not os.path.isdir(path):
-            print(f"[略過] content/{folder} 不存在，沿用 data/{outname}")
+            out_file = os.path.join(OUT, "data", outname)
+            if os.path.exists(out_file):
+                print(f"[略過] content/{folder} 不存在，沿用 data/{outname}")
+            else:
+                # 資料夾還沒建立（例如還沒新增過任何名詞）：先放一個空清單，網站才不會出現讀取失敗
+                with open(out_file, "w", encoding="utf-8") as fh:
+                    fh.write("[]")
+                print(f"[略過] content/{folder} 還沒有內容，先產生空的 data/{outname}")
             continue
         items = []
         for f in sorted(glob.glob(os.path.join(path, "*.json"))):
