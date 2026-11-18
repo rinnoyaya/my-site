@@ -66,6 +66,7 @@ def main():
         print(f"[完成] content/{folder} → data/{outname}（{len(items)} 筆）")
     warnings += build_share_pages()
     inject_home_meta()
+    write_version()
     print(f"建置完成，警告 {warnings} 個")
 
 # ---------------- 分享頁 ----------------
@@ -191,6 +192,17 @@ def build_share_pages():
     return warnings
 
 # 首頁的標題和社群預覽資訊（原本固定是「我的網站」）
+def write_version():
+    """把 index.html 裡的版本號寫成 data/version.json，網頁發現自己是舊版時會自動更新"""
+    try:
+        m = re.search(r'const SITE_VERSION="([^"]+)"', open(os.path.join(OUT, "index.html"), encoding="utf-8").read())
+    except OSError:
+        return
+    if m:
+        with open(os.path.join(OUT, "data", "version.json"), "w", encoding="utf-8") as fh:
+            json.dump({"version": m.group(1)}, fh, ensure_ascii=False)
+        print(f"[完成] 版本號 {m.group(1)}")
+
 def inject_home_meta():
     path = os.path.join(OUT, "index.html")
     try:
