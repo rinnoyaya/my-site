@@ -848,7 +848,7 @@ function newDays(){const v=SITE.newDays;if(v===undefined||v===null||v==="")retur
 function isNew(x){const d=newDays();if(!d||!x||!x.date)return false;const t=Date.parse(String(x.date).slice(0,10)+"T00:00:00+08:00");if(isNaN(t))return false;const age=Date.now()-t;return age>-864e5&&age<d*864e5;}
 const newBadge=x=>isNew(x)?`<span class="new-badge" title="最近更新">NEW</span>`:"";
 
-const SITE_VERSION="2026-11-17 v1.9";
+const SITE_VERSION="2026-11-18 v1.10";
 const BROKEN=[];
 async function load(){
   const files=["site.json","series.json","chapters.json","side-stories.json","characters.json","commissions.json","tools.json","notes.json","history.json","glossary.json"];
@@ -1099,6 +1099,9 @@ function commImages(m){
   String(m.variantUrls||"").split(/\r?\n/).forEach(line=>{line=line.trim();if(!line)return;const x=line.match(/^(\S+)(?:\s*[|｜]\s*(.*))?$/);if(!x)return;const src=imgOf({imageUrl:x[1]},"image");if(src)out.push({src,cap:(x[2]||"").trim()});});
   return out;
 }
+/* 每張委託圖自己的網址：#comm-檔名（檔名是後台自動產生的，不會因為改標題而變） */
+const commId=m=>String((m&&m._file)||"");
+let lbPrevHash=null;
 function bindComm(root){
   root.querySelectorAll("[data-c]").forEach(b=>b.onclick=()=>{
     const m=COMM[+b.dataset.c];
@@ -1106,7 +1109,9 @@ function bindComm(root){
     const artist=m.artistLink?`<a class="tag warm" href="${esc(m.artistLink)}" target="_blank" rel="noopener">繪師：${esc(m.artist)} ↗</a>`:`<span class="tag warm">繪師：${esc(m.artist)}</span>`;
     const imgs=commImages(m);
     openLb(imgs.length>1?cardsHtml(imgs,"","in-lb",m.title):pic(imgOf(m,"image"),"comm-"+m.title,m.title),m.title,m.description,
-      `<span class="tag">${esc(m.date)}</span>${m.type?`<span class="tag">${esc(m.type)}</span>`:""}${artist}${(m.characters||[]).map(charLink).join("")}${OWNER?`<a class="tag" href="${cmsEdit("commissions",m)}" target="_blank" rel="noopener">✎ 到後台編輯這張 ↗</a>`:""}`);
+      `<span class="tag">${esc(m.date)}</span>${m.type?`<span class="tag">${esc(m.type)}</span>`:""}${artist}${(m.characters||[]).map(charLink).join("")}${OWNER?`<a class="tag" href="${cmsEdit("commissions",m)}" target="_blank" rel="noopener">✎ 到後台編輯這張 ↗</a>`:""}`+(commId(m)?`<div class="share-row">${shareButtons(m.title)}</div>`:""));
+    /* 打開時網址換成這張圖的專屬網址（不會多一筆「上一頁」），關掉時換回來 */
+    if(commId(m)){lbPrevHash=location.hash.startsWith("#comm-")?"#commissions":(location.hash||"#commissions");history.replaceState(history.state,"","#comm-"+enc(commId(m)));document.title=m.title+"｜"+(SITE.siteName||"");}
   });
 }
 function renderComm(){
@@ -1364,13 +1369,14 @@ let stT;function siteToast(m){const t=$("#siteToast");t.textContent=m;t.classLis
 function shareUrl(){
   let h=location.hash.slice(1);try{h=decodeURIComponent(h);}catch(e){}
   const ok=v=>/^[A-Za-z0-9][A-Za-z0-9._-]*$/.test(String(v||""));
-  const m=h.match(/^(read|side|note|char|tool)-(.+)$/);
+  const m=h.match(/^(read|side|note|char|tool|comm)-(.+)$/);
   if(m){
     let slug="";
     if(m[1]==="read"){const c=CHAPTERS.find(x=>chId(x)===m[2]);slug=c&&(c.id||c._file);}
     else if(m[1]==="side"){const c=SIDE.find(x=>chId(x)===m[2]);slug=c&&(c.id||c._file);}
     else if(m[1]==="note"){const n=NOTES.find(x=>chId(x)===m[2]);slug=n&&(n.id||n._file);}
     else if(m[1]==="tool"){const t=TOOLS.find(x=>toolId(x)===m[2]);slug=t&&(t.id||t._file);}
+    else if(m[1]==="comm"){slug=m[2];}
     else {const c=charOf(m[2]);slug=c&&c._file;}
     if(ok(slug))return `${location.origin}/s/${m[1]}/${slug}/`;
   }
@@ -1396,8 +1402,10 @@ function openLb(artHtml,title,desc,meta){
   if(car){initCards($("#lbArt"));$("#lb .lb-in").scrollTop=0;}
 }
 let lbReturn=null;
-const closeLb=()=>{if(!$("#lb").classList.contains("on"))return;if(cardsFsEl&&$("#lb").contains(cardsFsEl)){cardsFsEl.classList.remove("fs");cardsFsEl=null;document.documentElement.classList.remove("cards-lock");}$("#lb").classList.remove("on");if(lbReturn&&lbReturn.focus&&document.contains(lbReturn))lbReturn.focus({preventScroll:true});lbReturn=null;};
-$("#lbClose").onclick=closeLb;
+const closeLb=fromRoute=>{if(!$("#lb").classList.contains("on"))return;
+  if(fromRoute!==true&&lbPrevHash!==null&&location.hash.startsWith("#comm-")){history.replaceState(history.state,"",lbPrevHash);const n=document.querySelector(".view.on h1");document.title=(lbPrevHash.startsWith("#char-")&&n?n.textContent.trim()+"｜":lbPrevHash==="#commissions"?"委託圖｜":"")+(SITE.siteName||"");}
+  lbPrevHash=null;if(cardsFsEl&&$("#lb").contains(cardsFsEl)){cardsFsEl.classList.remove("fs");cardsFsEl=null;document.documentElement.classList.remove("cards-lock");}$("#lb").classList.remove("on");if(lbReturn&&lbReturn.focus&&document.contains(lbReturn))lbReturn.focus({preventScroll:true});lbReturn=null;};
+$("#lbClose").onclick=()=>closeLb();
 document.addEventListener("click",e=>{
   const z=e.target.closest("[data-zoom]");if(!z||!z.closest(".reader,.bio,.about"))return;
   openLb(`<img src="${esc(z.dataset.zoom)}" alt="">`,z.dataset.cap||"","","");
@@ -1460,11 +1468,13 @@ function route(){
   const st=history.state,trav=!!(st&&typeof st.i==="number");
   if(trav){NAV_I=st.i;NAV.m=Math.max(NAV.m,NAV_I);}else{NAV_I=++NAV.m;try{history.replaceState({i:NAV_I},"");}catch(e){}}
   let h="home";try{h=decodeURIComponent(location.hash.slice(1))||"home";}catch(e){}
-  const pre=["read-","side-","char-","note-","tool-","term-"].find(p=>h.startsWith(p));
+  const pre=["read-","side-","char-","note-","tool-","term-","comm-"].find(p=>h.startsWith(p));
   const arg=pre?h.slice(pre.length):"";
-  let v=pre==="read-"?"read":pre==="side-"?"read":pre==="char-"?"char":pre==="note-"?"note":pre==="tool-"?"tool":pre==="term-"?"term":h;
+  let v=pre==="read-"?"read":pre==="side-"?"read":pre==="char-"?"char":pre==="note-"?"note":pre==="tool-"?"tool":pre==="term-"?"term":pre==="comm-"?"commissions":h;
   if(!document.getElementById("v-"+v))v="home";
-  closeLb();closeGlPop();
+  closeLb(true);closeGlPop();
+  /* 換頁時，上一頁跳出的年齡確認視窗一起關掉 */
+  if($("#gate").classList.contains("on")){$("#gate").classList.remove("on");gateCb=null;}
   document.querySelectorAll(".view").forEach(x=>x.classList.toggle("on",x.id==="v-"+v));
   const navKey=pre==="read-"?"stories":pre==="side-"?"side":pre==="char-"?"characters":pre==="note-"?"notes":pre==="tool-"?"tools":pre==="term-"?"glossary":v;
   document.querySelectorAll("#nav a").forEach(a=>{const on=a.getAttribute("href")==="#"+navKey;a.classList.toggle("on",on);if(on)a.setAttribute("aria-current","page");else a.removeAttribute("aria-current");});
@@ -1476,11 +1486,13 @@ function route(){
   if(pre==="tool-")renderTool(arg);
   if(pre==="term-")renderTerm(arg);
   if(v==="glossary")renderGlossary();
+  if(pre==="comm-")openCommLink(arg);
   updateFab(pre,arg,v);
   /* 分頁標題：例如「第一章｜黑曜石堡壘」 */
   const names={stories:"故事",side:"角色故事",characters:"角色",commissions:"委託圖",tools:"小工具",notes:"文章",about:"關於",glossary:"名詞百科"};
   const h1=document.querySelector(".view.on h1");
-  const sub=pre?(h1?h1.textContent.replace(/18\+$/,"").trim():""):(names[v]||"");
+  const cm=pre==="comm-"&&COMM.find(m=>commId(m)===arg);
+  const sub=cm?cm.title:pre?(h1?h1.textContent.replace(/18\+$/,"").trim():""):(names[v]||"");
   document.title=(sub?sub+"｜":"")+(SITE.siteName||"");
   const y=trav?(+NAV.s[NAV_I]||0):0;
   window.scrollTo(0,y);
@@ -1489,6 +1501,14 @@ function route(){
   BAR_EL=document.querySelector(".view.on .prose, .view.on #noteReader .notebody");
   if(!firstRoute)$("#main").focus({preventScroll:true});firstRoute=false;
   onScroll();
+}
+
+/* 從分享連結打開某一張委託圖：先顯示委託圖頁，再自動點開那張 */
+function openCommLink(id){
+  const i=COMM.findIndex(m=>commId(m)===id);
+  if(i<0){location.replace("#commissions");return;}
+  if(curChar!=="all"&&!(COMM[i].characters||[]).includes(curChar)){curChar="all";renderComm();}
+  setTimeout(()=>{const t=document.querySelector(`#cgrid [data-c="${i}"]`);if(!t)return;t.scrollIntoView({block:"center"});t.click();},60);
 }
 
 /* ---------- 捲動時：閱讀進度條、回到最上方、手機自動收起選單 ---------- */
