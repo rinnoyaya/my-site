@@ -38,6 +38,7 @@
     "after": "隨機",
     "effect": "結冰或燃燒（隨機）",
     "cooldownAfter": 0,
-    "cooldownSeconds": 5
+    "cooldownSeconds": 5,
+    "successLine": "好害羞喔...身體被人家偷看什麼的...."
   }
 }
