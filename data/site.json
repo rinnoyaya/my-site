@@ -30,5 +30,14 @@
     "bgFit": "填滿畫面",
     "bgOverlay": "淡"
   },
-  "useThumbs": true
+  "useThumbs": true,
+  "penalty": {
+    "enabled": true,
+    "speaker": "艾蕾諾雅",
+    "lines": "你是誰...?\n為什麼要偷看\n再亂猜我要凍結按鈕了",
+    "after": "隨機",
+    "effect": "結冰",
+    "cooldownAfter": 2,
+    "cooldownSeconds": 5
+  }
 }
