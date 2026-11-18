@@ -34,10 +34,10 @@
   "penalty": {
     "enabled": true,
     "speaker": "艾蕾諾雅",
-    "lines": "你是誰...?\n為什麼要偷看\n再亂猜我要凍結按鈕了",
+    "lines": "再亂猜我就把按鈕燒了\n再亂猜我要凍結按鈕了\n不要偷看!!!\n為什麼你會不知道密碼\n我要打110了",
     "after": "隨機",
-    "effect": "結冰",
-    "cooldownAfter": 2,
+    "effect": "結冰或燃燒（隨機）",
+    "cooldownAfter": 0,
     "cooldownSeconds": 5
   }
 }
