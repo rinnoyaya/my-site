@@ -1,5 +1,6 @@
 """把 content/ 裡「一筆一個檔案」的內容，合併成網站讀取的 data/*.json，
 輸出到 _site/ 資料夾給 GitHub Pages 發佈。由 .github/workflows/deploy.yml 自動執行。"""
+import base64
 import glob, html, json, os, re, shutil, sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -74,6 +75,7 @@ def main():
     warnings += build_share_pages()
     inject_home_meta()
     write_version()
+    pack_eggs()
     print(f"建置完成，警告 {warnings} 個")
 
 # ---------------- 分享頁 ----------------
@@ -199,6 +201,22 @@ def build_share_pages():
     return warnings
 
 # 首頁的標題和社群預覽資訊（原本固定是「我的網站」）
+def pack_eggs():
+    """把彩蛋設定 data/eggs.json 打包成看不懂的 data/eggs.dat，網站上不留原始的 eggs.json"""
+    src = os.path.join(OUT, "data", "eggs.json")
+    if not os.path.exists(src):
+        return
+    data = bytearray(open(src, "rb").read())
+    x = 0x5b1d9e47
+    for i in range(len(data)):
+        x = (x * 1664525 + 1013904223) & 0xFFFFFFFF
+        data[i] ^= x >> 24
+    with open(os.path.join(OUT, "data", "eggs.dat"), "w", encoding="ascii") as fh:
+        fh.write(base64.b64encode(bytes(data)).decode())
+    os.remove(src)
+    print("[完成] 彩蛋設定已打包成 data/eggs.dat")
+
+
 def write_version():
     """把 index.html 裡的版本號寫成 data/version.json，網頁發現自己是舊版時會自動更新"""
     try:
