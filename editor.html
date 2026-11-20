@@ -289,6 +289,8 @@ main{max-width:1040px;margin:0 auto;padding:28px 20px 64px}
 .ogrid{display:grid;grid-template-columns:1fr 1fr;gap:2px;margin-bottom:6px;border-bottom:1px solid var(--line);padding-bottom:6px}
 .ogrid a{padding:8px 12px;border-radius:8px;color:var(--ink);font-size:14px}
 .ogrid a:hover{background:var(--paper);text-decoration:none}
+.ogrid .ocms{grid-column:1/-1;text-align:left;padding:8px 12px;border:1px dashed var(--line);border-radius:8px;background:none;color:var(--muted);font:inherit;font-size:13px;cursor:pointer}
+.ogrid .ocms:hover{color:var(--ink);background:var(--paper)}
 .fab{border:0;font-family:inherit;cursor:pointer;display:flex;align-items:center;gap:6px;background:var(--ink);color:var(--paper);padding:10px 16px;border-radius:99px;font-size:15px;font-weight:500;box-shadow:0 6px 18px rgba(0,0,0,.25)}
 .fab:hover{text-decoration:none;opacity:.92}
 body:has(.owner:not([hidden])) footer{padding-bottom:76px}
@@ -371,6 +373,24 @@ body:has(.owner:not([hidden])) footer{padding-bottom:76px}
 .egg-scale{display:inline-flex;vertical-align:middle;width:26px;height:26px;padding:0;margin:0 4px;border:0;background:none;cursor:pointer;opacity:.55;transition:opacity .2s,transform .2s;animation:eggShine 3.2s ease-in-out infinite;text-indent:0}
 .egg-scale:hover,.egg-scale:focus-visible{opacity:1;transform:scale(1.15)}
 .egg-scale svg,.egg-scale img{width:100%;height:100%;display:block;object-fit:contain}
+.egg-scale.has-img{width:40px;height:40px;opacity:.85}
+.egg-scale[style*="--egg-size"]{width:var(--egg-size);height:var(--egg-size)}
+.egg-scale.lo{opacity:.35;animation:none}
+.egg-scale.ghost{opacity:.07;animation:none;transition:opacity .6s}
+.egg-scale.ghost:hover,.egg-scale.ghost:focus-visible{opacity:1}
+.egg-scale.in-h1{margin-left:8px}
+.egg-scale.in-card{position:absolute;right:8px;bottom:8px;margin:0;z-index:2}
+.scard,.ncard,.gcard,.tcard,.vcard,.series,.piece,.chlist li{position:relative}
+.chlist li .egg-scale.in-card{bottom:50%;transform:translateY(50%);right:auto;left:-18px}
+.chlist li .egg-scale.in-card:hover,.chlist li .egg-scale.in-card:focus-visible{transform:translateY(50%) scale(1.15)}
+#footer .egg-scale{width:18px;height:18px}
+#footer .egg-scale[style*="--egg-size"]{width:var(--egg-size);height:var(--egg-size)}
+.egg-scale-wrap.corner{position:fixed;bottom:14px;z-index:60;margin:0;opacity:0;pointer-events:none;transition:opacity .8s}
+.egg-scale-wrap.corner.left{left:14px}.egg-scale-wrap.corner.right{right:14px}
+.egg-scale-wrap.corner.on{opacity:1;pointer-events:auto}
+.egg-scale.fled{animation:eggPop .4s ease}
+@keyframes eggPop{from{transform:scale(.2)}to{transform:scale(1)}}
+.egg-scale img,.egg-fly img,.egg-pix{image-rendering:pixelated;image-rendering:crisp-edges}
 .egg-scale-wrap{text-align:center;margin:18px 0}
 .egg-scale-wrap.top{margin:0 0 10px;text-align:right}
 .egg-scale.got{animation:eggGot .6s ease forwards;pointer-events:none}
@@ -784,7 +804,7 @@ body{display:flex;flex-direction:column}
 
 <div class="foot">
   <button class="btn" type="button" id="copyBtn">複製全部，貼到後台</button>
-  <a class="tbtn" id="cmsLink" href="https://app.pagescms.org/rinnoyaya/my-site/main" target="_blank" rel="noopener">開啟後台 ↗</a>
+  <a class="tbtn" id="cmsLink" href="https://app.pagescms.org" target="_blank" rel="noopener">開啟後台 ↗</a>
   <select id="newSel" aria-label="在後台新增一筆內容"><option value="">＋ 在後台新增…</option></select>
   <a class="tbtn" href="upload.html">上傳圖片</a>
   <button class="tbtn" type="button" id="dlBtn" title="把這份草稿存成文字檔備份">下載備份</button>
@@ -830,6 +850,7 @@ body{display:flex;flex-direction:column}
     <div class="row" style="gap:6px;margin-bottom:6px"><input id="pwIn" type="text" autocomplete="off" placeholder="想設定的密碼" style="flex:1;min-width:0;font:inherit;font-size:14px;color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:7px;padding:7px 9px"><button class="tb" type="button" id="pwGen">產生代碼</button></div>
     <div class="row" style="gap:6px;margin-bottom:16px"><code id="pwOut" style="flex:1;min-width:0;word-break:break-all;font-size:12px;padding:6px 8px">（代碼會出現在這裡）</code><button class="tb" type="button" id="pwCopy" hidden>複製</button></div>
     <label for="ownerChk" style="display:flex;gap:8px;align-items:center;margin:0 0 14px;font-size:14px"><input type="checkbox" id="ownerChk"> 在這台裝置的網站上顯示「編輯」按鈕（訪客看不到）</label>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:-6px 0 14px;font-size:14px"><span id="cmsState"></span><button type="button" class="tbtn" id="cmsSet">設定後台位置</button></div>
     <p style="color:var(--muted)">加到手機主畫面：用 Safari 打開這頁 → 分享 → 加入主畫面；Android 用 Chrome 的選單 → 加到主畫面。</p>
     <button class="btn" type="button" id="helpClose" style="border:0;font:inherit;cursor:pointer">知道了</button>
   </div>
@@ -943,12 +964,27 @@ const plain=t=>String(t||"").replace(/!\[[^\]]*\]\([^)]*\)/g,"").replace(/\{[^|{
 const $=s=>document.querySelector(s);
 
 /* ---------- 寫作小幫手 ---------- */
-/* 後台網址：app.pagescms.org/帳號/repo/分支 */
-const CMS="https://app.pagescms.org/rinnoyaya/my-site/main";
+/* 後台網址：不寫在公開的程式碼裡，只存在這台裝置（localStorage 的 cms-repo），格式是「帳號/repo/分支」 */
+const CMS_ROOT="https://app.pagescms.org";
+function cmsRepo(){
+  let v="";try{v=localStorage.getItem("cms-repo")||"";}catch(e){}
+  const parts=String(v).trim().replace(/^https?:\/\/app\.pagescms\.org/i,"").split(/[/?#]/).filter(Boolean);
+  if(parts.length<2||!parts.slice(0,3).every(p=>/^[\w.-]+$/.test(p)))return "";
+  return parts.slice(0,2).join("/")+"/"+(parts[2]||"main");
+}
+function cmsSetup(){
+  const v=prompt("後台位置（只存在這台裝置，不會出現在網站上）\n\n打開 Pages CMS 進到網站的後台後，把整個網址複製貼過來就好，例如：\nhttps://app.pagescms.org/帳號/my-site/main",cmsRepo()?CMS_ROOT+"/"+cmsRepo():"");
+  if(v===null)return false;
+  try{localStorage.setItem("cms-repo",v.trim());}catch(e){}
+  if(v.trim()&&!cmsRepo()){alert("看不懂這個網址。請貼上 Pages CMS 後台的網址，像是 https://app.pagescms.org/帳號/my-site/main");return false;}
+  return true;
+}
+let CMS="";const cmsRefresh=()=>{const r=cmsRepo();CMS=r?CMS_ROOT+"/"+r:CMS_ROOT;const a=document.getElementById("cmsLink");if(a)a.href=CMS;};cmsRefresh();
 const CMS_DIR={chapters:"content/chapters",side:"content/side-stories",notes:"content/notes",characters:"content/characters",tools:"content/tools",glossary:"content/glossary"};
 const CMS_NEW=[["chapters","故事章節"],["side","角色故事"],["notes","文章"],["characters","角色"],["glossary","名詞"],["commissions","委託圖"],["tools","小工具"]];
 /* 有連到網站上某一篇的草稿 → 直接打開後台的那一篇；沒有 → 打開後台首頁 */
 function cmsHref(d){
+  if(!cmsRepo())return CMS_ROOT;
   if(!d||!d.src)return CMS;
   const t=d.src.slice(0,d.src.indexOf(":"));
   if(t==="site")return CMS+"/file/site-about";
@@ -1046,7 +1082,7 @@ $("#newDraft").onclick=()=>{flush();const d=cur();if(d&&!d.src&&!d.text.trim()){
 /* 電腦：編輯區捲動時，預覽跟著捲到差不多的位置 */
 src.addEventListener("scroll",()=>{if(narrow.matches)return;const p=$("#prev"),max=src.scrollHeight-src.clientHeight;if(max>0)p.scrollTop=src.scrollTop/max*(p.scrollHeight-p.clientHeight);},{passive:true});
 $("#newSel").innerHTML+=CMS_NEW.map(([k,l])=>`<option value="${k}">新增${l}</option>`).join("");
-$("#newSel").onchange=e=>{const k=e.target.value;e.target.value="";if(k)window.open(CMS+"/collection/"+k+"/new","_blank","noopener");};
+$("#newSel").onchange=e=>{const k=e.target.value;e.target.value="";if(k)window.open(cmsRepo()?CMS+"/collection/"+k+"/new":CMS_ROOT,"_blank","noopener");};
 $("#dlBtn").onclick=()=>{flush();const d=cur();if(!src.value.trim()){toast("這份草稿是空的");return;}
   const name=(d&&d.label?(d.label.split("｜")[1]||d.label):(plain(src.value).trim().split("\n")[0]||"草稿")).replace(/[\\/:*?"<>|\s]+/g,"_").slice(0,30)||"草稿";
   const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([src.value],{type:"text/plain;charset=utf-8"}));a.download=name+".txt";document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),2000);toast("已下載備份");};
@@ -1287,6 +1323,8 @@ $("#themeBtn").onclick=()=>{const r=document.documentElement,c=r.dataset.theme||
 /* ---------- 擁有者模式：讓這台裝置的網站顯示「編輯」按鈕 ---------- */
 let ownerOn=true;try{if(localStorage.getItem("owner-mode")==="0")ownerOn=false;else localStorage.setItem("owner-mode","1");}catch(e){}
 $("#ownerChk").checked=ownerOn;
+const cmsShow=()=>{cmsRefresh();$("#cmsState").textContent=cmsRepo()?"後台位置：已設定（只存在這台裝置）":"後台位置：還沒設定，「開啟後台」會先到 Pages CMS 首頁";};cmsShow();
+$("#cmsSet").onclick=()=>{if(cmsSetup()){cmsShow();toast("已儲存後台位置");}};
 $("#ownerChk").onchange=e=>{try{localStorage.setItem("owner-mode",e.target.checked?"1":"0");}catch(err){}toast(e.target.checked?"網站上會顯示編輯按鈕":"已隱藏網站上的編輯按鈕");};
 
 /* ---------- 從網站帶入內容：editor.html#edit=類型:代號 ---------- */

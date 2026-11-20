@@ -286,6 +286,8 @@ main{max-width:1040px;margin:0 auto;padding:28px 20px 64px}
 .ogrid{display:grid;grid-template-columns:1fr 1fr;gap:2px;margin-bottom:6px;border-bottom:1px solid var(--line);padding-bottom:6px}
 .ogrid a{padding:8px 12px;border-radius:8px;color:var(--ink);font-size:14px}
 .ogrid a:hover{background:var(--paper);text-decoration:none}
+.ogrid .ocms{grid-column:1/-1;text-align:left;padding:8px 12px;border:1px dashed var(--line);border-radius:8px;background:none;color:var(--muted);font:inherit;font-size:13px;cursor:pointer}
+.ogrid .ocms:hover{color:var(--ink);background:var(--paper)}
 .fab{border:0;font-family:inherit;cursor:pointer;display:flex;align-items:center;gap:6px;background:var(--ink);color:var(--paper);padding:10px 16px;border-radius:99px;font-size:15px;font-weight:500;box-shadow:0 6px 18px rgba(0,0,0,.25)}
 .fab:hover{text-decoration:none;opacity:.92}
 body:has(.owner:not([hidden])) footer{padding-bottom:76px}
@@ -956,7 +958,7 @@ function newDays(){const v=SITE.newDays;if(v===undefined||v===null||v==="")retur
 function isNew(x){const d=newDays();if(!d||!x||!x.date)return false;const t=Date.parse(String(x.date).slice(0,10)+"T00:00:00+08:00");if(isNaN(t))return false;const age=Date.now()-t;return age>-864e5&&age<d*864e5;}
 const newBadge=x=>isNew(x)?`<span class="new-badge" title="最近更新">NEW</span>`:"";
 
-const SITE_VERSION="2026-11-20 v1.18";
+const SITE_VERSION="2026-11-20 v1.19";
 const BROKEN=[];
 async function load(){
   const files=["site.json","series.json","chapters.json","side-stories.json","characters.json","commissions.json","tools.json","notes.json","history.json","glossary.json","eggs.json"];
@@ -1821,16 +1823,30 @@ document.addEventListener("keydown",e=>{const c=$("#lb").classList.contains("on"
 
 /* ---------- 編輯按鈕：只在打開過寫作小幫手的裝置上出現 ---------- */
 let OWNER=false;try{OWNER=localStorage.getItem("owner-mode")==="1";}catch(e){}
-/* 後台網址：app.pagescms.org/帳號/repo/分支 */
-const CMS="https://app.pagescms.org/rinnoyaya/my-site/main";
+/* 後台網址：不寫在公開的程式碼裡，只存在這台裝置（localStorage 的 cms-repo），格式是「帳號/repo/分支」 */
+const CMS_ROOT="https://app.pagescms.org";
+function cmsRepo(){
+  let v="";try{v=localStorage.getItem("cms-repo")||"";}catch(e){}
+  const parts=String(v).trim().replace(/^https?:\/\/app\.pagescms\.org/i,"").split(/[/?#]/).filter(Boolean);
+  if(parts.length<2||!parts.slice(0,3).every(p=>/^[\w.-]+$/.test(p)))return "";
+  return parts.slice(0,2).join("/")+"/"+(parts[2]||"main");
+}
+function cmsSetup(){
+  const v=prompt("後台位置（只存在這台裝置，不會出現在網站上）\n\n打開 Pages CMS 進到網站的後台後，把整個網址複製貼過來就好，例如：\nhttps://app.pagescms.org/帳號/my-site/main",cmsRepo()?CMS_ROOT+"/"+cmsRepo():"");
+  if(v===null)return false;
+  try{localStorage.setItem("cms-repo",v.trim());}catch(e){}
+  if(v.trim()&&!cmsRepo()){alert("看不懂這個網址。請貼上 Pages CMS 後台的網址，像是 https://app.pagescms.org/帳號/my-site/main");return false;}
+  return true;
+}
+let CMS="";const cmsRefresh=()=>{const r=cmsRepo();CMS=r?CMS_ROOT+"/"+r:"";};cmsRefresh();
 const CMS_ENTRIES=[["chapters","故事章節"],["side","角色故事"],["series","故事系列"],["characters","角色"],["glossary","名詞百科"],["commissions","委託圖"],["tools","小工具"],["notes","文章"],["history","網站歷程"],["site","首頁與基本"],["site-about","關於頁與頁尾"],["site-theme","外觀"],["site-safety","成人與圖片保護"],["site-advanced","進階設定"],["eggs","彩蛋"]];
 const CMS_FILES=["site","site-about","site-theme","site-safety","site-advanced","eggs"];
 const CMS_DIR={chapters:"content/chapters",side:"content/side-stories",series:"content/series",characters:"content/characters",glossary:"content/glossary",commissions:"content/commissions",tools:"content/tools",notes:"content/notes",history:"content/history"};
 const cmsName=k=>(CMS_ENTRIES.find(e=>e[0]===k)||[])[1]||"";
-const cmsUrl=name=>CMS+(CMS_FILES.includes(name)?"/file/":"/collection/")+name;
-const cmsNew=name=>CMS+"/collection/"+name+"/new";
+const cmsUrl=name=>!CMS?CMS_ROOT:CMS+(CMS_FILES.includes(name)?"/file/":"/collection/")+name;
+const cmsNew=name=>!CMS?CMS_ROOT:CMS+"/collection/"+name+"/new";
 /* 直接打開後台的那一筆（要有 _file，建置時會自動加上）；沒有就打開那一類的列表 */
-const cmsEdit=(name,x)=>x&&x._file&&CMS_DIR[name]?CMS+"/collection/"+name+"/edit/"+enc(CMS_DIR[name]+"/"+x._file+".json"):cmsUrl(name);
+const cmsEdit=(name,x)=>CMS&&x&&x._file&&CMS_DIR[name]?CMS+"/collection/"+name+"/edit/"+enc(CMS_DIR[name]+"/"+x._file+".json"):cmsUrl(name);
 function updateFab(pre,arg,v){
   const box=$("#owner");if(!OWNER){box.hidden=true;return;}
   const map={"read-":"chapters","side-":"side","note-":"notes","char-":"characters","tool-":"tools","term-":"glossary"};
@@ -1866,7 +1882,12 @@ $("#oVer").textContent="網站版本 "+SITE_VERSION;
   if(sessionStorage.getItem("ver-reload")===v)return;sessionStorage.setItem("ver-reload",v);
   await fetch(location.pathname,{cache:"reload"});location.reload();
 }catch(e){}})();
-$("#oAll").innerHTML=CMS_ENTRIES.map(([k,l])=>`<a href="${cmsUrl(k)}" target="_blank" rel="noopener" role="menuitem">${l}</a>`).join("");
+function renderOAll(){
+  $("#oAll").innerHTML=CMS_ENTRIES.map(([k,l])=>`<a href="${cmsUrl(k)}" target="_blank" rel="noopener" role="menuitem">${l}</a>`).join("")
+    +`<button type="button" class="ocms" role="menuitem">${CMS?"⚙ 更改後台位置":"⚠ 設定後台位置（設好後按鈕會直接開到那一篇）"}</button>`;
+  $("#oAll .ocms").onclick=e=>{e.stopPropagation();if(cmsSetup())location.reload();};
+}
+renderOAll();
 $("#fab").onclick=e=>{e.stopPropagation();const o=$("#owner").classList.toggle("open");$("#fab").setAttribute("aria-expanded",String(o));};
 document.addEventListener("click",e=>{if(!e.target.closest("#owner"))closeOwner();});
 document.addEventListener("keydown",e=>{if(e.key==="Escape")closeOwner();});
