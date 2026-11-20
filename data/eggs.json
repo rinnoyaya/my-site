@@ -28,5 +28,6 @@
   "birthday": {
     "enabled": false
   },
-  "entry": "連點三下"
+  "entry": "連點三下",
+  "intro": "這個堡壘裡面有散落一些東西跟藏有一些秘密\n去找找吧!"
 }
