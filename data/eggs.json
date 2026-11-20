@@ -1,10 +1,15 @@
 {
   "enabled": true,
   "scales": {
-    "enabled": true
+    "enabled": true,
+    "name": "諾雅的龍鱗",
+    "iconUrl": "https://img.obsidianfirelight.com/commissions/noya-scale-20261120-163609.gif",
+    "title": "掉落的龍鱗",
+    "hint": "堡壘各處都有諾雅散落的龍鱗，去找找吧 龍鱗會散發藍色跟橘色的光芒",
+    "speaker": "艾蕾諾雅"
   },
   "logo": {
-    "enabled": true
+    "enabled": false
   },
   "idle": {
     "enabled": true
@@ -14,5 +19,6 @@
   },
   "birthday": {
     "enabled": true
-  }
+  },
+  "entry": "連點三下"
 }
