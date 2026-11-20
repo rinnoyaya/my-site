@@ -875,6 +875,339 @@ content:
       - 不縮排
       - 每一行都縮排
       - 只有段落第一行縮排
+- name: eggs
+  label: 彩蛋
+  description: 讓訪客探索的彩蛋。找到的紀錄只存在訪客自己的瀏覽器。頁尾最右邊的小符號是收藏冊的入口。
+  type: file
+  path: data/eggs.json
+  format: json
+  fields:
+  - name: enabled
+    label: 開啟彩蛋
+    type: boolean
+    description: 關掉後，所有彩蛋和收藏冊都會消失
+    default: true
+  - name: title
+    label: 收藏冊名稱
+    type: string
+    description: 留空是「堡壘的秘密」
+  - name: intro
+    label: 收藏冊開頭的說明
+    type: text
+    description: 例如：這座堡壘藏著一些秘密，你找到了幾個呢？
+  - name: entry
+    label: 收藏冊入口要怎麼打開
+    type: select
+    description: 入口是頁尾最右邊的小符號
+    options:
+      values:
+      - 點一下
+      - 連點三下
+  - name: entrySymbol
+    label: 入口符號
+    type: string
+    description: 留空是 ✦，也可以換成其他符號或 emoji
+  - name: toast
+    label: 找到秘密時的提示
+    type: string
+    description: 可以用 {n} 和 {total}。留空是「🔮 發現了堡壘的秘密（{n} / {total}）」
+  - name: allToast
+    label: 全部找齊時的提示
+    type: string
+    description: 留空是「✨ 你找齊了堡壘的所有秘密！到收藏冊看看吧」
+  - name: reward
+    label: 找齊後的獎勵
+    type: object
+    description: 收藏冊全部找齊後，最下面會出現的內容
+    fields:
+    - name: title
+      label: 標題
+      type: string
+      description: 留空是「給找齊秘密的你」
+    - name: imageUrl
+      label: 獎勵圖片網址
+      type: string
+      description: 選填。隱藏插圖之類的
+      pattern:
+        regex: ^(|https?://\S+|/\S+)$
+        message: 請貼上 https:// 開頭的圖片網址（前後不要有空白）
+    - name: text
+      label: 內容
+      type: text
+      description: 可以寫一封信、一篇短篇。格式和故事內文一樣，可以用寫作小幫手寫好再貼過來
+    - name: lockedText
+      label: 還沒找齊時顯示的文字
+      type: string
+      description: 留空是「找齊所有秘密後，這裡會出現一份獎勵。」
+  - name: scales
+    label: ① 散落的龍鱗
+    type: object
+    description: 在指定的頁面藏一個閃閃發亮的小東西，點到就收集起來，全部找齊算一個秘密
+    fields:
+    - name: enabled
+      label: 開啟
+      type: boolean
+      default: true
+    - name: name
+      label: 收集品的名字
+      type: string
+      description: 留空是「龍鱗」，也可以改成羽毛、星星碎片等等
+    - name: iconUrl
+      label: 收集品圖片網址
+      type: string
+      description: 選填。留空會用內建的藍色龍鱗圖案。建議用去背的 PNG
+      pattern:
+        regex: ^(|https?://\S+|/\S+)$
+        message: 請貼上 https:// 開頭的圖片網址（前後不要有空白）
+    - name: title
+      label: 收藏冊裡的名稱
+      type: string
+      description: 留空是「散落的龍鱗」
+    - name: hint
+      label: 還沒找齊時的提示
+      type: string
+      description: 留空是「堡壘各處藏著閃閃發亮的龍鱗」
+    - name: completeText
+      label: 全部找齊時的話
+      type: text
+      description: 找齊時跳出來的台詞，也會顯示在收藏冊裡
+    - name: speaker
+      label: 說話的角色
+      type: reference
+      description: 選填。找齊時說話的角色
+      options:
+        collection: characters
+        value: '{fields.name}'
+        label: '{fields.name}'
+        search: fields.name
+    - name: items
+      label: 藏在哪裡
+      type: object
+      description: 每一項是一片。順序不影響，訪客可以照任何順序找
+      list:
+        collapsible:
+          collapsed: false
+          summary: '{page}　{spot}'
+      fields:
+      - name: page
+        label: 藏在哪一頁
+        type: string
+        description: '打開那一頁，複製網址 # 後面的部分貼過來，例如 #read-lg-1、#commissions、#char-玄城凜夜。首頁填 #home'
+        required: true
+      - name: spot
+        label: 放在頁面的哪裡
+        type: select
+        description: 「內文中間」會藏在文章中間那一段的最後面，最難找
+        options:
+          values:
+          - 頁面最下方
+          - 頁面最上方
+          - 內文中間
+      - name: note
+        label: 撿到時的一句話
+        type: string
+        description: 選填，例如「這片好像有點溫熱」
+  - name: logo
+    label: ② 戳 logo 的龍
+    type: object
+    description: 連點左上角的龍頭幾下會觸發
+    fields:
+    - name: enabled
+      label: 開啟
+      type: boolean
+      default: true
+    - name: title
+      label: 收藏冊裡的名稱
+      type: string
+      description: 找到之後顯示的名稱，例如：打噴嚏的龍
+    - name: hint
+      label: 還沒找到時的提示
+      type: string
+      description: 收藏冊裡給還沒找到的人的線索，例如：左上角的龍，好像不太喜歡被戳
+    - name: foundText
+      label: 找到之後的說明
+      type: text
+      description: 找到後在收藏冊裡顯示的一段話
+    - name: clicks
+      label: 要連點幾下
+      type: number
+      description: 留空是 7 下
+      options:
+        min: 3
+        max: 20
+    - name: effect
+      label: 效果
+      type: select
+      description: 留空是噴火
+      options:
+        values:
+        - 噴火
+        - 小龍飛過
+    - name: dragonUrl
+      label: 小龍圖片網址
+      type: string
+      description: 選填。選「小龍飛過」時飛過畫面的圖，留空會用 🐉
+      pattern:
+        regex: ^(|https?://\S+|/\S+)$
+        message: 請貼上 https:// 開頭的圖片網址（前後不要有空白）
+    - name: speaker
+      label: 說話的角色
+      type: reference
+      description: 選填。選一個角色，會顯示他的頭像和名字
+      options:
+        collection: characters
+        value: '{fields.name}'
+        label: '{fields.name}'
+        search: fields.name
+    - name: lines
+      label: 台詞
+      type: text
+      description: 一行一句，每次隨機說一句
+  - name: idle
+    label: ③ 偷看的角色
+    type: object
+    description: 在同一頁停著不動一段時間，角色會從右邊探出頭
+    fields:
+    - name: enabled
+      label: 開啟
+      type: boolean
+      default: true
+    - name: title
+      label: 收藏冊裡的名稱
+      type: string
+      description: 找到之後顯示的名稱，例如：偷看的人
+    - name: hint
+      label: 還沒找到時的提示
+      type: string
+      description: 收藏冊裡給還沒找到的人的線索，例如：靜靜待在同一頁，好像會有人來看你
+    - name: foundText
+      label: 找到之後的說明
+      type: text
+      description: 找到後在收藏冊裡顯示的一段話
+    - name: seconds
+      label: 停多久會出現（秒）
+      type: number
+      description: 留空是 60 秒
+      options:
+        min: 15
+        max: 600
+    - name: speaker
+      label: 說話的角色
+      type: reference
+      description: 選填。選一個角色，會顯示他的頭像和名字
+      options:
+        collection: characters
+        value: '{fields.name}'
+        label: '{fields.name}'
+        search: fields.name
+    - name: lines
+      label: 台詞
+      type: text
+      description: 一行一句，每次隨機說一句
+  - name: night
+    label: ④ 深夜的堡壘
+    type: object
+    description: 在台灣時間深夜來訪，網站會變暗並點起燭光
+    fields:
+    - name: enabled
+      label: 開啟
+      type: boolean
+      default: true
+    - name: title
+      label: 收藏冊裡的名稱
+      type: string
+      description: 找到之後顯示的名稱，例如：深夜的堡壘
+    - name: hint
+      label: 還沒找到時的提示
+      type: string
+      description: 收藏冊裡給還沒找到的人的線索，例如：夜深的時候，堡壘的燈火會改變
+    - name: foundText
+      label: 找到之後的說明
+      type: text
+      description: 找到後在收藏冊裡顯示的一段話
+    - name: start
+      label: 從幾點開始
+      type: number
+      description: 0～23，留空是 0 點
+      options:
+        min: 0
+        max: 23
+    - name: end
+      label: 到幾點結束
+      type: number
+      description: 1～24，留空是 4 點（凌晨 0 點到 4 點）
+      options:
+        min: 1
+        max: 24
+    - name: speaker
+      label: 說話的角色
+      type: reference
+      description: 選填。選一個角色，會顯示他的頭像和名字
+      options:
+        collection: characters
+        value: '{fields.name}'
+        label: '{fields.name}'
+        search: fields.name
+    - name: lines
+      label: 台詞
+      type: text
+      description: 一行一句，每次隨機說一句
+  - name: birthday
+    label: ⑤ 角色生日
+    type: object
+    description: 在角色生日那天來訪，首頁和角色頁會出現生日橫幅和紙花
+    fields:
+    - name: enabled
+      label: 開啟
+      type: boolean
+      default: true
+    - name: title
+      label: 收藏冊裡的名稱
+      type: string
+      description: 找到之後顯示的名稱，例如：特別的日子
+    - name: hint
+      label: 還沒找到時的提示
+      type: string
+      description: 收藏冊裡給還沒找到的人的線索，例如：在某個人特別的日子來訪
+    - name: foundText
+      label: 找到之後的說明
+      type: text
+      description: 找到後在收藏冊裡顯示的一段話
+    - name: list
+      label: 生日
+      type: object
+      list:
+        collapsible:
+          collapsed: false
+          summary: '{character}　{month} 月 {day} 日'
+      fields:
+      - name: character
+        label: 角色
+        type: reference
+        required: true
+        options:
+          collection: characters
+          value: '{fields.name}'
+          label: '{fields.name}'
+          search: fields.name
+      - name: month
+        label: 月
+        type: number
+        required: true
+        options:
+          min: 1
+          max: 12
+      - name: day
+        label: 日
+        type: number
+        required: true
+        options:
+          min: 1
+          max: 31
+      - name: message
+        label: 生日那天的話
+        type: text
+        description: 選填，顯示在生日橫幅上
 - name: g-site
   label: 網站設定
   type: group
