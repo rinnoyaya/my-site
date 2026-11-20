@@ -970,7 +970,7 @@ function newDays(){const v=SITE.newDays;if(v===undefined||v===null||v==="")retur
 function isNew(x){const d=newDays();if(!d||!x||!x.date)return false;const t=Date.parse(String(x.date).slice(0,10)+"T00:00:00+08:00");if(isNaN(t))return false;const age=Date.now()-t;return age>-864e5&&age<d*864e5;}
 const newBadge=x=>isNew(x)?`<span class="new-badge" title="最近更新">NEW</span>`:"";
 
-const SITE_VERSION="2026-11-20 v1.20";
+const SITE_VERSION="2026-11-20 v1.21";
 const BROKEN=[];
 /* 解開建置時打包過的設定檔（data/eggs.dat） */
 function unpk(t){try{const b=atob(t.trim()),u=new Uint8Array(b.length);let x=0x5b1d9e47;for(let i=0;i<b.length;i++){x=(Math.imul(x,1664525)+1013904223)>>>0;u[i]=b.charCodeAt(i)^(x>>>24);}return new TextDecoder().decode(u);}catch(e){return "";}}
@@ -1389,6 +1389,8 @@ function heroSlidesOf(){
   });
   return out;
 }
+/* 輪播圖片：一開始只載入前兩張，其他的輪到前一張時才載入，手機不會一次下載全部 */
+function heroLoad(el){const im=el&&el.querySelector("img[data-src]");if(im){im.loading="eager";im.src=im.dataset.src;im.removeAttribute("data-src");}}
 function renderHeroSlides(){
   clearInterval(heroTimer);heroTimer=null;
   const box=$("#heroArt"),fit=SITE.heroFit==="完整顯示";
@@ -1400,7 +1402,7 @@ function renderHeroSlides(){
   const slideFx=SITE.heroEffect==="左右滑動";
   box.className+=" hslides"+(slideFx?" fx-slide":"");
   box.setAttribute("aria-roledescription","carousel");box.setAttribute("aria-label","首頁主圖");
-  box.innerHTML=list.map((x,i)=>{const inner=`<img src="${esc(x.src)}" alt="${esc(x.cap)}" ${i?`loading="lazy"`:""} draggable="false">${x.cap?`<span class="hcap">${esc(x.cap)}</span>`:""}`;
+  box.innerHTML=list.map((x,i)=>{const inner=`<img ${i<2?"src":"data-src"}="${esc(x.src)}" alt="${esc(x.cap)}" ${i?`loading="lazy"`:""} draggable="false">${x.cap?`<span class="hcap">${esc(x.cap)}</span>`:""}`;
     return x.link?`<a class="hslide${i?"":" on"}" href="${esc(x.link)}"${/^https?:/.test(x.link)?` target="_blank" rel="noopener"`:""} aria-label="${esc(x.cap||"第 "+(i+1)+" 張")}">${inner}</a>`:`<div class="hslide${i?"":" on"}">${inner}</div>`;}).join("")
     +`<button type="button" class="harrow prev" aria-label="上一張">‹</button><button type="button" class="harrow next" aria-label="下一張">›</button>`
     +`<div class="hdots">${list.map((_,i)=>`<button type="button" class="${i?"":"on"}" aria-label="第 ${i+1} 張"></button>`).join("")}</div>`;
@@ -1410,7 +1412,7 @@ function renderHeroSlides(){
     if(slideFx){box.classList.add("nofx");sl.forEach(e=>e.classList.remove("out"));box.classList.toggle("rev",dir<0);void box.offsetWidth;box.classList.remove("nofx");}
     sl[cur].classList.remove("on");if(slideFx)sl[cur].classList.add("out");
     sl[i].classList.add("on");dots.forEach((d,j)=>d.classList.toggle("on",j===i));cur=i;
-    const nx=sl[(i+1)%n].querySelector("img");if(nx)nx.loading="eager";};
+    [sl[i],sl[(i+1)%n],sl[(i-1+n)%n]].forEach(heroLoad);};
   const sec=Math.max(2,Math.min(60,+SITE.heroInterval||5));
   const reduce=matchMedia("(prefers-reduced-motion:reduce)").matches;
   let paused=false;
