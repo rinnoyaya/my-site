@@ -431,6 +431,17 @@ html.egg-night body::after{content:"";position:fixed;inset:0;pointer-events:none
 .secret.no h3{color:var(--muted);letter-spacing:.2em}
 .secret small{display:block;margin-top:6px;color:var(--accent);font-size:12.5px}
 .secret-reward{margin-top:28px;padding:20px;border-radius:14px;border:1px solid var(--line);background:var(--card)}
+.egg-clues{margin-top:24px;padding:16px 18px;border-radius:14px;border:1px solid var(--line);background:var(--card)}
+.egg-clues h2{font-size:17px;margin:0 0 8px;display:flex;align-items:baseline;gap:10px}.egg-clues h2 small{font-size:13px;color:var(--muted);font-weight:400}
+.egg-clues ol{margin:0;padding-left:1.4em;line-height:1.9}.egg-clues p{margin:0;color:var(--muted);font-size:14px}
+.secret-reward.seal{text-align:center;border-style:dashed}
+.egg-seal-ic{font-size:34px;line-height:1;margin-bottom:6px;transition:transform .7s,filter .7s}
+.secret-reward.seal.open .egg-seal-ic{transform:scale(1.6) rotate(20deg);filter:drop-shadow(0 0 14px #9cf)}
+.egg-seal-f{display:flex;gap:8px;max-width:420px;margin:12px auto 0}
+.egg-seal-f input{flex:1;min-width:0;font:inherit;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--paper);color:var(--ink)}
+.egg-seal-f .btn{border:0;font:inherit;cursor:pointer;white-space:nowrap}
+.egg-seal-msg{min-height:1.5em;margin:10px 0 0;color:var(--muted);font-size:14px}
+.secret-reward.shake{animation:gShake .45s}
 .secret-reward.lock{text-align:center;color:var(--muted);border-style:dashed;background:transparent}
 .secret-reward .art{max-width:520px;margin:12px auto;border-radius:10px;overflow:hidden}
 @media (prefers-reduced-motion:reduce){.egg-scale,html.egg-night body::after{animation:none}.egg-fly,.egg-fire,.egg-confetti{display:none}}
@@ -849,6 +860,16 @@ body{display:flex;flex-direction:column}
     <p style="color:var(--muted);margin:0 0 8px">輸入你想設定的密碼，把產生的代碼貼到後台「網站設定 › 成人內容設定 › 密碼代碼」。代碼無法反推出密碼，所以真正的密碼不會出現在公開的檔案裡。</p>
     <div class="row" style="gap:6px;margin-bottom:6px"><input id="pwIn" type="text" autocomplete="off" placeholder="想設定的密碼" style="flex:1;min-width:0;font:inherit;font-size:14px;color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:7px;padding:7px 9px"><button class="tb" type="button" id="pwGen">產生代碼</button></div>
     <div class="row" style="gap:6px;margin-bottom:16px"><code id="pwOut" style="flex:1;min-width:0;word-break:break-all;font-size:12px;padding:6px 8px">（代碼會出現在這裡）</code><button class="tb" type="button" id="pwCopy" hidden>複製</button></div>
+    <h2 style="font-size:18px;margin:18px 0 6px">加密彩蛋獎勵（密語封印）</h2>
+    <p style="color:var(--muted);margin:0 0 8px">訪客找齊所有秘密後，要輸入這句密語才看得到獎勵。密語不會存到任何地方，網站和 GitHub 上只有加密後的亂碼，所以看程式碼也拿不到獎勵。<b>密語請自己記好</b>，忘了只能重新產生。比對時會忽略空白、標點和英文大小寫。</p>
+    <div style="display:grid;gap:6px;margin-bottom:6px">
+      <input id="egPass" type="text" autocomplete="off" placeholder="密語（建議 4 個字以上，不要太好猜）" style="font:inherit;font-size:14px;color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:7px;padding:7px 9px">
+      <input id="egTitle" type="text" autocomplete="off" placeholder="獎勵標題（選填）" style="font:inherit;font-size:14px;color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:7px;padding:7px 9px">
+      <input id="egImg" type="url" autocomplete="off" placeholder="獎勵圖片網址（選填，https:// 開頭）" style="font:inherit;font-size:14px;color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:7px;padding:7px 9px">
+      <textarea id="egText" rows="5" placeholder="獎勵內容：一封信、一篇短篇都可以，格式和故事內文一樣" style="font:inherit;font-size:14px;color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:7px;padding:7px 9px;resize:vertical"></textarea>
+    </div>
+    <div class="row" style="gap:6px;margin-bottom:6px;flex-wrap:wrap"><button class="tb" type="button" id="egGen">產生加密獎勵</button><button class="tb" type="button" id="egCheck">用密語解開看看</button></div>
+    <div class="row" style="gap:6px;margin-bottom:16px"><textarea id="egOut" rows="3" placeholder="加密後的獎勵會出現在這裡；也可以貼上後台現有的代碼，再按「用密語解開看看」確認內容" style="flex:1;min-width:0;font-size:12px;word-break:break-all;font:inherit;font-size:14px;color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:7px;padding:7px 9px"></textarea><button class="tb" type="button" id="egCopy">複製</button></div>
     <label for="ownerChk" style="display:flex;gap:8px;align-items:center;margin:0 0 14px;font-size:14px"><input type="checkbox" id="ownerChk"> 在這台裝置的網站上顯示「編輯」按鈕（訪客看不到）</label>
     <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:-6px 0 14px;font-size:14px"><span id="cmsState"></span><button type="button" class="tbtn" id="cmsSet">設定後台位置</button></div>
     <p style="color:var(--muted)">加到手機主畫面：用 Safari 打開這頁 → 分享 → 加入主畫面；Android 用 Chrome 的選單 → 加到主畫面。</p>
@@ -1386,6 +1407,40 @@ $("#pwGen").onclick=async()=>{
   $("#pwOut").textContent=[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join("");$("#pwCopy").hidden=false;
 };
 $("#pwCopy").onclick=async()=>{try{await navigator.clipboard.writeText($("#pwOut").textContent);toast("代碼已複製，貼到後台的「密碼代碼」");}catch(e){toast("請手動選取代碼複製");}};
+/* 彩蛋獎勵加密（和網站的 e.js 用同一套方法：PBKDF2 + AES-GCM） */
+const egNorm=t=>String(t||"").normalize("NFKC").replace(/[\s\p{P}\p{S}]+/gu,"").toLowerCase();
+const egB64=u=>btoa(String.fromCharCode(...u)),egUn=x=>Uint8Array.from(atob(x),c=>c.charCodeAt(0));
+async function egKey(pass,salt,use){
+  const base=await crypto.subtle.importKey("raw",new TextEncoder().encode(egNorm(pass)),"PBKDF2",false,["deriveKey"]);
+  return crypto.subtle.deriveKey({name:"PBKDF2",salt,iterations:250000,hash:"SHA-256"},base,{name:"AES-GCM",length:256},false,[use]);
+}
+async function egSeal(pass,obj){
+  const salt=crypto.getRandomValues(new Uint8Array(16)),iv=crypto.getRandomValues(new Uint8Array(12));
+  const ct=new Uint8Array(await crypto.subtle.encrypt({name:"AES-GCM",iv},await egKey(pass,salt,"encrypt"),new TextEncoder().encode(JSON.stringify(obj))));
+  return "egg1:"+egB64(salt)+"."+egB64(iv)+"."+egB64(ct);
+}
+async function egOpen(code,pass){
+  const m=/^egg1:([\w+/=]+)\.([\w+/=]+)\.([\w+/=]+)$/.exec(String(code||"").replace(/\s+/g,""));if(!m)throw new Error("format");
+  const pt=await crypto.subtle.decrypt({name:"AES-GCM",iv:egUn(m[2])},await egKey(pass,egUn(m[1]),"decrypt"),egUn(m[3]));
+  return JSON.parse(new TextDecoder().decode(pt));
+}
+$("#egGen").onclick=async()=>{
+  if(!window.crypto||!crypto.subtle){toast("請用 https:// 開頭的網址開啟小幫手");return;}
+  const pass=$("#egPass").value,text=$("#egText").value.trim(),img=$("#egImg").value.trim();
+  if(egNorm(pass).length<2){toast("密語太短了");return;}
+  if(!text&&!img){toast("至少要有內容或圖片");return;}
+  if(img&&!/^https:\/\//i.test(img)){toast("圖片網址要是 https:// 開頭");return;}
+  const obj={t:$("#egTitle").value.trim(),i:img,x:text};
+  try{const code=await egSeal(pass,obj);const back=await egOpen(code,pass);if(back.x!==obj.x)throw 0;
+    $("#egOut").value=code;toast("產生好了，複製後貼到後台「彩蛋 › 找齊後的獎勵 › 加密後的獎勵」");}
+  catch(e){toast("加密失敗，請再試一次");}
+};
+$("#egCheck").onclick=async()=>{
+  const code=$("#egOut").value.trim();if(!code){toast("先產生或貼上加密後的獎勵");return;}
+  try{const r=await egOpen(code,$("#egPass").value);$("#egTitle").value=r.t||"";$("#egImg").value=r.i||"";$("#egText").value=r.x||"";toast("解開了！內容已經放回上面的欄位");}
+  catch(e){toast(e.message==="format"?"這不是加密獎勵的代碼（要是 egg1: 開頭）":"密語不對，解不開");}
+};
+$("#egCopy").onclick=async()=>{const v=$("#egOut").value.trim();if(!v)return;try{await navigator.clipboard.writeText(v);toast("已複製");}catch(e){$("#egOut").select();toast("請手動複製");}};
 /* 預覽套用網站的「段落縮排」設定 */
 fetch("data/site.json",{cache:"no-cache"}).then(r=>r.ok?r.json():{}).then(d=>{
   const ind=({"每一行都縮排":"ind-all","只有段落第一行縮排":"ind-first"})[((d&&d.theme)||{}).indent]||"";
