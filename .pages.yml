@@ -959,6 +959,22 @@ content:
       pattern:
         regex: ^(|https?://\S+|/\S+)$
         message: 請貼上 https:// 開頭的圖片網址（前後不要有空白）
+    - name: size
+      label: 預設大小（像素）
+      type: number
+      description: 選填。每一片的預設大小，留空是 26（用自己的圖片時是 40）。越小越難找，建議 14～60
+      options:
+        min: 10
+        max: 120
+    - name: look
+      label: 預設顯眼程度
+      type: select
+      description: 選填。每一片也可以另外設定
+      options:
+        values:
+        - 正常（會發光）
+        - 低調（不發光、半透明）
+        - 幾乎隱形（滑過或靠近才看得到）
     - name: title
       label: 收藏冊裡的名稱
       type: string
@@ -997,12 +1013,63 @@ content:
       - name: spot
         label: 放在頁面的哪裡
         type: select
-        description: 「內文中間」會藏在文章中間那一段的最後面，最難找
+        description: 留空是「頁面最下方」。「隨機」類的位置每次打開頁面都不一樣；「指定文字後面」和「內文第幾段後面」要再填下面對應的欄位。找不到內文或卡片的頁面會改放在最下方
         options:
           values:
           - 頁面最下方
           - 頁面最上方
+          - 標題旁邊
           - 內文中間
+          - 內文第幾段後面
+          - 內文隨機一段
+          - 指定文字後面
+          - 隨機一張卡片裡
+          - 頁尾那一行
+          - 畫面角落（捲到最底才出現）
+          - 完全隨機
+      - name: after
+        label: 指定文字
+        type: string
+        description: 選「指定文字後面」時填。龍鱗會藏在這頁第一個出現這段文字的地方後面，例如「月光」
+      - name: para
+        label: 第幾段
+        type: number
+        description: 選「內文第幾段後面」時填，例如 3。超過段數會放在最後一段
+        options:
+          min: 1
+          max: 999
+      - name: size
+        label: 大小（像素）
+        type: number
+        description: 選填。留空就用上面的預設大小
+        options:
+          min: 10
+          max: 120
+      - name: look
+        label: 顯眼程度
+        type: select
+        description: 選填。留空就用上面的預設
+        options:
+          values:
+          - 正常（會發光）
+          - 低調（不發光、半透明）
+          - 幾乎隱形（滑過或靠近才看得到）
+      - name: delay
+        label: 停留幾秒後才出現
+        type: number
+        description: 選填。訪客要在這頁待滿幾秒，龍鱗才會冒出來。留空是馬上出現
+        options:
+          min: 0
+          max: 300
+      - name: flee
+        label: 第一次點會逃走
+        type: boolean
+        description: 打勾的話，第一次點到它會溜到這頁的別的地方，要再找一次
+        default: false
+      - name: fleeText
+        label: 逃走時的話
+        type: string
+        description: 選填。留空是「咦？它溜走了……」
       - name: note
         label: 撿到時的一句話
         type: string
