@@ -368,6 +368,8 @@ body:has(.owner:not([hidden])) footer{padding-bottom:76px}
 .egg-scale{display:inline-flex;vertical-align:middle;width:26px;height:26px;padding:0;margin:0 4px;border:0;background:none;cursor:pointer;opacity:.55;transition:opacity .2s,transform .2s;animation:eggShine 3.2s ease-in-out infinite;text-indent:0}
 .egg-scale:hover,.egg-scale:focus-visible{opacity:1;transform:scale(1.15)}
 .egg-scale svg,.egg-scale img{width:100%;height:100%;display:block;object-fit:contain}
+.egg-scale.has-img{width:40px;height:40px;opacity:.85}
+.egg-scale img,.egg-fly img,.egg-pix{image-rendering:pixelated;image-rendering:crisp-edges}
 .egg-scale-wrap{text-align:center;margin:18px 0}
 .egg-scale-wrap.top{margin:0 0 10px;text-align:right}
 .egg-scale.got{animation:eggGot .6s ease forwards;pointer-events:none}
@@ -938,7 +940,7 @@ function newDays(){const v=SITE.newDays;if(v===undefined||v===null||v==="")retur
 function isNew(x){const d=newDays();if(!d||!x||!x.date)return false;const t=Date.parse(String(x.date).slice(0,10)+"T00:00:00+08:00");if(isNaN(t))return false;const age=Date.now()-t;return age>-864e5&&age<d*864e5;}
 const newBadge=x=>isNew(x)?`<span class="new-badge" title="最近更新">NEW</span>`:"";
 
-const SITE_VERSION="2026-11-20 v1.16";
+const SITE_VERSION="2026-11-20 v1.17";
 const BROKEN=[];
 async function load(){
   const files=["site.json","series.json","chapters.json","side-stories.json","characters.json","commissions.json","tools.json","notes.json","history.json","glossary.json","eggs.json"];
@@ -1613,7 +1615,7 @@ function eggScales(){
   (sc.items||[]).forEach(it=>{
     const k=eggScaleKey(it);if(eggHash(it.page)!==here||s.scales[k])return;
     const b=document.createElement("button");b.type="button";b.className="egg-scale";b.setAttribute("aria-label","閃閃發亮的東西");
-    const img=imgOf(sc,"icon");b.innerHTML=img?`<img src="${esc(img)}" alt="">`:EGG_SCALE_SVG;
+    const img=imgOf(sc,"icon");b.innerHTML=img?`<img src="${esc(img)}" alt="">`:EGG_SCALE_SVG;if(img)b.classList.add("has-img");
     b.onclick=()=>eggGetScale(it,b);
     const spot=it.spot||"頁面最下方";
     if(spot==="內文中間"){const ps=[...view.querySelectorAll(".prose p, .notebody p, .bio p, .rich p")].filter(p=>!p.closest(".gate-panel"));if(ps.length){ps[Math.floor(ps.length/2)].append(b);return;}}
