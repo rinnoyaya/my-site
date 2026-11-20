@@ -1,0 +1,70 @@
+{
+  "enabled": true,
+  "title": "堡壘的秘密",
+  "intro": "這座堡壘藏著一些不為人知的秘密。仔細看看每個角落，你能找到幾個呢？",
+  "entry": "點一下",
+  "entrySymbol": "✦",
+  "toast": "🔮 發現了堡壘的秘密（{n} / {total}）",
+  "allToast": "✨ 你找齊了堡壘的所有秘密！到收藏冊看看吧",
+  "reward": {
+    "title": "給找齊秘密的你",
+    "imageUrl": "",
+    "text": "謝謝你願意花這麼多時間，走遍這座堡壘的每個角落。\n\n（這裡可以放隱藏插圖、只給找齊的人看的短篇，或是一封信。到後台「彩蛋 › 找齊後的獎勵」修改。）",
+    "lockedText": "找齊所有秘密後，這裡會出現一份獎勵。"
+  },
+  "scales": {
+    "enabled": true,
+    "name": "龍鱗",
+    "iconUrl": "",
+    "title": "散落的龍鱗",
+    "hint": "堡壘各處藏著閃閃發亮的龍鱗，有些在頁面角落，有些藏在故事裡",
+    "completeText": "七片龍鱗都找回來了……是哪隻小龍掉的呢？",
+    "speaker": "艾蕾諾雅",
+    "items": [
+      {"page": "#home", "spot": "頁面最下方", "note": "第一片，在堡壘的大門口。"},
+      {"page": "#stories", "spot": "頁面最上方", "note": ""},
+      {"page": "#read-lg-1", "spot": "內文中間", "note": "這片好像還有點溫熱。"},
+      {"page": "#char-玄城凜夜", "spot": "頁面最下方", "note": ""},
+      {"page": "#commissions", "spot": "頁面最下方", "note": ""},
+      {"page": "#tools", "spot": "頁面最上方", "note": ""},
+      {"page": "#about", "spot": "內文中間", "note": "最後一片，藏在主人的自我介紹裡。"}
+    ]
+  },
+  "logo": {
+    "enabled": true,
+    "title": "打噴嚏的龍",
+    "hint": "左上角的龍，好像不太喜歡被戳",
+    "foundText": "被戳了太多下的龍，忍不住打了一個大噴嚏。",
+    "clicks": 7,
+    "effect": "噴火",
+    "dragonUrl": "",
+    "speaker": "",
+    "lines": "哈啾！\n……不要再戳了。\n再戳就把你烤了喔。"
+  },
+  "idle": {
+    "enabled": true,
+    "title": "偷看的人",
+    "hint": "靜靜待在同一頁，好像會有人來看你",
+    "foundText": "看得太入迷，連有人在旁邊偷看都沒發現。",
+    "seconds": 60,
+    "speaker": "玄城凜夜",
+    "lines": "……還在看嗎？\n看得這麼認真，要不要喝杯茶？\n這一頁有那麼好看嗎。"
+  },
+  "night": {
+    "enabled": true,
+    "title": "深夜的堡壘",
+    "hint": "夜深的時候，堡壘的燈火會改變",
+    "foundText": "深夜的堡壘點起了燭光，只有晚睡的人看得到。",
+    "start": 0,
+    "end": 4,
+    "speaker": "玄城凜夜",
+    "lines": "這麼晚了，還不睡嗎？\n深夜還來堡壘作客，真是稀客。"
+  },
+  "birthday": {
+    "enabled": true,
+    "title": "特別的日子",
+    "hint": "在某個人特別的日子來訪",
+    "foundText": "在特別的日子裡，一起慶祝了生日。",
+    "list": []
+  }
+}

@@ -113,7 +113,7 @@ main{max-width:1040px;margin:0 auto;padding:28px 20px 64px}
   /* iPhone 點到小於 16px 的輸入框會自動放大整個畫面，所以觸控裝置上一律用 16px */
   input:not([type=checkbox]):not([type=radio]):not([type=range]),textarea,select{font-size:16px!important}
   /* 內文裡的連結（例如「關於」頁的社群連結）手指比較好點 */
-  .rich a,.prose a,.bio a,#contact a{padding:5px 0;margin:-5px 0}
+  .rich a,.prose a,.bio a,#contact a,.egg-bday a{padding:5px 0;margin:-5px 0}
 }
 .harrow{position:absolute;top:50%;transform:translateY(-50%);z-index:3;width:36px;height:36px;border-radius:50%;border:0;background:rgba(0,0,0,.35);color:#fff;font-size:20px;line-height:1;cursor:pointer;opacity:0;transition:opacity .2s;display:flex;align-items:center;justify-content:center}
 .harrow.prev{left:8px}.harrow.next{right:8px}
@@ -362,6 +362,56 @@ body:has(.owner:not([hidden])) footer{padding-bottom:76px}
 @media (prefers-reduced-motion:reduce){.fire i{animation:none}}
 .gate-in button:disabled{opacity:.55;cursor:not-allowed}
 @media (prefers-reduced-motion:reduce){.gate-in.shake,.gate-say.pop,.ice.crack{animation:none}}
+/* ---------- 彩蛋 ---------- */
+.egg-entry{font:inherit;background:none;border:0;color:var(--muted);opacity:.35;cursor:pointer;padding:6px 8px;margin-left:4px;font-size:13px;transition:opacity .2s}
+.egg-entry:hover,.egg-entry:focus-visible{opacity:.9}
+.egg-scale{display:inline-flex;vertical-align:middle;width:26px;height:26px;padding:0;margin:0 4px;border:0;background:none;cursor:pointer;opacity:.55;transition:opacity .2s,transform .2s;animation:eggShine 3.2s ease-in-out infinite;text-indent:0}
+.egg-scale:hover,.egg-scale:focus-visible{opacity:1;transform:scale(1.15)}
+.egg-scale svg,.egg-scale img{width:100%;height:100%;display:block;object-fit:contain}
+.egg-scale-wrap{text-align:center;margin:18px 0}
+.egg-scale-wrap.top{margin:0 0 10px;text-align:right}
+.egg-scale.got{animation:eggGot .6s ease forwards;pointer-events:none}
+@keyframes eggShine{0%,100%{filter:drop-shadow(0 0 0 transparent)}50%{filter:drop-shadow(0 0 5px rgba(140,220,255,.9))}}
+@keyframes eggGot{to{transform:translateY(-30px) scale(1.6);opacity:0}}
+.egg-toast{position:fixed;left:50%;top:18px;transform:translate(-50%,-140%);z-index:60;background:linear-gradient(135deg,#2b2350,#3c2f6e);color:#f3eaff;border:1px solid rgba(200,170,255,.5);box-shadow:0 8px 26px rgba(0,0,0,.35),0 0 18px rgba(170,130,255,.35);padding:10px 18px;border-radius:999px;font-size:14.5px;transition:transform .45s cubic-bezier(.2,.9,.3,1.2);max-width:calc(100vw - 24px);text-align:center;pointer-events:none}
+.egg-toast.on{transform:translate(-50%,0)}
+@media (max-width:720px){.egg-toast{top:calc(10px + env(safe-area-inset-top));font-size:13.5px;padding:8px 14px;width:max-content}}
+.egg-say{position:fixed;z-index:55;bottom:calc(18px + env(safe-area-inset-bottom));left:16px;max-width:min(330px,calc(100vw - 32px));display:flex;gap:10px;align-items:flex-end;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:16px;padding:12px 14px;box-shadow:0 10px 28px rgba(0,0,0,.28);transform:translateY(140%);transition:transform .45s cubic-bezier(.2,.9,.3,1.1);cursor:pointer}
+.egg-say.on{transform:none}
+.egg-say.peek{left:auto;right:0;border-radius:16px 0 0 16px;transform:translateX(105%)}
+.egg-say.peek.on{transform:none}
+.egg-say .es-av{flex:none;width:46px;height:46px;border-radius:50%;overflow:hidden;background:var(--line)}
+.egg-say .es-av img{width:100%;height:100%;object-fit:cover;display:block}
+.egg-say b{display:block;font-size:12.5px;color:var(--accent);margin-bottom:2px}
+.egg-say p{margin:0;font-size:14.5px;line-height:1.6}
+.egg-fly{position:fixed;z-index:58;pointer-events:none;font-size:42px;left:-80px;top:30vh;animation:eggFly 3.4s ease-in-out forwards}
+.egg-fly img{width:72px;height:72px;object-fit:contain;display:block}
+@keyframes eggFly{0%{transform:translate(0,0) rotate(-8deg)}25%{transform:translate(28vw,-8vh) rotate(6deg)}50%{transform:translate(55vw,4vh) rotate(-6deg)}75%{transform:translate(82vw,-10vh) rotate(5deg)}100%{transform:translate(calc(100vw + 160px),-4vh) rotate(-4deg)}}
+.egg-fire{position:fixed;z-index:58;pointer-events:none;font-size:22px;animation:eggFire 1.1s ease-out forwards}
+@keyframes eggFire{0%{transform:translate(0,0) scale(.6);opacity:1}100%{transform:translate(var(--dx),var(--dy)) scale(1.3);opacity:0}}
+html.egg-night body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:4;background:radial-gradient(ellipse at 50% 40%,transparent 45%,rgba(4,3,12,.55) 100%),radial-gradient(circle at 8% 100%,rgba(255,170,70,.16),transparent 30%),radial-gradient(circle at 92% 100%,rgba(255,170,70,.12),transparent 28%);animation:eggCandle 4s ease-in-out infinite alternate}
+@keyframes eggCandle{from{opacity:.85}to{opacity:1}}
+.egg-bday{margin:0 0 22px;padding:14px 18px;border-radius:14px;background:linear-gradient(135deg,color-mix(in srgb,var(--lamp) 30%,var(--card)),var(--card));border:1px solid color-mix(in srgb,var(--lamp) 50%,var(--line));display:flex;gap:12px;align-items:center}
+.egg-bday .eb-ic{font-size:28px}
+.egg-bday b{display:block;font-size:16px}
+.egg-bday p{margin:2px 0 0;color:var(--muted);font-size:14px}
+.egg-confetti{position:fixed;top:-20px;width:8px;height:14px;z-index:57;pointer-events:none;border-radius:2px;animation:eggFall linear forwards}
+@keyframes eggFall{to{transform:translateY(110vh) rotate(720deg)}}
+.secrets-bar{height:8px;border-radius:4px;background:var(--line);overflow:hidden;margin:6px 0 22px}
+.secrets-bar i{display:block;height:100%;background:linear-gradient(90deg,#7c5cff,#c58bff)}
+.secrets-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px;align-items:start}
+.secret{border:1px solid var(--line);border-radius:12px;padding:14px 16px;background:var(--card)}
+.secret.no{border-style:dashed;background:transparent}
+.secret .sc-ic{font-size:22px}
+.secret h3{font-size:16px;margin:6px 0 4px}
+.secret p{margin:0;color:var(--muted);font-size:14px;line-height:1.65}
+.secret.no h3{color:var(--muted);letter-spacing:.2em}
+.secret small{display:block;margin-top:6px;color:var(--accent);font-size:12.5px}
+.secret-reward{margin-top:28px;padding:20px;border-radius:14px;border:1px solid var(--line);background:var(--card)}
+.secret-reward.lock{text-align:center;color:var(--muted);border-style:dashed;background:transparent}
+.secret-reward .art{max-width:520px;margin:12px auto;border-radius:10px;overflow:hidden}
+@media (prefers-reduced-motion:reduce){.egg-scale,html.egg-night body::after{animation:none}.egg-fly,.egg-fire,.egg-confetti{display:none}}
+
 .gate-in input[type=password]{font:inherit;color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:9px 11px}
 .gate-in .gate-remember{display:flex;align-items:center;gap:8px}
 .gate-in label[hidden]{display:none}
@@ -665,6 +715,10 @@ footer{border-top:1px solid var(--line);color:var(--muted);font-size:13px;text-a
     <article class="reader" id="noteReader"></article>
   </section>
 
+  <section class="view" id="v-secrets">
+    <div class="reader" id="secretsPage"></div>
+  </section>
+
   <section class="view" id="v-about">
     <div class="about">
       <div class="eyebrow">關於</div>
@@ -866,7 +920,7 @@ function thumbOf(src){
 function thumbFail(img){img.onerror=null;THUMB_MISS[img.src]=Date.now();try{localStorage.setItem("thumb-miss",JSON.stringify(THUMB_MISS));}catch(e){}img.src=img.dataset.full;}
 const picT=(src,key,alt)=>{const t=thumbOf(src);return t?`<img src="${esc(t)}" data-full="${esc(src)}" alt="${esc(alt||"")}" loading="lazy" onerror="thumbFail(this)">`:pic(src,key,alt);};
 
-let SITE={},SERIES=[],CHAPTERS=[],SIDE=[],CHARS=[],COMM=[],TOOLS=[],NOTES=[],HISTORY=[],GLOSS=[];
+let SITE={},SERIES=[],CHAPTERS=[],SIDE=[],CHARS=[],COMM=[],TOOLS=[],NOTES=[],HISTORY=[],GLOSS=[],EGGS={};
 const byDateDesc=(a,b)=>String(b.date||"").localeCompare(String(a.date||""));
 const chId=c=>c.id||c.title;
 const charOf=n=>CHARS.find(h=>h.name===n);
@@ -884,24 +938,25 @@ function newDays(){const v=SITE.newDays;if(v===undefined||v===null||v==="")retur
 function isNew(x){const d=newDays();if(!d||!x||!x.date)return false;const t=Date.parse(String(x.date).slice(0,10)+"T00:00:00+08:00");if(isNaN(t))return false;const age=Date.now()-t;return age>-864e5&&age<d*864e5;}
 const newBadge=x=>isNew(x)?`<span class="new-badge" title="最近更新">NEW</span>`:"";
 
-const SITE_VERSION="2026-11-18 v1.15";
+const SITE_VERSION="2026-11-20 v1.16";
 const BROKEN=[];
 async function load(){
-  const files=["site.json","series.json","chapters.json","side-stories.json","characters.json","commissions.json","tools.json","notes.json","history.json","glossary.json"];
-  const optional=["history.json","tools.json","glossary.json"];
+  const files=["site.json","series.json","chapters.json","side-stories.json","characters.json","commissions.json","tools.json","notes.json","history.json","glossary.json","eggs.json"];
+  const optional=["history.json","tools.json","glossary.json","eggs.json"];
+  const OBJ=["site.json","eggs.json"]; /* 這兩個檔案是「一個設定」，其他是「一筆一筆的清單」 */
   const get=async f=>{
-    const empty=f==="site.json"?{}:[];
+    const empty=OBJ.includes(f)?{}:[];
     try{
       const r=await fetch("data/"+f,{cache:"no-cache"}); /* 每次都跟伺服器確認有沒有新版，沒變就直接用快取 */
       if(!r.ok){if(r.status===404&&optional.includes(f))return empty;throw new Error(r.status===404?"找不到這個檔案":"讀取失敗（"+r.status+"）");}
       const t=await r.text();
       if(!t.trim())return empty; /* 後台刪光所有項目時會存成空白檔案，當作沒有內容 */
       let d;try{d=JSON.parse(t);}catch(e){throw new Error("格式有錯，可能少了括號或逗號");}
-      if(f==="site.json"?(typeof d!=="object"||Array.isArray(d)||d===null):!Array.isArray(d))throw new Error("內容類型不對");
-      return f==="site.json"?d:d.filter(x=>x&&typeof x==="object");
+      if(OBJ.includes(f)?(typeof d!=="object"||Array.isArray(d)||d===null):!Array.isArray(d))throw new Error("內容類型不對");
+      return OBJ.includes(f)?d:d.filter(x=>x&&typeof x==="object");
     }catch(e){BROKEN.push({f,msg:e.message});return empty;}
   };
-  [SITE,SERIES,CHAPTERS,SIDE,CHARS,COMM,TOOLS,NOTES,HISTORY,GLOSS]=await Promise.all(files.map(get));
+  [SITE,SERIES,CHAPTERS,SIDE,CHARS,COMM,TOOLS,NOTES,HISTORY,GLOSS,EGGS]=await Promise.all(files.map(get));
 }
 
 /* ---------- 網站資訊、首頁 ---------- */
@@ -978,6 +1033,7 @@ function renderSite(){
   $("#aboutText").innerHTML=blocks(SITE.about).join("");
   $("#contact").innerHTML=inline(SITE.contact||"");
   $("#footer").innerHTML=esc(`© ${new Date().getFullYear()} ${SITE.siteName||""}${SITE.author?" · "+SITE.author:""}　｜　`)+inline(SITE.footer||"");
+  eggFooter();
   const ups=[
     ...CHAPTERS.map(c=>({d:c.date,t:"故事",cls:"story",txt:`${c.series}・${c.title}`,href:"#read-"+enc(chId(c)),x:c})),
     ...SIDE.map(c=>({d:c.date,t:"角色故事",cls:"story",txt:`${c.character}・${c.title}`,href:"#side-"+enc(chId(c)),x:c})),
@@ -1495,6 +1551,165 @@ function renderTerm(k){
   glossify($("#termPage .notebody"),g);
 }
 
+
+/* ============ 彩蛋（後台：彩蛋） ============ */
+/* 找到的紀錄只存在訪客自己的瀏覽器 */
+const EGG_KEY="fortress-secrets";
+const EGG_SCALE_SVG='<svg viewBox="0 0 32 32" aria-hidden="true"><defs><linearGradient id="egS" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#c9f1ff"/><stop offset=".5" stop-color="#5fb8e6"/><stop offset="1" stop-color="#2a5d9c"/></linearGradient></defs><path d="M16 2C9 8 5 13 5 19a11 11 0 0 0 22 0c0-6-4-11-11-17z" fill="url(#egS)" stroke="#e8fbff" stroke-width="1.2"/><path d="M11 18c2 3 8 3 10 0" fill="none" stroke="#e8fbff" stroke-width="1.2" opacity=".7"/></svg>';
+const eggOn=x=>!!x&&(x.enabled===true||x.enabled==="true");
+const eggLines=t=>String(t||"").split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
+const eggPick=a=>a[Math.floor(Math.random()*a.length)];
+function eggState(){let s={};try{s=JSON.parse(localStorage.getItem(EGG_KEY)||"{}")||{};}catch(e){}s.found=s.found||{};s.scales=s.scales||{};return s;}
+function eggSave(s){try{localStorage.setItem(EGG_KEY,JSON.stringify(s));}catch(e){}}
+function eggTaipei(){const d=new Date(new Date().toLocaleString("en-US",{timeZone:"Asia/Taipei"}));return {h:d.getHours(),m:d.getMonth()+1,d:d.getDate()};}
+const eggHash=p=>{p=String(p||"").trim();const i=p.indexOf("#");p=i>=0?p.slice(i+1):p;try{p=decodeURIComponent(p);}catch(e){}return p||"home";};
+const eggScaleKey=it=>"s:"+eggHash(it.page)+"|"+(it.spot||"頁面最下方");
+/* 收藏冊裡的每一項 */
+function eggEntries(){
+  if(!eggOn(EGGS))return [];
+  const E=[],sc=EGGS.scales;
+  if(eggOn(sc)&&(sc.items||[]).length)E.push({key:"scales",icon:"🐉",title:sc.title||`散落的${sc.name||"龍鱗"}`,hint:sc.hint||`堡壘各處藏著閃閃發亮的${sc.name||"龍鱗"}`,text:sc.completeText||"全部找齊了！",total:sc.items.length});
+  if(eggOn(EGGS.logo))E.push({key:"logo",icon:"🔥",title:EGGS.logo.title||"打噴嚏的龍",hint:EGGS.logo.hint||"左上角的龍，好像不太喜歡被戳",text:EGGS.logo.foundText||"龍打了一個大噴嚏。"});
+  if(eggOn(EGGS.idle))E.push({key:"idle",icon:"👀",title:EGGS.idle.title||"偷看的人",hint:EGGS.idle.hint||"靜靜待在同一頁，好像會有人來看你",text:EGGS.idle.foundText||"被偷看了。"});
+  if(eggOn(EGGS.night))E.push({key:"night",icon:"🕯️",title:EGGS.night.title||"深夜的堡壘",hint:EGGS.night.hint||"夜深的時候，堡壘的燈火會改變",text:EGGS.night.foundText||"深夜的堡壘點起了燭光。"});
+  const bd=EGGS.birthday;if(eggOn(bd)&&(bd.list||[]).some(x=>+x.month&&+x.day))E.push({key:"birthday",icon:"🎂",title:bd.title||"特別的日子",hint:bd.hint||"在某個人特別的日子來訪",text:bd.foundText||"一起慶祝了生日。"});
+  return E;
+}
+function eggFound(key,quiet){
+  const s=eggState();if(s.found[key])return false;
+  s.found[key]=Date.now();eggSave(s);
+  const E=eggEntries(),n=E.filter(e=>s.found[e.key]).length,tot=E.length;
+  if(!quiet)eggToast(String(EGGS.toast||"🔮 發現了堡壘的秘密（{n} / {total}）").replace(/\{n\}/g,n).replace(/\{total\}/g,tot));
+  if(n===tot&&tot)eggToast(EGGS.allToast||"✨ 你找齊了堡壘的所有秘密！到收藏冊看看吧");
+  if(location.hash==="#secrets")renderSecrets();
+  return true;
+}
+/* 提示一個接一個顯示，不會互相蓋掉 */
+let eggQ=[],eggBusy=false;
+function eggToast(t){eggQ.push(t);if(!eggBusy)eggNext();}
+function eggNext(){
+  const t=eggQ.shift();if(t===undefined){eggBusy=false;return;}eggBusy=true;
+  let el=$("#eggToast");if(!el){el=document.createElement("div");el.id="eggToast";el.className="egg-toast";el.setAttribute("role","status");document.body.append(el);}
+  el.textContent=t;requestAnimationFrame(()=>el.classList.add("on"));
+  setTimeout(()=>{el.classList.remove("on");setTimeout(eggNext,500);},2600);
+}
+/* 角色說話的小對話框；peek = 從右邊探出頭 */
+let eggSayT;
+function eggSay(speaker,text,peek){
+  if(!text)return;
+  let el=$("#eggSay");if(!el){el=document.createElement("div");el.id="eggSay";el.setAttribute("role","status");el.setAttribute("aria-live","polite");el.onclick=()=>el.classList.remove("on");document.body.append(el);}
+  const who=String(speaker||"").trim(),h=who&&charOf(who),av=h&&imgOf(h,"avatar");
+  el.className="egg-say"+(peek?" peek":"");
+  el.innerHTML=(who?`<span class="es-av">${av?`<img src="${esc(av)}" alt="">`:""}</span>`:"")+`<div>${who?`<b>${esc(who)}</b>`:""}<p>${inline(text)}</p></div>`;
+  requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.add("on")));
+  clearTimeout(eggSayT);eggSayT=setTimeout(()=>el.classList.remove("on"),6500);
+}
+const eggCalm=()=>matchMedia("(prefers-reduced-motion:reduce)").matches;
+/* 1. 散落的龍鱗：依目前所在的頁面放上還沒撿到的龍鱗 */
+function eggScales(){
+  document.querySelectorAll(".egg-scale-wrap,.egg-scale").forEach(x=>x.remove());
+  const sc=EGGS&&EGGS.scales;if(!eggOn(EGGS)||!eggOn(sc))return;
+  const here=eggHash(location.hash),s=eggState(),view=document.querySelector(".view.on");if(!view)return;
+  (sc.items||[]).forEach(it=>{
+    const k=eggScaleKey(it);if(eggHash(it.page)!==here||s.scales[k])return;
+    const b=document.createElement("button");b.type="button";b.className="egg-scale";b.setAttribute("aria-label","閃閃發亮的東西");
+    const img=imgOf(sc,"icon");b.innerHTML=img?`<img src="${esc(img)}" alt="">`:EGG_SCALE_SVG;
+    b.onclick=()=>eggGetScale(it,b);
+    const spot=it.spot||"頁面最下方";
+    if(spot==="內文中間"){const ps=[...view.querySelectorAll(".prose p, .notebody p, .bio p, .rich p")].filter(p=>!p.closest(".gate-panel"));if(ps.length){ps[Math.floor(ps.length/2)].append(b);return;}}
+    const w=document.createElement("div");w.className="egg-scale-wrap"+(spot==="頁面最上方"?" top":"");w.append(b);
+    if(spot==="頁面最上方"){const h1=view.querySelector("h1");if(h1)h1.after(w);else view.prepend(w);}else view.append(w);
+  });
+}
+function eggGetScale(it,btn){
+  const sc=EGGS.scales,s=eggState(),k=eggScaleKey(it);if(s.scales[k])return;
+  s.scales[k]=Date.now();eggSave(s);btn.classList.add("got");setTimeout(()=>{const w=btn.closest(".egg-scale-wrap");(w||btn).remove();},650);
+  const keys=(sc.items||[]).map(eggScaleKey),got=keys.filter(x=>s.scales[x]).length,tot=keys.length,name=sc.name||"龍鱗";
+  if(got>=tot){eggToast(`✨ ${name}全部找齊了（${tot} / ${tot}）`);eggFound("scales");setTimeout(()=>{eggDragon();eggSay(sc.speaker,sc.completeText||"全部找齊了！");},900);return;}
+  eggToast(`${it.note?it.note+"　":""}找到了${name}（${got} / ${tot}）`);
+}
+/* 2. 戳 logo 的龍 */
+let eggTaps=[];
+function eggLogo(){
+  const L=EGGS&&EGGS.logo;if(!eggOn(EGGS)||!eggOn(L))return;
+  const need=Math.max(3,Math.min(20,+L.clicks||7)),now=Date.now();
+  eggTaps=eggTaps.filter(t=>now-t<1500*need/7+1500);eggTaps.push(now);
+  if(eggTaps.length<need)return;eggTaps=[];
+  if((L.effect||"噴火")==="小龍飛過")eggDragon();else eggFire();
+  eggSay(L.speaker,eggPick(eggLines(L.lines).length?eggLines(L.lines):["哈啾！"]));
+  eggFound("logo");
+}
+function eggFire(){
+  if(eggCalm())return;const r=document.querySelector("header .logo img").getBoundingClientRect();
+  for(let i=0;i<10;i++){const f=document.createElement("span");f.className="egg-fire";f.textContent="🔥";f.style.left=(r.right-6)+"px";f.style.top=(r.top+r.height/2-12)+"px";
+    f.style.setProperty("--dx",(60+Math.random()*120)+"px");f.style.setProperty("--dy",(Math.random()*80-40)+"px");f.style.animationDelay=(i*40)+"ms";document.body.append(f);setTimeout(()=>f.remove(),1600);}
+}
+function eggDragon(){
+  if(eggCalm())return;const f=document.createElement("div");f.className="egg-fly";
+  const img=EGGS.logo&&imgOf(EGGS.logo,"dragon");f.innerHTML=img?`<img src="${esc(img)}" alt="">`:"🐉";document.body.append(f);setTimeout(()=>f.remove(),3600);
+}
+/* 3. 偷看的角色：同一頁停著不動一段時間 */
+let eggIdleT=0,eggIdleDone=false;
+function eggIdleReset(){
+  clearTimeout(eggIdleT);const I=EGGS&&EGGS.idle;if(!eggOn(EGGS)||!eggOn(I)||eggIdleDone)return;
+  eggIdleT=setTimeout(()=>{
+    if(document.hidden||document.documentElement.classList.contains("modal-lock")||cardsFsEl){eggIdleReset();return;}
+    eggIdleDone=true;eggSay(I.speaker,eggPick(eggLines(I.lines).length?eggLines(I.lines):["……還在看嗎？"]),true);eggFound("idle");
+  },Math.max(15,+I.seconds||60)*1000);
+}
+["scroll","pointerdown","keydown","touchstart"].forEach(ev=>addEventListener(ev,()=>{if(!eggIdleDone)eggIdleReset();},{passive:true}));
+/* 4. 深夜的堡壘＋5. 角色生日：打開網站時檢查一次 */
+function eggTime(){
+  if(!eggOn(EGGS))return;const t=eggTaipei();
+  const N=EGGS.night;
+  if(eggOn(N)){const a=Math.max(0,Math.min(23,N.start===undefined||N.start===""?0:+N.start)),b=Math.max(0,Math.min(24,N.end===undefined||N.end===""?4:+N.end));
+    const night=a<=b?(t.h>=a&&t.h<b):(t.h>=a||t.h<b);
+    document.documentElement.classList.toggle("egg-night",night);
+    if(night&&!sessionStorage.getItem("egg-night")){try{sessionStorage.setItem("egg-night","1");}catch(e){}setTimeout(()=>{eggSay(N.speaker,eggPick(eggLines(N.lines).length?eggLines(N.lines):["這麼晚了，還不睡嗎？"]));eggFound("night");},1800);}}
+  const bd=EGGS.birthday;
+  EGG_BDAY=eggOn(bd)?(bd.list||[]).filter(x=>+x.month===t.m&&+x.day===t.d&&x.character):[];
+  if(EGG_BDAY.length&&!sessionStorage.getItem("egg-bday")){try{sessionStorage.setItem("egg-bday","1");}catch(e){}setTimeout(()=>{eggConfetti();eggFound("birthday");},1200);}
+}
+let EGG_BDAY=[];
+function eggBirthdayBanner(){
+  document.querySelectorAll(".egg-bday").forEach(x=>x.remove());if(!EGG_BDAY.length)return;
+  const here=eggHash(location.hash),view=document.querySelector(".view.on");if(!view)return;
+  EGG_BDAY.forEach(x=>{if(here!=="home"&&here!=="char-"+x.character)return;
+    const d=document.createElement("div");d.className="egg-bday";
+    d.innerHTML=`<span class="eb-ic" aria-hidden="true">🎂</span><div><b>今天是 <a href="#char-${enc(x.character)}">${esc(x.character)}</a> 的生日！</b>${x.message?`<p>${inline(x.message)}</p>`:""}</div>`;
+    const anchor=here==="home"?view.firstElementChild:view.querySelector("h1")||view.firstElementChild;
+    if(here==="home")view.prepend(d);else anchor.after(d);});
+}
+function eggConfetti(){
+  if(eggCalm())return;const cols=["#ffd23f","#ff6b9d","#7c5cff","#4fd1c5","#ff8a3d"];
+  for(let i=0;i<46;i++){const c=document.createElement("i");c.className="egg-confetti";c.style.left=Math.random()*100+"vw";c.style.background=cols[i%cols.length];
+    c.style.animationDuration=(2.2+Math.random()*1.8)+"s";c.style.animationDelay=(Math.random()*.6)+"s";document.body.append(c);setTimeout(()=>c.remove(),4800);}
+}
+/* 收藏冊入口：頁尾的小符號 */
+let eggEntryTaps=[];
+function eggFooter(){
+  if(!eggOn(EGGS)||!eggEntries().length)return;
+  const b=document.createElement("button");b.type="button";b.className="egg-entry";b.textContent=EGGS.entrySymbol||"✦";b.setAttribute("aria-label","？");
+  b.onclick=()=>{const need=EGGS.entry==="連點三下"?3:1,now=Date.now();eggEntryTaps=eggEntryTaps.filter(t=>now-t<1200);eggEntryTaps.push(now);if(eggEntryTaps.length>=need){eggEntryTaps=[];location.hash="secrets";}};
+  $("#footer").append(b);
+}
+function renderSecrets(){
+  const box=$("#secretsPage");if(!box)return;
+  if(!eggOn(EGGS)){box.innerHTML=`<h1>這裡什麼都沒有</h1>`;return;}
+  const E=eggEntries(),s=eggState(),n=E.filter(e=>s.found[e.key]).length,tot=E.length,done=tot&&n===tot;
+  const sc=EGGS.scales,scKeys=eggOn(sc)?(sc.items||[]).map(eggScaleKey):[],scGot=scKeys.filter(k=>s.scales[k]).length;
+  const R=EGGS.reward||{},rImg=imgOf(R,"image");
+  box.innerHTML=`<div class="eyebrow">收藏冊</div><h1>${esc(EGGS.title||"堡壘的秘密")}</h1>
+    ${EGGS.intro?`<p style="color:var(--muted)">${inline(EGGS.intro)}</p>`:""}
+    <p style="margin:14px 0 0;font-size:14px;color:var(--muted)">已找到 ${n} / ${tot}</p><div class="secrets-bar"><i style="width:${tot?Math.round(n/tot*100):0}%"></i></div>
+    <div class="secrets-list">${E.map(e=>{const f=!!s.found[e.key];
+      return `<div class="secret${f?"":" no"}"><span class="sc-ic" aria-hidden="true">${f?e.icon:"❔"}</span><h3>${f?esc(e.title):"？？？"}</h3><p>${f?inline(e.text):"提示："+inline(e.hint)}</p>${e.key==="scales"&&!f?`<small>已找到 ${scGot} / ${scKeys.length}</small>`:""}</div>`;}).join("")}</div>
+    ${done?`<div class="secret-reward"><h2 style="margin:0 0 6px">${esc(R.title||"給找齊秘密的你")}</h2>${rImg?`<div class="art full" data-zoom="${esc(rImg)}" style="cursor:zoom-in">${pic(rImg,"reward",R.title||"")}</div>`:""}<div class="notebody rich">${blocks(R.text||"謝謝你花時間探索這座堡壘。").join("")}</div></div>`
+      :`<div class="secret-reward lock">🔒 ${inline(R.lockedText||"找齊所有秘密後，這裡會出現一份獎勵。")}</div>`}`;
+}
+/* 換頁時 */
+function eggRoute(){if(!eggOn(EGGS))return;eggScales();eggBirthdayBanner();eggIdleDone=false;eggIdleReset();if(location.hash==="#secrets")renderSecrets();}
+
 /* ---------- 分享連結 ---------- */
 let stT;function siteToast(m){const t=$("#siteToast");t.textContent=m;t.classList.add("on");clearTimeout(stT);stT=setTimeout(()=>t.classList.remove("on"),2200);}
 /* 網址用看得懂的中文（貼上後瀏覽器會自動處理） */
@@ -1551,8 +1766,8 @@ document.addEventListener("keydown",e=>{const c=$("#lb").classList.contains("on"
 let OWNER=false;try{OWNER=localStorage.getItem("owner-mode")==="1";}catch(e){}
 /* 後台網址：app.pagescms.org/帳號/repo/分支 */
 const CMS="https://app.pagescms.org/rinnoyaya/my-site/main";
-const CMS_ENTRIES=[["chapters","故事章節"],["side","角色故事"],["series","故事系列"],["characters","角色"],["glossary","名詞百科"],["commissions","委託圖"],["tools","小工具"],["notes","文章"],["history","網站歷程"],["site","首頁與基本"],["site-about","關於頁與頁尾"],["site-theme","外觀"],["site-safety","成人與圖片保護"],["site-advanced","進階設定"]];
-const CMS_FILES=["site","site-about","site-theme","site-safety","site-advanced"];
+const CMS_ENTRIES=[["chapters","故事章節"],["side","角色故事"],["series","故事系列"],["characters","角色"],["glossary","名詞百科"],["commissions","委託圖"],["tools","小工具"],["notes","文章"],["history","網站歷程"],["site","首頁與基本"],["site-about","關於頁與頁尾"],["site-theme","外觀"],["site-safety","成人與圖片保護"],["site-advanced","進階設定"],["eggs","彩蛋"]];
+const CMS_FILES=["site","site-about","site-theme","site-safety","site-advanced","eggs"];
 const CMS_DIR={chapters:"content/chapters",side:"content/side-stories",series:"content/series",characters:"content/characters",glossary:"content/glossary",commissions:"content/commissions",tools:"content/tools",notes:"content/notes",history:"content/history"};
 const cmsName=k=>(CMS_ENTRIES.find(e=>e[0]===k)||[])[1]||"";
 const cmsUrl=name=>CMS+(CMS_FILES.includes(name)?"/file/":"/collection/")+name;
@@ -1573,6 +1788,8 @@ function updateFab(pre,arg,v){
       +`<a class="oitem" href="${cmsNew(e)}"${ext}>＋ 新增一筆「${cmsName(e)}」↗</a>`;
   }else if(v==="about"){
     h+=`<a class="oitem main" href="editor.html#edit=${enc("site:about")}" role="menuitem">✎ 用小幫手編輯關於頁</a><a class="oitem" href="${cmsUrl("site-about")}"${ext}>⚙ 到後台編輯「關於頁與頁尾」↗</a>`;
+  }else if(v==="secrets"){
+    h+=`<a class="oitem main" href="${cmsUrl("eggs")}"${ext}>⚙ 到後台編輯彩蛋 ↗</a><button class="oitem" type="button" onclick="localStorage.removeItem('fortress-secrets');sessionStorage.removeItem('egg-night');sessionStorage.removeItem('egg-bday');renderSecrets();siteToast('已清除這台裝置的彩蛋紀錄')">↺ 清除我的彩蛋紀錄（測試用）</button>`;
   }else if(v==="home"){
     h+=`<a class="oitem main" href="${cmsUrl("site")}"${ext}>⚙ 編輯首頁（標題、主圖、輪播）↗</a><a class="oitem" href="${cmsNew("history")}"${ext}>＋ 新增一筆「網站歷程」↗</a>`;
   }else if(viewEntry[v]){
@@ -1627,9 +1844,10 @@ function route(){
   if(pre==="term-")renderTerm(arg);
   if(v==="glossary")renderGlossary();
   if(pre==="comm-")openCommLink(arg);
+  eggRoute();
   updateFab(pre,arg,v);
   /* 分頁標題：例如「第一章｜黑曜石堡壘」 */
-  const names={stories:"故事",side:"角色故事",characters:"角色",commissions:"委託圖",tools:"小工具",notes:"文章",about:"關於",glossary:"名詞百科"};
+  const names={stories:"故事",side:"角色故事",characters:"角色",commissions:"委託圖",tools:"小工具",notes:"文章",about:"關於",glossary:"名詞百科",secrets:(EGGS&&EGGS.title)||"堡壘的秘密"};
   const h1=document.querySelector(".view.on h1");
   const cm=pre==="comm-"&&COMM.find(m=>commId(m)===arg);
   const sub=cm?cm.title:pre?(h1?h1.textContent.replace(/18\+$/,"").trim():""):(names[v]||"");
@@ -1710,6 +1928,7 @@ load().then(()=>{
   }
   setFs(0);
   glossPrep();renderSite();renderHistory();renderSeries();renderSide();renderChars();renderComm();renderTools();renderNotes();renderGlossary();
+  eggTime();document.querySelector("header .logo").addEventListener("click",eggLogo);
   addEventListener("hashchange",route);route();
 }).catch(err=>{
   $("#loading").textContent="內容載入失敗："+err.message+"。請確認 data 資料夾裡的檔案都在，而且格式正確。";
