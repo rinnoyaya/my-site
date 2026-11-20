@@ -369,6 +369,22 @@ body:has(.owner:not([hidden])) footer{padding-bottom:76px}
 .egg-scale:hover,.egg-scale:focus-visible{opacity:1;transform:scale(1.15)}
 .egg-scale svg,.egg-scale img{width:100%;height:100%;display:block;object-fit:contain}
 .egg-scale.has-img{width:40px;height:40px;opacity:.85}
+.egg-scale[style*="--egg-size"]{width:var(--egg-size);height:var(--egg-size)}
+.egg-scale.lo{opacity:.35;animation:none}
+.egg-scale.ghost{opacity:.07;animation:none;transition:opacity .6s}
+.egg-scale.ghost:hover,.egg-scale.ghost:focus-visible{opacity:1}
+.egg-scale.in-h1{margin-left:8px}
+.egg-scale.in-card{position:absolute;right:8px;bottom:8px;margin:0;z-index:2}
+.scard,.ncard,.gcard,.tcard,.vcard,.series,.piece,.chlist li{position:relative}
+.chlist li .egg-scale.in-card{bottom:50%;transform:translateY(50%);right:auto;left:-18px}
+.chlist li .egg-scale.in-card:hover,.chlist li .egg-scale.in-card:focus-visible{transform:translateY(50%) scale(1.15)}
+#footer .egg-scale{width:18px;height:18px}
+#footer .egg-scale[style*="--egg-size"]{width:var(--egg-size);height:var(--egg-size)}
+.egg-scale-wrap.corner{position:fixed;bottom:14px;z-index:60;margin:0;opacity:0;pointer-events:none;transition:opacity .8s}
+.egg-scale-wrap.corner.left{left:14px}.egg-scale-wrap.corner.right{right:14px}
+.egg-scale-wrap.corner.on{opacity:1;pointer-events:auto}
+.egg-scale.fled{animation:eggPop .4s ease}
+@keyframes eggPop{from{transform:scale(.2)}to{transform:scale(1)}}
 .egg-scale img,.egg-fly img,.egg-pix{image-rendering:pixelated;image-rendering:crisp-edges}
 .egg-scale-wrap{text-align:center;margin:18px 0}
 .egg-scale-wrap.top{margin:0 0 10px;text-align:right}
@@ -940,7 +956,7 @@ function newDays(){const v=SITE.newDays;if(v===undefined||v===null||v==="")retur
 function isNew(x){const d=newDays();if(!d||!x||!x.date)return false;const t=Date.parse(String(x.date).slice(0,10)+"T00:00:00+08:00");if(isNaN(t))return false;const age=Date.now()-t;return age>-864e5&&age<d*864e5;}
 const newBadge=x=>isNew(x)?`<span class="new-badge" title="最近更新">NEW</span>`:"";
 
-const SITE_VERSION="2026-11-20 v1.17";
+const SITE_VERSION="2026-11-20 v1.18";
 const BROKEN=[];
 async function load(){
   const files=["site.json","series.json","chapters.json","side-stories.json","characters.json","commissions.json","tools.json","notes.json","history.json","glossary.json","eggs.json"];
@@ -1608,19 +1624,58 @@ function eggSay(speaker,text,peek){
 }
 const eggCalm=()=>matchMedia("(prefers-reduced-motion:reduce)").matches;
 /* 1. 散落的龍鱗：依目前所在的頁面放上還沒撿到的龍鱗 */
-function eggScales(){
+const EGG_SPOTS=["頁面最下方","頁面最上方","標題旁邊","內文中間","內文隨機一段","隨機一張卡片裡","頁尾那一行","畫面角落（捲到最底才出現）"];
+let eggTimers=[],eggCornerOff=null;
+function eggClearScales(){
+  eggTimers.forEach(clearTimeout);eggTimers=[];if(eggCornerOff){eggCornerOff();eggCornerOff=null;}
   document.querySelectorAll(".egg-scale-wrap,.egg-scale").forEach(x=>x.remove());
+}
+function eggParas(view){return [...view.querySelectorAll(".prose p, .notebody p, .bio p, .rich p")].filter(p=>!p.closest(".gate-panel")&&p.offsetParent!==null);}
+function eggPlace(view,b,it,spot){
+  const wrap=cls=>{const w=document.createElement("div");w.className="egg-scale-wrap"+(cls?" "+cls:"");w.append(b);return w;};
+  const ps=eggParas(view);
+  if(spot==="完全隨機")spot=EGG_SPOTS[Math.floor(Math.random()*EGG_SPOTS.length)];
+  if(spot==="指定文字後面"&&it.after){
+    const want=String(it.after).trim(),tw=document.createTreeWalker(view,NodeFilter.SHOW_TEXT);let n;
+    while((n=tw.nextNode())){const i=n.data.indexOf(want);if(i<0||n.parentElement.closest(".gate-panel,script,style,button"))continue;
+      const rest=n.splitText(i+want.length);rest.before(b);return;}
+  }
+  if(spot==="內文第幾段後面"&&ps.length){const k=Math.max(1,Math.min(ps.length,Math.round(+it.para||1)));ps[k-1].append(b);return;}
+  if(spot==="內文中間"&&ps.length){ps[Math.floor(ps.length/2)].append(b);return;}
+  if(spot==="內文隨機一段"&&ps.length){ps[Math.floor(Math.random()*ps.length)].append(b);return;}
+  if(spot==="標題旁邊"){const h1=view.querySelector("h1");if(h1){b.classList.add("in-h1");h1.append(b);return;}}
+  if(spot==="隨機一張卡片裡"){const cs=[...view.querySelectorAll(".scard,.ncard,.gcard,.tcard,.vcard,.series,.piece,.chlist li")].filter(c=>c.offsetParent!==null);
+    if(cs.length){const c=cs[Math.floor(Math.random()*cs.length)];b.classList.add("in-card");c.append(b);return;}}
+  if(spot==="頁尾那一行"){$("#footer").append(b);return;}
+  if(spot==="畫面角落（捲到最底才出現）"){
+    const w=wrap("corner "+(Math.random()<.5?"left":"right"));document.body.append(w);
+    const chk=()=>{const atEnd=innerHeight+scrollY>=document.documentElement.scrollHeight-60;w.classList.toggle("on",atEnd);};
+    addEventListener("scroll",chk,{passive:true});addEventListener("resize",chk);chk();
+    eggCornerOff=()=>{removeEventListener("scroll",chk);removeEventListener("resize",chk);};return;
+  }
+  if(spot==="頁面最上方"){const w=wrap("top"),h1=view.querySelector("h1");if(h1)h1.after(w);else view.prepend(w);return;}
+  view.append(wrap(""));
+}
+function eggScales(){
+  eggClearScales();
   const sc=EGGS&&EGGS.scales;if(!eggOn(EGGS)||!eggOn(sc))return;
   const here=eggHash(location.hash),s=eggState(),view=document.querySelector(".view.on");if(!view)return;
   (sc.items||[]).forEach(it=>{
     const k=eggScaleKey(it);if(eggHash(it.page)!==here||s.scales[k])return;
     const b=document.createElement("button");b.type="button";b.className="egg-scale";b.setAttribute("aria-label","閃閃發亮的東西");
     const img=imgOf(sc,"icon");b.innerHTML=img?`<img src="${esc(img)}" alt="">`:EGG_SCALE_SVG;if(img)b.classList.add("has-img");
-    b.onclick=()=>eggGetScale(it,b);
-    const spot=it.spot||"頁面最下方";
-    if(spot==="內文中間"){const ps=[...view.querySelectorAll(".prose p, .notebody p, .bio p, .rich p")].filter(p=>!p.closest(".gate-panel"));if(ps.length){ps[Math.floor(ps.length/2)].append(b);return;}}
-    const w=document.createElement("div");w.className="egg-scale-wrap"+(spot==="頁面最上方"?" top":"");w.append(b);
-    if(spot==="頁面最上方"){const h1=view.querySelector("h1");if(h1)h1.after(w);else view.prepend(w);}else view.append(w);
+    const size=Math.round(+it.size||+sc.size||0);if(size)b.style.setProperty("--egg-size",Math.max(10,Math.min(120,size))+"px");
+    const look=it.look||sc.look||"正常（會發光）";
+    if(look.startsWith("低調"))b.classList.add("lo");else if(look.startsWith("幾乎隱形"))b.classList.add("ghost");
+    let fled=false;
+    b.onclick=e=>{e.preventDefault();e.stopPropagation();
+      if(it.flee&&!fled){fled=true;const w=b.closest(".egg-scale-wrap");b.remove();if(w)w.remove();
+        b.classList.add("fled");const spots=EGG_SPOTS.filter(x=>x!==(it.spot||"頁面最下方")&&!x.startsWith("畫面角落"));
+        eggPlace(view,b,it,spots[Math.floor(Math.random()*spots.length)]);eggToast(it.fleeText||"咦？它溜走了……");return;}
+      eggGetScale(it,b);};
+    const put=()=>{if(!view.classList.contains("on"))return;eggPlace(view,b,it,it.spot||"頁面最下方");};
+    const wait=Math.max(0,Math.min(300,+it.delay||0));
+    if(wait)eggTimers.push(setTimeout(put,wait*1000));else put();
   });
 }
 function eggGetScale(it,btn){
