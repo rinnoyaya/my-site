@@ -76,6 +76,7 @@ def main():
     inject_home_meta()
     write_version()
     pack_eggs()
+    bust_cache()
     print(f"建置完成，警告 {warnings} 個")
 
 # ---------------- 分享頁 ----------------
@@ -201,6 +202,21 @@ def build_share_pages():
     return warnings
 
 # 首頁的標題和社群預覽資訊（原本固定是「我的網站」）
+def bust_cache():
+    """e.js 後面加上內容的指紋，改版後瀏覽器一定會抓新的，不會跟新的 index.html 對不上"""
+    import hashlib
+    js = os.path.join(OUT, "e.js")
+    page = os.path.join(OUT, "index.html")
+    if not (os.path.exists(js) and os.path.exists(page)):
+        return
+    tag = hashlib.md5(open(js, "rb").read()).hexdigest()[:8]
+    s = open(page, encoding="utf-8").read()
+    s2 = s.replace('<script src="e.js"></script>', f'<script src="e.js?v={tag}"></script>', 1)
+    if s2 != s:
+        with open(page, "w", encoding="utf-8") as fh:
+            fh.write(s2)
+
+
 def pack_eggs():
     """把彩蛋設定 data/eggs.json 打包成看不懂的 data/eggs.dat，網站上不留原始的 eggs.json"""
     src = os.path.join(OUT, "data", "eggs.json")
