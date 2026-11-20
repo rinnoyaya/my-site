@@ -6,19 +6,27 @@
     "iconUrl": "https://img.obsidianfirelight.com/commissions/noya-scale-20261120-163609.gif",
     "title": "掉落的龍鱗",
     "hint": "堡壘各處都有諾雅散落的龍鱗，去找找吧 龍鱗會散發藍色跟橘色的光芒",
-    "speaker": "艾蕾諾雅"
+    "speaker": "艾蕾諾雅",
+    "completeText": "我脫落的龍鱗，居然被你一片一片的蒐集起來了",
+    "items": [
+      {
+        "page": "#stories",
+        "spot": "頁面最上方",
+        "note": "這片龍鱗摸起來熱熱又冰冰的"
+      }
+    ]
   },
   "logo": {
     "enabled": false
   },
   "idle": {
-    "enabled": true
+    "enabled": false
   },
   "night": {
-    "enabled": true
+    "enabled": false
   },
   "birthday": {
-    "enabled": true
+    "enabled": false
   },
   "entry": "連點三下"
 }
