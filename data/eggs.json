@@ -1,0 +1,18 @@
+{
+  "enabled": true,
+  "scales": {
+    "enabled": true
+  },
+  "logo": {
+    "enabled": true
+  },
+  "idle": {
+    "enabled": true
+  },
+  "night": {
+    "enabled": true
+  },
+  "birthday": {
+    "enabled": true
+  }
+}
