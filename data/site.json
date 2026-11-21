@@ -40,5 +40,6 @@
     "cooldownAfter": 0,
     "cooldownSeconds": 5,
     "successLine": "好害羞喔...身體被人家偷看什麼的...."
-  }
+  },
+  "newDays": 3
 }
