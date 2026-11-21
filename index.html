@@ -428,6 +428,51 @@ html.egg-night body::after{content:"";position:fixed;inset:0;pointer-events:none
 .secret.no h3{color:var(--muted);letter-spacing:.2em}
 .secret small{display:block;margin-top:6px;color:var(--accent);font-size:12.5px}
 .secret-reward{margin-top:28px;padding:20px;border-radius:14px;border:1px solid var(--line);background:var(--card)}
+.egg-book{margin-top:24px}
+.egg-book h2{font-size:17px;margin:0 0 4px;display:flex;align-items:baseline;gap:10px}.egg-book h2 small{font-size:13px;color:var(--muted);font-weight:400}
+.egg-book-tip{margin:0 0 10px;font-size:13px;color:var(--muted)}
+.egg-book-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:10px;margin-top:8px}
+.egg-slot{display:flex;flex-direction:column;align-items:center;gap:4px;padding:14px 8px 12px;border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);font:inherit;text-align:center;min-height:132px}
+button.egg-slot{cursor:pointer;transition:transform .15s,border-color .15s,box-shadow .15s}
+button.egg-slot:hover,button.egg-slot:focus-visible{transform:translateY(-2px);border-color:var(--accent);box-shadow:0 4px 14px rgba(0,0,0,.18)}
+.egg-slot-ic{width:48px;height:48px;display:grid;place-items:center}
+.egg-slot-ic img,.egg-slot-ic svg{width:100%;height:100%;object-fit:contain;image-rendering:pixelated}
+.egg-slot.no{border-style:dashed;background:none;color:var(--muted)}
+.egg-slot.no .egg-slot-ic{font-size:26px;opacity:.5}
+.egg-slot-no{font-size:11px;letter-spacing:.08em;color:var(--muted)}
+.egg-slot-t{font-size:13px;line-height:1.45;word-break:break-word}
+.egg-slot.no .egg-slot-t{font-size:12px}
+.egg-book-modal{position:fixed;inset:0;z-index:9;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(8,10,18,.72)}
+.egg-book-modal.on{display:flex;animation:eggBmIn .2s ease}
+@keyframes eggBmIn{from{opacity:0}to{opacity:1}}
+.egg-bm-card{position:relative;width:min(560px,100%);max-height:min(86dvh,760px);overflow:auto;overscroll-behavior:contain;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:16px;padding:22px 22px 18px;box-shadow:0 18px 50px rgba(0,0,0,.4)}
+.egg-bm-x{position:absolute;top:10px;right:10px;width:36px;height:36px;border:0;border-radius:50%;background:none;color:var(--muted);font-size:18px;cursor:pointer}
+.egg-bm-x:hover{background:var(--paper);color:var(--ink)}
+.egg-bm-head{display:flex;gap:14px;align-items:center;margin:0 34px 14px 0}
+.egg-bm-ic{flex:0 0 64px;width:64px;height:64px;display:grid;place-items:center}
+.egg-bm-ic img,.egg-bm-ic svg{width:100%;height:100%;object-fit:contain;image-rendering:pixelated}
+.egg-bm-no{font-size:12px;letter-spacing:.08em;color:var(--muted)}
+.egg-bm-head h2{margin:2px 0 4px;font-size:20px;line-height:1.35}
+.egg-bm-meta{font-size:13px;color:var(--muted)}
+.egg-bm-say{margin:0 0 14px;padding:10px 14px;border-left:3px solid var(--accent);background:var(--paper);border-radius:0 10px 10px 0;font-style:normal}
+.egg-bm-card .art.full{margin:0 0 14px;border-radius:10px;overflow:hidden}
+.egg-bm-card .notebody{margin:0 0 14px}
+.egg-bm-clue{margin:0 0 14px;padding:10px 14px;border:1px dashed var(--line);border-radius:10px;font-size:14px}
+.egg-bm-clue b{display:block;margin-bottom:2px;font-size:13px;color:var(--muted)}
+.egg-bm-empty{color:var(--muted);text-align:center;margin:10px 0 16px}
+.egg-bm-nav{display:flex;align-items:center;justify-content:space-between;gap:10px;border-top:1px solid var(--line);padding-top:12px;margin-top:4px;font-size:13px;color:var(--muted)}
+.egg-bm-nav button{border:1px solid var(--line);background:none;color:var(--ink);font:inherit;font-size:14px;padding:8px 14px;border-radius:999px;cursor:pointer}
+.egg-bm-nav button:hover{background:var(--paper)}
+@media (max-width:600px){
+  .egg-book-modal{align-items:flex-end;padding:0}
+  .egg-bm-card{width:100%;max-height:88dvh;border-radius:18px 18px 0 0;padding:20px 18px calc(16px + env(safe-area-inset-bottom))}
+  .egg-book-modal.on .egg-bm-card{animation:eggBmUp .25s ease}
+  .egg-book-grid{grid-template-columns:repeat(3,1fr);gap:8px}
+  .egg-slot{min-height:118px;padding:12px 6px 10px}
+  .egg-slot-ic{width:40px;height:40px}
+}
+@keyframes eggBmUp{from{transform:translateY(30px)}to{transform:none}}
+@media (prefers-reduced-motion:reduce){.egg-book-modal.on,.egg-book-modal.on .egg-bm-card{animation:none}}
 .egg-clues{margin-top:24px;padding:16px 18px;border-radius:14px;border:1px solid var(--line);background:var(--card)}
 .egg-clues h2{font-size:17px;margin:0 0 8px;display:flex;align-items:baseline;gap:10px}.egg-clues h2 small{font-size:13px;color:var(--muted);font-weight:400}
 .egg-clues ol{margin:0;padding-left:1.4em;line-height:1.9}.egg-clues p{margin:0;color:var(--muted);font-size:14px}
@@ -970,7 +1015,7 @@ function newDays(){const v=SITE.newDays;if(v===undefined||v===null||v==="")retur
 function isNew(x){const d=newDays();if(!d||!x||!x.date)return false;const t=Date.parse(String(x.date).slice(0,10)+"T00:00:00+08:00");if(isNaN(t))return false;const age=Date.now()-t;return age>-864e5&&age<d*864e5;}
 const newBadge=x=>isNew(x)?`<span class="new-badge" title="最近更新">NEW</span>`:"";
 
-const SITE_VERSION="2026-11-20 v1.21";
+const SITE_VERSION="2026-11-21 v1.22";
 const BROKEN=[];
 /* 解開建置時打包過的設定檔（data/eggs.dat） */
 function unpk(t){try{const b=atob(t.trim()),u=new Uint8Array(b.length);let x=0x5b1d9e47;for(let i=0;i<b.length;i++){x=(Math.imul(x,1664525)+1013904223)>>>0;u[i]=b.charCodeAt(i)^(x>>>24);}return new TextDecoder().decode(u);}catch(e){return "";}}
@@ -1638,7 +1683,7 @@ const closeLb=fromRoute=>{if(!$("#lb").classList.contains("on"))return;
   lbPrevHash=null;if(cardsFsEl&&$("#lb").contains(cardsFsEl)){cardsFsEl.classList.remove("fs");cardsFsEl=null;document.documentElement.classList.remove("cards-lock");}$("#lb").classList.remove("on");if(lbReturn&&lbReturn.focus&&document.contains(lbReturn))lbReturn.focus({preventScroll:true});lbReturn=null;};
 $("#lbClose").onclick=()=>closeLb();
 document.addEventListener("click",e=>{
-  const z=e.target.closest("[data-zoom]");if(!z||!z.closest(".reader,.bio,.about"))return;
+  const z=e.target.closest("[data-zoom]");if(!z||!z.closest(".reader,.bio,.about,.egg-book-modal"))return;
   openLb(`<img src="${esc(z.dataset.zoom)}" alt="">`,z.dataset.cap||"","","");
 });$("#lb").onclick=e=>{if(e.target.id==="lb")closeLb();};
 document.addEventListener("keydown",e=>{if(e.key==="Escape"){closeLb();$("#gate").classList.remove("on");gateCb=null;}});
@@ -1797,7 +1842,7 @@ $("#skipBtn").onclick=()=>{$("#main").focus();$("#main").scrollIntoView();};
 $("#hdr").addEventListener("focusin",()=>$("#hdr").classList.remove("hide"));
 
 /* 開著大圖或年齡確認時，後面的頁面不要跟著捲動 */
-new MutationObserver(()=>document.documentElement.classList.toggle("modal-lock",$("#lb").classList.contains("on")||$("#gate").classList.contains("on")))
+new MutationObserver(()=>document.documentElement.classList.toggle("modal-lock",$("#lb").classList.contains("on")||$("#gate").classList.contains("on")||!!document.querySelector(".egg-book-modal.on")))
   .observe(document.body,{subtree:true,attributes:true,attributeFilter:["class"]});
 
 /* 電腦：← → 鍵換上一篇／下一篇 */
