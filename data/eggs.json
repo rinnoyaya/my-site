@@ -12,16 +12,19 @@
       {
         "page": "#stories",
         "spot": "頁面最上方",
+        "flee": false,
         "note": "這片龍鱗摸起來熱熱又冰冰的"
       },
       {
         "page": "#home",
         "spot": "內文中間",
+        "flee": false,
         "note": "這片龍鱗摸起來硬硬的"
       },
       {
         "page": "#side-elenoastories-1",
         "spot": "頁面最下方",
+        "flee": false,
         "note": "這片龍鱗上面有被切割的痕跡...."
       }
     ]
@@ -39,5 +42,11 @@
     "enabled": false
   },
   "entry": "連點三下",
-  "intro": "這個堡壘裡面有散落一些東西跟藏有一些秘密\n去找找吧!"
+  "intro": "這個堡壘裡面有散落一些東西跟藏有一些秘密\n去找找吧!",
+  "title": "黑曜石堡壘的收藏箱",
+  "allToast": "蒐集齊秘密的獎勵",
+  "reward": {
+    "sealed": "egg1:wm7wgALcDiwWtGqnuBDZnQ==.sixVAIi4F9eAAqLg.ZmRkFLdQrB9a+MMRONo+O/XEvD0gbT7GW9nNpSa0nR1icp5TKZ2S1iqen7z9T+2go1hBLvEMfIO6xoxeM0TPfppsnrIf5SQ/tiG25fiXnfLi5bjuTWL9LaDW09tQY9Sjjrxpu8GPPPU9GA+QJGPjdYgzroXMq18S4YsGGfCtAFyfswGHHK/NtqO1lw/Dvl7GWHXQIzd2h0ZY+4gD8uLHBUHQPuliplG6wp7KwI0Huria3v3lUdKbAs/huL+rhc5W9HNzV5E/1t5u4Qq0KOoeQVOZpdwOrIUuZp24nMoZ0fprkMW54M+WWYW7gSUlAnJFBkDNgwks4BdAtSxfIqaAOff52WQw2F/p",
+    "sealTitle": "關於凜夜跟諾雅兩人的秘密"
+  }
 }
