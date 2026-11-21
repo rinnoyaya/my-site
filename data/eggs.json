@@ -4,7 +4,7 @@
     "enabled": true,
     "name": "諾雅的龍鱗",
     "iconUrl": "https://img.obsidianfirelight.com/commissions/noya-scale-20261120-163609.gif",
-    "title": "掉落的龍鱗",
+    "title": "n03xji4的龍鱗",
     "hint": "堡壘各處都有諾雅散落的龍鱗，去找找吧 龍鱗會散發藍色跟橘色的光芒",
     "speaker": "艾蕾諾雅",
     "completeText": "我脫落的龍鱗，居然被你一片一片的蒐集起來了",
@@ -27,7 +27,9 @@
         "flee": false,
         "note": "這片龍鱗上面有被切割的痕跡...."
       }
-    ]
+    ],
+    "size": 20,
+    "look": "正常（會發光）"
   },
   "logo": {
     "enabled": false
