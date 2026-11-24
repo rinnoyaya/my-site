@@ -362,8 +362,23 @@ body:has(.owner:not([hidden])) footer{padding-bottom:76px}
 @keyframes flame{0%{transform:scale(1,.85) skewX(-4deg)}50%{transform:scale(.9,1.08) skewX(3deg)}100%{transform:scale(1.05,.95) skewX(-2deg)}}
 .fire.out{transition:opacity .4s;opacity:0}
 @media (prefers-reduced-motion:reduce){.fire i{animation:none}}
+/* 符咒封印：黃色符紙貼上去，時間到從下面燒掉 */
+.seal{position:absolute;inset:-6px -4px;z-index:3;display:flex;align-items:center;justify-content:center;pointer-events:auto;cursor:not-allowed;animation:sealSlap .38s cubic-bezier(.3,1.6,.5,1) both}
+.seal-paper{position:relative;width:100%;height:100%;min-height:46px;display:flex;align-items:center;justify-content:center;gap:10px;padding:0 12px;box-sizing:border-box;transform:rotate(-2.5deg);
+  background:linear-gradient(180deg,rgba(255,255,255,.18),transparent 40%),repeating-linear-gradient(90deg,rgba(120,80,0,.05) 0 2px,transparent 2px 7px),linear-gradient(135deg,#f7dc6f,#f1c84b 55%,#e9b93a);
+  border-radius:3px;box-shadow:0 6px 16px rgba(0,0,0,.35),inset 0 0 0 3px #f7dc6f,inset 0 0 0 5px #c0392b,inset 0 0 0 7px #f1c84b,inset 0 0 0 8px rgba(192,57,43,.7);color:#b3261e;overflow:hidden}
+.seal-ch{font-family:"Noto Serif TC","Songti TC","PMingLiU",serif;font-size:30px;line-height:1;font-weight:900;text-shadow:0 0 6px rgba(255,80,40,.55);animation:sealGlow 1.4s ease-in-out infinite alternate}
+.seal-side{writing-mode:vertical-rl;font-family:"Noto Serif TC",serif;font-size:11px;font-weight:700;letter-spacing:.1em;opacity:.85}
+.seal-txt{font-size:13px;font-weight:700;color:#7a1a12;white-space:nowrap}
+.seal-stamp{position:absolute;right:10px;bottom:6px;width:22px;height:22px;border:2px solid #c0392b;border-radius:4px;display:grid;place-items:center;font-size:12px;font-weight:900;color:#c0392b;transform:rotate(8deg);opacity:.85}
+.seal.nudge .seal-paper{animation:sealNudge .3s}
+.seal.out .seal-paper{animation:sealBurn .9s ease-in forwards}
+@keyframes sealSlap{0%{transform:scale(1.9) rotate(-14deg);opacity:0}70%{opacity:1}100%{transform:none}}
+@keyframes sealGlow{from{text-shadow:0 0 4px rgba(255,80,40,.4)}to{text-shadow:0 0 12px rgba(255,60,20,.9)}}
+@keyframes sealNudge{25%{transform:rotate(-1deg) translateX(-2px)}75%{transform:rotate(-4deg) translateX(2px)}}
+@keyframes sealBurn{0%{clip-path:inset(0 0 0 0);filter:none}40%{filter:sepia(.6) brightness(.8)}100%{clip-path:inset(0 0 100% 0);filter:sepia(1) brightness(.4);transform:rotate(-2.5deg) translateY(-6px);opacity:.2}}
 .gate-in button:disabled{opacity:.55;cursor:not-allowed}
-@media (prefers-reduced-motion:reduce){.gate-in.shake,.gate-say.pop,.ice.crack{animation:none}}
+@media (prefers-reduced-motion:reduce){.gate-in.shake,.gate-say.pop,.ice.crack,.seal,.seal-ch,.seal.nudge .seal-paper{animation:none}.seal.out .seal-paper{animation-duration:.01s}}
 /* ---------- 彩蛋 ---------- */
 .egg-entry{font:inherit;background:none;border:0;color:var(--muted);opacity:.35;cursor:pointer;padding:6px 8px;margin-left:4px;font-size:13px;transition:opacity .2s}
 .egg-entry:hover,.egg-entry:focus-visible{opacity:.9}
@@ -396,14 +411,37 @@ body:has(.owner:not([hidden])) footer{padding-bottom:76px}
 .egg-toast{position:fixed;left:50%;top:18px;transform:translate(-50%,-140%);z-index:60;background:linear-gradient(135deg,#2b2350,#3c2f6e);color:#f3eaff;border:1px solid rgba(200,170,255,.5);box-shadow:0 8px 26px rgba(0,0,0,.35),0 0 18px rgba(170,130,255,.35);padding:10px 18px;border-radius:999px;font-size:14.5px;transition:transform .45s cubic-bezier(.2,.9,.3,1.2);max-width:calc(100vw - 24px);text-align:center;pointer-events:none}
 .egg-toast.on{transform:translate(-50%,0)}
 @media (max-width:720px){.egg-toast{top:calc(10px + env(safe-area-inset-top));font-size:13.5px;padding:8px 14px;width:max-content}}
-.egg-say{position:fixed;z-index:55;bottom:calc(18px + env(safe-area-inset-bottom));left:16px;max-width:min(330px,calc(100vw - 32px));display:flex;gap:10px;align-items:flex-end;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:16px;padding:12px 14px;box-shadow:0 10px 28px rgba(0,0,0,.28);transform:translateY(140%);transition:transform .45s cubic-bezier(.2,.9,.3,1.1);cursor:pointer}
-.egg-say.on{transform:none}
-.egg-say.peek{left:auto;right:0;border-radius:16px 0 0 16px;transform:translateX(105%)}
-.egg-say.peek.on{transform:none}
-.egg-say .es-av{flex:none;width:46px;height:46px;border-radius:50%;overflow:hidden;background:var(--line)}
-.egg-say .es-av img{width:100%;height:100%;object-fit:cover;display:block}
-.egg-say b{display:block;font-size:12.5px;color:var(--accent);margin-bottom:2px}
-.egg-say p{margin:0;font-size:14.5px;line-height:1.6}
+.egg-say{position:fixed;z-index:59;left:20px;bottom:calc(20px + env(safe-area-inset-bottom));width:min(440px,calc(100vw - 40px));display:flex;gap:14px;align-items:flex-start;
+  padding:16px 18px 14px;border-radius:18px;background:linear-gradient(160deg,color-mix(in srgb,var(--accent) 16%,var(--card)),var(--card) 55%);color:var(--ink);
+  border:2px solid color-mix(in srgb,var(--accent) 70%,var(--line));box-shadow:0 14px 40px rgba(0,0,0,.45),0 0 0 4px color-mix(in srgb,var(--accent) 18%,transparent);
+  opacity:0;transform:translateY(30px) scale(.96);pointer-events:none;transition:opacity .25s,transform .35s cubic-bezier(.2,1.4,.4,1)}
+.egg-say.on{opacity:1;transform:none;pointer-events:auto;animation:esGlow 2.4s ease-in-out .4s 2}
+.egg-say.swap{opacity:0;transform:translateY(8px)}
+@keyframes esGlow{50%{box-shadow:0 14px 40px rgba(0,0,0,.45),0 0 0 9px color-mix(in srgb,var(--accent) 10%,transparent),0 0 30px color-mix(in srgb,var(--accent) 45%,transparent)}}
+.egg-say::after{content:"";position:absolute;left:34px;bottom:-11px;width:18px;height:18px;background:var(--card);border-right:2px solid color-mix(in srgb,var(--accent) 70%,var(--line));border-bottom:2px solid color-mix(in srgb,var(--accent) 70%,var(--line));transform:rotate(45deg);border-radius:0 0 4px 0}
+.egg-say.noname::after{display:none}
+.egg-say .es-av{position:relative;flex:none;width:64px;height:64px;border-radius:50%;padding:3px;background:conic-gradient(from 200deg,var(--accent),color-mix(in srgb,var(--accent) 30%,#fff),var(--accent))}
+.egg-say .es-av img,.egg-say .es-av>span{width:100%;height:100%;border-radius:50%;object-fit:cover;display:grid;place-items:center;background:var(--card);border:2px solid var(--card);box-sizing:border-box;font-weight:700;font-size:24px}
+.egg-say .es-bang{position:absolute;top:-4px;right:-4px;width:22px;height:22px;border-radius:50%;background:#ff5a5f;color:#fff;font:700 14px/22px system-ui,sans-serif;font-style:normal;text-align:center;box-shadow:0 2px 6px rgba(0,0,0,.3);animation:esBang .9s ease-in-out infinite alternate}
+@keyframes esBang{to{transform:translateY(-3px) scale(1.08)}}
+.egg-say .es-body{flex:1;min-width:0}
+.egg-say .es-name{display:inline-block;font-size:13px;font-weight:700;letter-spacing:.04em;color:#fff;background:var(--accent);padding:2px 10px;border-radius:999px;margin-bottom:6px}
+.egg-say .es-text{margin:0;font-size:16px;line-height:1.75;min-height:1.75em;word-break:break-word}
+.egg-say .es-text.typing::after{content:"▍";margin-left:1px;opacity:.6;animation:esCaret .7s steps(1) infinite}
+@keyframes esCaret{50%{opacity:0}}
+.egg-say .es-foot{display:flex;justify-content:flex-end;margin-top:10px}
+.egg-say .es-ok{border:0;border-radius:999px;background:var(--accent);color:#fff;font:inherit;font-size:14px;font-weight:700;padding:8px 18px;cursor:pointer;display:inline-flex;align-items:center;gap:8px;box-shadow:0 3px 10px color-mix(in srgb,var(--accent) 45%,transparent)}
+.egg-say .es-ok small{font-weight:400;font-size:12px;opacity:.85}
+.egg-say .es-ok:hover{filter:brightness(1.1)}.egg-say .es-ok:active{transform:scale(.96)}
+.egg-say.peek{left:auto;right:20px}
+.egg-say.peek::after{left:auto;right:34px}
+@media (max-width:640px){
+  .egg-say,.egg-say.peek{left:12px;right:12px;width:auto;bottom:calc(14px + env(safe-area-inset-bottom));padding:14px 14px 12px;gap:12px}
+  .egg-say .es-av{width:54px;height:54px}
+  .egg-say .es-text{font-size:15.5px}
+  .egg-say .es-ok{padding:10px 18px}
+}
+@media (prefers-reduced-motion:reduce){.egg-say,.egg-say.on{transition:opacity .2s;transform:none;animation:none}.egg-say .es-bang{animation:none}}
 .egg-fly{position:fixed;z-index:58;pointer-events:none;font-size:42px;left:-80px;top:30vh;animation:eggFly 3.4s ease-in-out forwards}
 .egg-fly img{width:72px;height:72px;object-fit:contain;display:block}
 @keyframes eggFly{0%{transform:translate(0,0) rotate(-8deg)}25%{transform:translate(28vw,-8vh) rotate(6deg)}50%{transform:translate(55vw,4vh) rotate(-6deg)}75%{transform:translate(82vw,-10vh) rotate(5deg)}100%{transform:translate(calc(100vw + 160px),-4vh) rotate(-4deg)}}
@@ -1085,7 +1123,7 @@ function newDays(){const v=SITE.newDays;if(v===undefined||v===null||v==="")retur
 function isNew(x){const d=newDays();if(!d||!x||!x.date)return false;const t=Date.parse(String(x.date).slice(0,10)+"T00:00:00+08:00");if(isNaN(t))return false;const age=Date.now()-t;return age>-864e5&&age<d*864e5;}
 const newBadge=x=>isNew(x)?`<span class="new-badge" title="最近更新">NEW</span>`:"";
 
-const SITE_VERSION="2026-11-24 v1.25";
+const SITE_VERSION="2026-11-24 v1.26";
 const BROKEN=[];
 /* 解開建置時打包過的設定檔（data/eggs.dat） */
 function unpk(t){try{const b=atob(t.trim()),u=new Uint8Array(b.length);let x=0x5b1d9e47;for(let i=0;i<b.length;i++){x=(Math.imul(x,1664525)+1013904223)>>>0;u[i]=b.charCodeAt(i)^(x>>>24);}return new TextDecoder().decode(u);}catch(e){return "";}}
@@ -1215,7 +1253,7 @@ const PEN_LINES=["密碼不對。","還是不對喔。","第 {次數} 次了…�
 function penCfg(){const p=SITE.penalty||{};return p.enabled===true||p.enabled==="true"?p:null;}
 function penState(){let s={};try{s=JSON.parse(localStorage.getItem(PEN_KEY)||"{}")||{};}catch(e){}
   if(s.last&&Date.now()-s.last>864e5)s={}; /* 一天沒有再猜就重新計算 */
-  return {n:+s.n||0,until:+s.until||0,last:+s.last||0};}
+  return {n:+s.n||0,until:+s.until||0,last:+s.last||0,who:s.who||""};}
 function penSave(s){try{localStorage.setItem(PEN_KEY,JSON.stringify(s));}catch(e){}}
 function penFill(t,n,sec){return String(t||"").replace(/\{次數\}/g,n).replace(/\{秒\}/g,sec);}
 function penLine(p,n){
@@ -1224,6 +1262,13 @@ function penLine(p,n){
   if(p.after==="從頭輪流")return L[(n-1)%L.length];
   if(p.after==="隨機")return L[Math.floor(Math.random()*L.length)];
   return L[L.length-1];
+}
+/* 懲罰的角色：後台有設定「懲罰的角色」時，每次猜錯隨機抽一位，用他的台詞和懲罰方式 */
+function penWho(p,name){
+  const list=(p.characters||[]).filter(c=>c&&String(c.character||"").trim());
+  if(!list.length)return {speaker:p.speaker,lines:p.lines,after:p.after,effect:p.effect};
+  const c=(name&&list.find(x=>x.character===name))||list[Math.floor(Math.random()*list.length)];
+  return {speaker:c.character,lines:String(c.lines||"").trim()?c.lines:p.lines,after:p.after,effect:c.effect||"結冰或燃燒（隨機）",sealSeconds:c.sealSeconds,sealText:c.sealText};
 }
 function penSay(p,text){
   const box=$("#gateSay");if(!text){box.hidden=true;return;}
@@ -1234,7 +1279,7 @@ function penSay(p,text){
 let penTimer=0;
 function penCooldown(){
   clearInterval(penTimer);const p=penCfg();
-  const iced=()=>!!$("#gatePw").parentElement.querySelector(".ice:not(.crack),.fire:not(.out)");
+  const iced=()=>!!$("#gatePw").parentElement.querySelector(".ice:not(.crack),.fire:not(.out),.seal:not(.out)");
   const lock=on=>{$("#gatePw").disabled=on||iced();$("#gateYes").disabled=on;};
   if(!p){lock(false);return false;}
   const tick=()=>{const left=Math.ceil((penState().until-Date.now())/1000);
@@ -1244,7 +1289,23 @@ function penCooldown(){
   lock(false);return false;
 }
 let fireTimer=0;
-function penClearFx(){clearInterval(fireTimer);$("#gatePw").parentElement.querySelectorAll(".ice,.fire").forEach(x=>x.remove());}
+function penClearFx(){clearInterval(fireTimer);$("#gatePw").parentElement.querySelectorAll(".ice,.fire,.seal").forEach(x=>x.remove());}
+/* 符咒封印：一張符咒「啪」地貼在輸入框上，時間到才會燒掉脫落 */
+function penSeal(w){
+  penClearFx();
+  const box=$("#gatePw").parentElement,sec=Math.max(3,Math.min(30,Math.round(+w.sealSeconds||6))),ch=String(w.sealText||"").trim().slice(0,2)||"封";
+  const el=document.createElement("div");el.className="seal";el.setAttribute("aria-live","polite");
+  let left=sec;
+  el.innerHTML=`<div class="seal-paper"><span class="seal-side">敕令</span><b class="seal-ch">${esc(ch)}</b><span class="seal-txt"></span><span class="seal-stamp">${esc((w.speaker||"").slice(0,1)||"印")}</span></div>`;
+  const txt=()=>{el.querySelector(".seal-txt").textContent=`符咒封印中…${left}`;};txt();
+  el.onclick=()=>{el.classList.remove("nudge");void el.offsetWidth;el.classList.add("nudge");};
+  $("#gatePw").disabled=true;box.append(el);
+  fireTimer=setInterval(()=>{left--;
+    if(left>0){txt();return;}
+    clearInterval(fireTimer);el.classList.add("out");
+    setTimeout(()=>{el.remove();if(!penCooldown()&&$("#gate").classList.contains("on")){$("#gatePw").disabled=false;$("#gatePw").focus();}},900);
+  },1000);
+}
 /* 燃燒：輸入框燒 5 秒，燒完才能再輸入 */
 function penFire(){
   penClearFx();
@@ -1273,24 +1334,26 @@ function penWrong(){
   const after=p.cooldownAfter===undefined||p.cooldownAfter===null||p.cooldownAfter===""?3:Math.max(0,+p.cooldownAfter||0);
   if(after&&s.n>=after){const base=Math.max(5,+p.cooldownSeconds||30);s.until=Date.now()+Math.min(300,base*Math.pow(2,s.n-after))*1000;}
   penSave(s);
-  penSay(p,penFill(penLine(p,s.n),s.n,""));
+  const w=penWho(p);s.who=w.speaker||"";penSave(s);
+  penSay(w,penFill(penLine(w,s.n),s.n,""));
   $("#gateErr").textContent="";
   $("#gatePw").value="";
   /* 每一次猜錯都套用效果（冷卻中也一樣） */
-  const fx=penEffects(p.effect);
+  const fx=penEffects(w.effect);
   if(fx.shake){const g=$("#gate .gate-in");g.classList.remove("shake");void g.offsetWidth;g.classList.add("shake");try{navigator.vibrate&&navigator.vibrate([60,40,60]);}catch(e){}}
-  if(fx.ice)penIce();else if(fx.fire)penFire();
-  if(!penCooldown()&&!fx.ice&&!fx.fire)$("#gatePw").focus();
+  if(fx.ice)penIce();else if(fx.fire)penFire();else if(fx.seal)penSeal(w);
+  if(!penCooldown()&&!fx.ice&&!fx.fire&&!fx.seal)$("#gatePw").focus();
 }
 /* 「每次隨機」：每次猜錯從三種裡抽一種；沒設定效果時預設搖晃 */
 function penEffects(e){
   if(e==="無")return {};
   const pick=a=>a[Math.floor(Math.random()*a.length)];
   if(e==="結冰")return {ice:1};
+  if(e==="符咒封印")return {seal:1,shake:1};
   if(e==="燃燒")return {fire:1,shake:1};
   if(e==="搖晃＋結冰")return {shake:1,ice:1};
   if(e==="結冰或燃燒（隨機）")return pick([{ice:1},{fire:1,shake:1}]);
-  if(e==="每次隨機")return pick([{shake:1},{ice:1},{shake:1,ice:1},{fire:1,shake:1}]);
+  if(e==="每次隨機")return pick([{shake:1},{ice:1},{shake:1,ice:1},{fire:1,shake:1},{seal:1,shake:1}]);
   return {shake:1};
 }
 let gateCb=null;
@@ -1303,7 +1366,7 @@ function openGate(cb){
   $("#gate").classList.add("on");
   /* 之前猜錯被罰冷卻、時間還沒到：打開時繼續倒數 */
   const p=hash&&penCfg(),st=penState();
-  if(p&&st.n&&st.until>Date.now())penSay(p,penFill(penLine(p,st.n),st.n,""));
+  if(p&&st.n&&st.until>Date.now()){const w=penWho(p,st.who);penSay(w,penFill(penLine(w,st.n),st.n,""));}
   if(!(hash&&penCooldown()))(hash?$("#gatePw"):$("#gateYes")).focus();
 }
 async function tryUnlock(){
@@ -1316,8 +1379,9 @@ async function tryUnlock(){
     if(!window.crypto||!crypto.subtle){$("#gateErr").textContent="請用 https:// 開頭的網址開啟網站";return;}
     const h=await sha256("obsidian-gate:"+$("#gatePw").value);
     if(h!==hash){penWrong();return;}
-    const p=penCfg(),tried=penState().n;penSave({});
-    if(p&&p.successLine&&tried)setTimeout(()=>siteToast(penFill(p.successLine,tried,"")),200);
+    const p=penCfg(),st0=penState(),tried=st0.n;penSave({});
+    if(p&&p.successLine&&tried){const who=p.speaker||st0.who||"",t=penFill(p.successLine,tried,"");
+      setTimeout(()=>{if(typeof eggSay==="function")eggSay(who,t);else siteToast(t);},300);}
   }
   ADULT_OK=true;
   try{sessionStorage.setItem("adult-ok","1");if($("#gateRemember").checked)localStorage.setItem("adult-until",String(Date.now()+30*864e5));}catch(e){}
