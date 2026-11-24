@@ -1015,7 +1015,7 @@ function newDays(){const v=SITE.newDays;if(v===undefined||v===null||v==="")retur
 function isNew(x){const d=newDays();if(!d||!x||!x.date)return false;const t=Date.parse(String(x.date).slice(0,10)+"T00:00:00+08:00");if(isNaN(t))return false;const age=Date.now()-t;return age>-864e5&&age<d*864e5;}
 const newBadge=x=>isNew(x)?`<span class="new-badge" title="最近更新">NEW</span>`:"";
 
-const SITE_VERSION="2026-11-21 v1.22";
+const SITE_VERSION="2026-11-24 v1.23";
 const BROKEN=[];
 /* 解開建置時打包過的設定檔（data/eggs.dat） */
 function unpk(t){try{const b=atob(t.trim()),u=new Uint8Array(b.length);let x=0x5b1d9e47;for(let i=0;i<b.length;i++){x=(Math.imul(x,1664525)+1013904223)>>>0;u[i]=b.charCodeAt(i)^(x>>>24);}return new TextDecoder().decode(u);}catch(e){return "";}}
