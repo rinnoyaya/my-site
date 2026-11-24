@@ -363,7 +363,7 @@ body:has(.owner:not([hidden])) footer{padding-bottom:76px}
 .fire.out{transition:opacity .4s;opacity:0}
 @media (prefers-reduced-motion:reduce){.fire i{animation:none}}
 /* 符咒封印：黃色符紙貼上去，時間到從下面燒掉 */
-.seal{position:absolute;inset:-6px -4px;z-index:3;display:flex;align-items:center;justify-content:center;pointer-events:auto;cursor:not-allowed;animation:sealSlap .38s cubic-bezier(.3,1.6,.5,1) both}
+.pw-box .seal{position:absolute;inset:-6px -4px;z-index:3;display:flex;align-items:center;justify-content:center;pointer-events:auto;cursor:not-allowed;animation:sealSlap .38s cubic-bezier(.3,1.6,.5,1) both}
 .seal-paper{position:relative;width:100%;height:100%;min-height:46px;display:flex;align-items:center;justify-content:center;gap:10px;padding:0 12px;box-sizing:border-box;transform:rotate(-2.5deg);
   background:linear-gradient(180deg,rgba(255,255,255,.18),transparent 40%),repeating-linear-gradient(90deg,rgba(120,80,0,.05) 0 2px,transparent 2px 7px),linear-gradient(135deg,#f7dc6f,#f1c84b 55%,#e9b93a);
   border-radius:3px;box-shadow:0 6px 16px rgba(0,0,0,.35),inset 0 0 0 3px #f7dc6f,inset 0 0 0 5px #c0392b,inset 0 0 0 7px #f1c84b,inset 0 0 0 8px rgba(192,57,43,.7);color:#b3261e;overflow:hidden}
@@ -371,8 +371,8 @@ body:has(.owner:not([hidden])) footer{padding-bottom:76px}
 .seal-side{writing-mode:vertical-rl;font-family:"Noto Serif TC",serif;font-size:11px;font-weight:700;letter-spacing:.1em;opacity:.85}
 .seal-txt{font-size:13px;font-weight:700;color:#7a1a12;white-space:nowrap}
 .seal-stamp{position:absolute;right:10px;bottom:6px;width:22px;height:22px;border:2px solid #c0392b;border-radius:4px;display:grid;place-items:center;font-size:12px;font-weight:900;color:#c0392b;transform:rotate(8deg);opacity:.85}
-.seal.nudge .seal-paper{animation:sealNudge .3s}
-.seal.out .seal-paper{animation:sealBurn .9s ease-in forwards}
+.pw-box .seal.nudge .seal-paper{animation:sealNudge .3s}
+.pw-box .seal.out .seal-paper{animation:sealBurn .9s ease-in forwards}
 @keyframes sealSlap{0%{transform:scale(1.9) rotate(-14deg);opacity:0}70%{opacity:1}100%{transform:none}}
 @keyframes sealGlow{from{text-shadow:0 0 4px rgba(255,80,40,.4)}to{text-shadow:0 0 12px rgba(255,60,20,.9)}}
 @keyframes sealNudge{25%{transform:rotate(-1deg) translateX(-2px)}75%{transform:rotate(-4deg) translateX(2px)}}
@@ -398,7 +398,7 @@ body:has(.owner:not([hidden])) footer{padding-bottom:76px}
 .chains.free{background:none}
 @keyframes lockGone{to{transform:translateY(30px) rotate(25deg);opacity:0}}
 .gate-in button:disabled{opacity:.55;cursor:not-allowed}
-@media (prefers-reduced-motion:reduce){.gate-in.shake,.gate-say.pop,.ice.crack,.seal,.seal-ch,.seal.nudge .seal-paper,.chain,.chains.jolt .chain-lock{animation:none}.chain.snap{animation-duration:.01s}.seal.out .seal-paper{animation-duration:.01s}}
+@media (prefers-reduced-motion:reduce){.gate-in.shake,.gate-say.pop,.ice.crack,.pw-box .seal,.seal-ch,.pw-box .seal.nudge .seal-paper,.chain,.chains.jolt .chain-lock{animation:none}.chain.snap{animation-duration:.01s}.pw-box .seal.out .seal-paper{animation-duration:.01s}}
 /* ---------- 彩蛋 ---------- */
 .egg-entry{font:inherit;background:none;border:0;color:var(--muted);opacity:.35;cursor:pointer;padding:6px 8px;margin-left:4px;font-size:13px;transition:opacity .2s}
 .egg-entry:hover,.egg-entry:focus-visible{opacity:.9}
@@ -1198,7 +1198,7 @@ function newDays(){const v=SITE.newDays;if(v===undefined||v===null||v==="")retur
 function isNew(x){const d=newDays();if(!d||!x||!x.date)return false;const t=Date.parse(String(x.date).slice(0,10)+"T00:00:00+08:00");if(isNaN(t))return false;const age=Date.now()-t;return age>-864e5&&age<d*864e5;}
 const newBadge=x=>isNew(x)?`<span class="new-badge" title="最近更新">NEW</span>`:"";
 
-const SITE_VERSION="2026-11-24 v1.29";
+const SITE_VERSION="2026-11-24 v1.30";
 const BROKEN=[];
 /* 解開建置時打包過的設定檔（data/eggs.dat） */
 function unpk(t){try{const b=atob(t.trim()),u=new Uint8Array(b.length);let x=0x5b1d9e47;for(let i=0;i<b.length;i++){x=(Math.imul(x,1664525)+1013904223)>>>0;u[i]=b.charCodeAt(i)^(x>>>24);}return new TextDecoder().decode(u);}catch(e){return "";}}
