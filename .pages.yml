@@ -1599,8 +1599,54 @@ content:
         label: 開啟懲罰
         type: boolean
         default: false
+      - name: characters
+        label: 懲罰的角色（每次猜錯隨機抽一位）
+        type: object
+        description: 選填。加了角色以後，每次猜錯會隨機抽一位出來，用他自己的台詞和懲罰方式；下面的「說話的角色」「猜錯時的台詞」「猜錯時的效果」就只在這裡沒有角色時使用
+        list:
+          collapsible:
+            collapsed: false
+            summary: '{character}　{effect}'
+        fields:
+        - name: character
+          label: 角色
+          type: reference
+          required: true
+          options:
+            collection: characters
+            value: '{fields.name}'
+            label: '{fields.name}'
+            search: fields.name
+        - name: effect
+          label: 這個角色的懲罰方式
+          type: select
+          description: 燃燒：輸入框燒 5 秒。結冰：要點 3 下敲碎。符咒封印：一張符咒貼住輸入框，時間到才會燒掉脫落。留空是「結冰或燃燒（隨機）」
+          options:
+            values:
+            - 結冰或燃燒（隨機）
+            - 燃燒
+            - 結冰
+            - 符咒封印
+            - 搖晃
+            - 每次隨機
+            - 無
+        - name: lines
+          label: 這個角色的台詞
+          type: text
+          description: 一行一句。留空會用下面共用的「猜錯時的台詞」。可以用 {次數}
+        - name: sealSeconds
+          label: 符咒封印幾秒
+          type: number
+          description: 選「符咒封印」時才用到，3～30 秒，留空是 6 秒
+          options:
+            min: 3
+            max: 30
+        - name: sealText
+          label: 符咒上的大字
+          type: string
+          description: 選「符咒封印」時才用到，一到兩個字，留空是「封」。例如「鎮」「禁」「冷靜」
       - name: speaker
-        label: 說話的角色
+        label: 說話的角色（沒設定懲罰角色時用）
         type: reference
         description: 選填。選一個角色，猜錯時會顯示他的頭像和名字
         options:
@@ -1609,7 +1655,7 @@ content:
           label: '{fields.name}'
           search: fields.name
       - name: lines
-        label: 猜錯時的台詞
+        label: 猜錯時的台詞（共用）
         type: text
         description: 一行一句，第 1 次猜錯說第 1 句、第 2 次說第 2 句……。可以用 {次數} 代表這是第幾次猜錯，也可以用 **粗體**、{紅|彩色字} 等格式。留空會用預設的三句
       - name: after
@@ -1622,7 +1668,7 @@ content:
           - 從頭輪流
           - 隨機
       - name: effect
-        label: 猜錯時的效果
+        label: 猜錯時的效果（沒設定懲罰角色時用）
         type: select
         description: 每一次猜錯都會出現。結冰：輸入框結冰，要點 3 下敲碎才能再輸入。燃燒：輸入框燒起來 5 秒，燒完才能再輸入。搖晃：視窗抖一下（Android 手機還會震動）。結冰或燃燒（隨機）：每次二選一。每次隨機：從所有效果裡抽。不選就是搖晃
         options:
@@ -1630,6 +1676,7 @@ content:
           - 結冰或燃燒（隨機）
           - 結冰
           - 燃燒
+          - 符咒封印
           - 搖晃
           - 搖晃＋結冰
           - 每次隨機
@@ -1654,7 +1701,7 @@ content:
       - name: successLine
         label: 猜對時的台詞
         type: string
-        description: 選填。之前猜錯過、最後終於猜對時，畫面下方跳出的一句話，可以用 {次數}
+        description: 選填。之前猜錯過、最後終於猜對時跳出的一句話，可以用 {次數}。由上面的「說話的角色」說；沒選的話，由最後一位懲罰你的角色說
     - name: protect
       label: 圖片保護
       type: object
