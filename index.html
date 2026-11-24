@@ -377,8 +377,28 @@ body:has(.owner:not([hidden])) footer{padding-bottom:76px}
 @keyframes sealGlow{from{text-shadow:0 0 4px rgba(255,80,40,.4)}to{text-shadow:0 0 12px rgba(255,60,20,.9)}}
 @keyframes sealNudge{25%{transform:rotate(-1deg) translateX(-2px)}75%{transform:rotate(-4deg) translateX(2px)}}
 @keyframes sealBurn{0%{clip-path:inset(0 0 0 0);filter:none}40%{filter:sepia(.6) brightness(.8)}100%{clip-path:inset(0 0 100% 0);filter:sepia(1) brightness(.4);transform:rotate(-2.5deg) translateY(-6px);opacity:.2}}
+/* 咒鎖：金色鎖鏈交錯拴住輸入框，中間一把發光的鎖 */
+.chains{position:absolute;inset:-8px -10px;z-index:3;display:flex;align-items:center;justify-content:center;cursor:pointer;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent;
+  border-radius:10px;background:radial-gradient(ellipse at center,rgba(255,200,80,.16),transparent 70%)}
+.chains:focus-visible{outline:2px solid #f2c14e;outline-offset:2px}
+.chain{position:absolute;left:-6%;right:-6%;top:50%;height:16px;margin-top:-8px;transform:translateY(var(--y)) rotate(var(--a));filter:drop-shadow(0 2px 2px rgba(0,0,0,.55)) drop-shadow(0 0 4px rgba(255,200,80,.45));animation:chainIn .45s cubic-bezier(.2,1.5,.5,1) both}
+.chain-svg{width:100%;height:100%;display:block}
+.chain.snap{animation:chainSnap .6s ease-in forwards}
+@keyframes chainIn{from{transform:translateY(var(--y)) rotate(var(--a)) scaleX(.2);opacity:0}to{transform:translateY(var(--y)) rotate(var(--a))}}
+@keyframes chainSnap{0%{clip-path:inset(0 0 0 0);opacity:1}20%{transform:translateY(var(--y)) rotate(var(--a)) scaleY(1.4);filter:drop-shadow(0 0 10px #fff3b0) brightness(1.8)}100%{transform:translateY(calc(var(--y) + 70px)) rotate(calc(var(--a) * 3));opacity:0;clip-path:inset(0 0 0 0)}}
+.chain-lock{position:relative;z-index:2;width:38px;height:44px;margin-top:-4px;filter:drop-shadow(0 3px 4px rgba(0,0,0,.5))}
+.cl-shackle{position:absolute;left:8px;top:0;width:22px;height:22px;border:5px solid #d9a832;border-bottom:0;border-radius:12px 12px 0 0;box-sizing:border-box;transition:transform .35s}
+.cl-body{position:absolute;left:0;bottom:0;width:38px;height:28px;border-radius:6px;background:linear-gradient(160deg,#fff0a8,#f2c14e 40%,#a8741a);display:grid;place-items:center;box-shadow:inset 0 -3px 0 rgba(0,0,0,.2)}
+.cl-hole{position:relative;width:7px;height:7px;margin-top:-5px;border-radius:50%;background:#4a2e08;box-shadow:inset 0 1px 1px rgba(0,0,0,.6)}.cl-hole::after{content:"";position:absolute;left:2px;top:5px;width:3px;height:7px;background:#4a2e08;border-radius:0 0 1px 1px}
+.chain-txt{position:absolute;z-index:3;left:50%;bottom:-30px;transform:translateX(-50%);white-space:nowrap;font-size:12.5px;font-weight:700;color:#ffd970;background:rgba(20,14,4,.88);border:1px solid rgba(242,193,78,.6);padding:3px 12px;border-radius:999px;pointer-events:none}.chain-txt:empty{display:none}
+.chains.jolt .chain-lock{animation:chainJolt .25s}
+@keyframes chainJolt{25%{transform:translateX(-3px) rotate(-6deg)}75%{transform:translateX(3px) rotate(6deg)}}
+.chains.free .cl-shackle{transform:translateY(-9px) rotate(-25deg);transform-origin:right bottom}
+.chains.free .chain-lock{animation:lockGone .7s .2s ease-in forwards}
+.chains.free{background:none}
+@keyframes lockGone{to{transform:translateY(30px) rotate(25deg);opacity:0}}
 .gate-in button:disabled{opacity:.55;cursor:not-allowed}
-@media (prefers-reduced-motion:reduce){.gate-in.shake,.gate-say.pop,.ice.crack,.seal,.seal-ch,.seal.nudge .seal-paper{animation:none}.seal.out .seal-paper{animation-duration:.01s}}
+@media (prefers-reduced-motion:reduce){.gate-in.shake,.gate-say.pop,.ice.crack,.seal,.seal-ch,.seal.nudge .seal-paper,.chain,.chains.jolt .chain-lock{animation:none}.chain.snap{animation-duration:.01s}.seal.out .seal-paper{animation-duration:.01s}}
 /* ---------- 彩蛋 ---------- */
 .egg-entry{font:inherit;background:none;border:0;color:var(--muted);opacity:.35;cursor:pointer;padding:6px 8px;margin-left:4px;font-size:13px;transition:opacity .2s}
 .egg-entry:hover,.egg-entry:focus-visible{opacity:.9}
@@ -1123,7 +1143,7 @@ function newDays(){const v=SITE.newDays;if(v===undefined||v===null||v==="")retur
 function isNew(x){const d=newDays();if(!d||!x||!x.date)return false;const t=Date.parse(String(x.date).slice(0,10)+"T00:00:00+08:00");if(isNaN(t))return false;const age=Date.now()-t;return age>-864e5&&age<d*864e5;}
 const newBadge=x=>isNew(x)?`<span class="new-badge" title="最近更新">NEW</span>`:"";
 
-const SITE_VERSION="2026-11-24 v1.26";
+const SITE_VERSION="2026-11-24 v1.28";
 const BROKEN=[];
 /* 解開建置時打包過的設定檔（data/eggs.dat） */
 function unpk(t){try{const b=atob(t.trim()),u=new Uint8Array(b.length);let x=0x5b1d9e47;for(let i=0;i<b.length;i++){x=(Math.imul(x,1664525)+1013904223)>>>0;u[i]=b.charCodeAt(i)^(x>>>24);}return new TextDecoder().decode(u);}catch(e){return "";}}
@@ -1268,7 +1288,7 @@ function penWho(p,name){
   const list=(p.characters||[]).filter(c=>c&&String(c.character||"").trim());
   if(!list.length)return {speaker:p.speaker,lines:p.lines,after:p.after,effect:p.effect};
   const c=(name&&list.find(x=>x.character===name))||list[Math.floor(Math.random()*list.length)];
-  return {speaker:c.character,lines:String(c.lines||"").trim()?c.lines:p.lines,after:p.after,effect:c.effect||"結冰或燃燒（隨機）",sealSeconds:c.sealSeconds,sealText:c.sealText};
+  return {speaker:c.character,lines:String(c.lines||"").trim()?c.lines:p.lines,after:p.after,effect:c.effect||"結冰或燃燒（隨機）",sealSeconds:c.sealSeconds,sealText:c.sealText,chainCount:c.chainCount};
 }
 function penSay(p,text){
   const box=$("#gateSay");if(!text){box.hidden=true;return;}
@@ -1279,7 +1299,7 @@ function penSay(p,text){
 let penTimer=0;
 function penCooldown(){
   clearInterval(penTimer);const p=penCfg();
-  const iced=()=>!!$("#gatePw").parentElement.querySelector(".ice:not(.crack),.fire:not(.out),.seal:not(.out)");
+  const iced=()=>!!$("#gatePw").parentElement.querySelector(".ice:not(.crack),.fire:not(.out),.seal:not(.out),.chains:not(.free)");
   const lock=on=>{$("#gatePw").disabled=on||iced();$("#gateYes").disabled=on;};
   if(!p){lock(false);return false;}
   const tick=()=>{const left=Math.ceil((penState().until-Date.now())/1000);
@@ -1289,7 +1309,31 @@ function penCooldown(){
   lock(false);return false;
 }
 let fireTimer=0;
-function penClearFx(){clearInterval(fireTimer);$("#gatePw").parentElement.querySelectorAll(".ice,.fire,.seal").forEach(x=>x.remove());}
+function penClearFx(){clearInterval(fireTimer);$("#gatePw").parentElement.querySelectorAll(".ice,.fire,.seal,.chains").forEach(x=>x.remove());}
+/* 咒鎖：金色鎖鏈交錯拴住輸入框，點一下斷一條，全部斷了鎖才會打開 */
+function penChain(w){
+  penClearFx();
+  const box=$("#gatePw").parentElement,n=Math.max(3,Math.min(9,Math.round(+w.chainCount||5)));
+  const el=document.createElement("div");el.className="chains";el.setAttribute("role","button");el.tabIndex=0;el.setAttribute("aria-live","polite");
+  const angs=[-9,7,-3,12,-14,4,-6,10,-11];
+  const link=(id)=>`<svg class="chain-svg" viewBox="0 0 600 20" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="cg${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff3b0"/><stop offset=".45" stop-color="#f2c14e"/><stop offset="1" stop-color="#9a6a12"/></linearGradient>
+    <pattern id="cp${id}" width="30" height="20" patternUnits="userSpaceOnUse"><rect x="1.5" y="4" width="17" height="12" rx="6" fill="none" stroke="url(#cg${id})" stroke-width="3.4"/><rect x="16" y="8.3" width="13" height="3.4" rx="1.7" fill="url(#cg${id})"/></pattern></defs>
+    <rect width="600" height="20" fill="url(#cp${id})"/></svg>`;
+  el.innerHTML=Array.from({length:n},(_,i)=>`<div class="chain" style="--a:${angs[i%angs.length]}deg;--y:${(i-(n-1)/2)*Math.min(7,36/n)}px;animation-delay:${i*.06}s">${link(Math.random().toString(36).slice(2,7)+i)}</div>`).join("")
+    +`<div class="chain-lock"><div class="cl-shackle"></div><div class="cl-body"><i class="cl-hole"></i></div></div><span class="chain-txt"></span>`;
+  const txt=()=>{const left=el.querySelectorAll(".chain:not(.snap)").length;el.querySelector(".chain-txt").textContent=left?`咒鎖・點一下斬斷一條（剩 ${left} 條）`:"";el.setAttribute("aria-label",`咒鎖，剩 ${left} 條`);};
+  txt();$("#gatePw").disabled=true;
+  const hit=()=>{
+    const live=[...el.querySelectorAll(".chain:not(.snap)")];if(!live.length)return;
+    const c=live[live.length-1];c.classList.add("snap");
+    el.classList.remove("jolt");void el.offsetWidth;el.classList.add("jolt");try{navigator.vibrate&&navigator.vibrate(25);}catch(e){}
+    txt();
+    if(live.length===1){el.classList.add("free");
+      setTimeout(()=>{el.remove();if(!penCooldown()&&$("#gate").classList.contains("on")){$("#gatePw").disabled=false;$("#gatePw").focus();}},750);}
+  };
+  el.onclick=e=>{e.preventDefault();hit();};el.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();hit();}};
+  box.append(el);
+}
 /* 符咒封印：一張符咒「啪」地貼在輸入框上，時間到才會燒掉脫落 */
 function penSeal(w){
   penClearFx();
@@ -1341,8 +1385,8 @@ function penWrong(){
   /* 每一次猜錯都套用效果（冷卻中也一樣） */
   const fx=penEffects(w.effect);
   if(fx.shake){const g=$("#gate .gate-in");g.classList.remove("shake");void g.offsetWidth;g.classList.add("shake");try{navigator.vibrate&&navigator.vibrate([60,40,60]);}catch(e){}}
-  if(fx.ice)penIce();else if(fx.fire)penFire();else if(fx.seal)penSeal(w);
-  if(!penCooldown()&&!fx.ice&&!fx.fire&&!fx.seal)$("#gatePw").focus();
+  if(fx.ice)penIce();else if(fx.fire)penFire();else if(fx.seal)penSeal(w);else if(fx.chain)penChain(w);
+  if(!penCooldown()&&!fx.ice&&!fx.fire&&!fx.seal&&!fx.chain)$("#gatePw").focus();
 }
 /* 「每次隨機」：每次猜錯從三種裡抽一種；沒設定效果時預設搖晃 */
 function penEffects(e){
@@ -1350,10 +1394,12 @@ function penEffects(e){
   const pick=a=>a[Math.floor(Math.random()*a.length)];
   if(e==="結冰")return {ice:1};
   if(e==="符咒封印")return {seal:1,shake:1};
+  if(e==="咒鎖")return {chain:1,shake:1};
+  if(e==="符咒封印或咒鎖（隨機）")return pick([{seal:1,shake:1},{chain:1,shake:1}]);
   if(e==="燃燒")return {fire:1,shake:1};
   if(e==="搖晃＋結冰")return {shake:1,ice:1};
   if(e==="結冰或燃燒（隨機）")return pick([{ice:1},{fire:1,shake:1}]);
-  if(e==="每次隨機")return pick([{shake:1},{ice:1},{shake:1,ice:1},{fire:1,shake:1},{seal:1,shake:1}]);
+  if(e==="每次隨機")return pick([{shake:1},{ice:1},{shake:1,ice:1},{fire:1,shake:1},{seal:1,shake:1},{chain:1,shake:1}]);
   return {shake:1};
 }
 let gateCb=null;
