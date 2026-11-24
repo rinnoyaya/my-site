@@ -428,6 +428,11 @@ html.egg-night body::after{content:"";position:fixed;inset:0;pointer-events:none
 .secret.no h3{color:var(--muted);letter-spacing:.2em}
 .secret small{display:block;margin-top:6px;color:var(--accent);font-size:12.5px}
 .secret-reward{margin-top:28px;padding:20px;border-radius:14px;border:1px solid var(--line);background:var(--card)}
+.egg-reset{margin:36px 0 8px;padding-top:18px;border-top:1px dashed var(--line);text-align:center}
+.egg-reset button{border:1px solid var(--line);background:none;color:var(--muted);font:inherit;font-size:14px;padding:8px 16px;border-radius:999px;cursor:pointer;transition:color .15s,border-color .15s,background .15s}
+.egg-reset button:hover{color:var(--ink);background:var(--paper)}
+.egg-reset button.armed{color:#fff;background:#c0392b;border-color:#c0392b}
+.egg-reset p{margin:8px 0 0;font-size:12px;color:var(--muted)}
 .egg-book{margin-top:24px}
 .egg-book h2{font-size:17px;margin:0 0 4px;display:flex;align-items:baseline;gap:10px}.egg-book h2 small{font-size:13px;color:var(--muted);font-weight:400}
 .egg-book-tip{margin:0 0 10px;font-size:13px;color:var(--muted)}
@@ -1015,7 +1020,7 @@ function newDays(){const v=SITE.newDays;if(v===undefined||v===null||v==="")retur
 function isNew(x){const d=newDays();if(!d||!x||!x.date)return false;const t=Date.parse(String(x.date).slice(0,10)+"T00:00:00+08:00");if(isNaN(t))return false;const age=Date.now()-t;return age>-864e5&&age<d*864e5;}
 const newBadge=x=>isNew(x)?`<span class="new-badge" title="最近更新">NEW</span>`:"";
 
-const SITE_VERSION="2026-11-24 v1.23";
+const SITE_VERSION="2026-11-24 v1.24";
 const BROKEN=[];
 /* 解開建置時打包過的設定檔（data/eggs.dat） */
 function unpk(t){try{const b=atob(t.trim()),u=new Uint8Array(b.length);let x=0x5b1d9e47;for(let i=0;i<b.length;i++){x=(Math.imul(x,1664525)+1013904223)>>>0;u[i]=b.charCodeAt(i)^(x>>>24);}return new TextDecoder().decode(u);}catch(e){return "";}}
