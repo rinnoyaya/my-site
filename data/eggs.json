@@ -12,7 +12,10 @@
       {
         "page": "#stories",
         "spot": "頁面最上方",
-        "flee": false,
+        "size": 10,
+        "look": "正常（會發光）",
+        "flee": true,
+        "fleeText": "龍鱗居然跑掉了...",
         "note": "這片龍鱗摸起來熱熱又冰冰的"
       },
       {
@@ -28,8 +31,9 @@
         "note": "這片龍鱗上面有被切割的痕跡...."
       }
     ],
-    "size": 20,
-    "look": "正常（會發光）"
+    "size": 10,
+    "look": "正常（會發光）",
+    "appear": "打開收藏冊之後才出現"
   },
   "logo": {
     "enabled": false
