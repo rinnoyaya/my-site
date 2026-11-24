@@ -1281,7 +1281,7 @@ content:
   - name: birthday
     label: ⑤ 角色生日
     type: object
-    description: 在角色生日那天來訪，首頁和角色頁會出現生日橫幅和紙花
+    description: 在角色生日那天（台灣時間）來訪，首頁和角色頁會出現生日卡片，畫面會飄起氣球。訪客點蛋糕吹熄蠟燭，才算找到這個秘密
     fields:
     - name: enabled
       label: 開啟
@@ -1299,6 +1299,13 @@ content:
       label: 找到之後的說明
       type: text
       description: 找到後在收藏冊裡顯示的一段話
+    - name: countdownDays
+      label: 生日前幾天開始倒數
+      type: number
+      description: 選填。例如填 7，生日前 7 天起，角色頁會出現「再過 N 天就是 OO 的生日了」。留空或 0 是不顯示
+      options:
+        min: 0
+        max: 60
     - name: list
       label: 生日
       type: object
@@ -1333,7 +1340,46 @@ content:
       - name: message
         label: 生日那天的話
         type: text
-        description: 選填，顯示在生日橫幅上
+        description: 選填，顯示在生日卡片上。可以分段
+      - name: theme
+        label: 卡片的顏色
+        type: select
+        description: 留空是金色。卡片、蛋糕、氣球都會用這個顏色
+        options:
+          values:
+          - 金色
+          - 櫻花粉
+          - 星空藍
+          - 薰衣草紫
+          - 火焰紅
+          - 森林綠
+          - 冰與火
+      - name: candles
+        label: 蠟燭幾根
+        type: number
+        description: 選填，1～9。每點一下蛋糕吹熄一根，留空是 3 根
+        options:
+          min: 1
+          max: 9
+      - name: wishLine
+        label: 吹熄蠟燭時角色說的話
+        type: string
+        description: 選填。留空是「謝謝你陪我過生日。」
+      - name: giftTitle
+        label: 回禮的標題
+        type: string
+        description: 選填。留空是「來自 OO 的回禮」
+      - name: gift
+        label: 回禮的內容
+        type: text
+        description: 選填。吹熄蠟燭後才會打開，可以是一封信、一段小故事。格式和故事內文一樣
+      - name: giftImage
+        label: 回禮的圖片網址
+        type: string
+        description: 選填。吹熄蠟燭後才會出現，例如生日賀圖
+        pattern:
+          regex: ^(|https?://\S+|/\S+)$
+          message: 請貼上 https:// 開頭的圖片網址（前後不要有空白）
 - name: g-site
   label: 網站設定
   type: group
