@@ -1007,6 +1007,10 @@ content:
       label: 收藏冊裡的名稱
       type: string
       description: 留空是「散落的龍鱗」
+    - name: itemType
+      label: 道具種類
+      type: string
+      description: 選填。撿到時的道具視窗會顯示這個標籤，留空是「珍貴素材」，例如可以改成「龍的遺物」
     - name: bookTitle
       label: 圖鑑的標題
       type: string
@@ -1117,7 +1121,18 @@ content:
       - name: note
         label: 撿到時的一句話
         type: string
-        description: 選填，例如「這片好像有點溫熱」。撿到時會跳出來，圖鑑裡也看得到
+        description: 選填，例如「這片好像有點溫熱」。會顯示在道具視窗的「說明」，圖鑑裡也看得到
+      - name: rarity
+        label: 稀有度
+        type: select
+        description: 選填。撿到時的道具視窗會顯示星星，留空就不顯示
+        options:
+          values:
+          - ★
+          - ★★
+          - ★★★
+          - ★★★★
+          - ★★★★★
       - name: story
         label: 留下的內容
         type: text
