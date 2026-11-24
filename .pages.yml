@@ -975,6 +975,18 @@ content:
       pattern:
         regex: ^(|https?://\S+|/\S+)$
         message: 請貼上 https:// 開頭的圖片網址（前後不要有空白）
+    - name: appear
+      label: 龍鱗什麼時候開始出現
+      type: select
+      description: 留空是「打開收藏冊之後才出現」：訪客要先找到頁尾的入口、打開過收藏冊，龍鱗才會開始出現在各頁。已經撿過龍鱗的訪客不受影響
+      options:
+        values:
+        - 打開收藏冊之後才出現
+        - 一開始就出現
+    - name: awakenText
+      label: 龍鱗開始出現時的話
+      type: string
+      description: 選填。訪客第一次打開收藏冊時會跳出這句（有設定「說話的角色」就由角色說）。留空是「堡壘的各個角落，好像有什麼東西開始閃閃發光了……」
     - name: size
       label: 預設大小（像素）
       type: number
