@@ -1620,13 +1620,15 @@ content:
         - name: effect
           label: 這個角色的懲罰方式
           type: select
-          description: 燃燒：輸入框燒 5 秒。結冰：要點 3 下敲碎。符咒封印：一張符咒貼住輸入框，時間到才會燒掉脫落。留空是「結冰或燃燒（隨機）」
+          description: 燃燒：輸入框燒 5 秒。結冰：要點 3 下敲碎。符咒封印：一張符咒貼住輸入框，時間到才會燒掉脫落。咒鎖：金色鎖鏈拴住輸入框，每點一下斷一條，全部斷了才能輸入。留空是「結冰或燃燒（隨機）」
           options:
             values:
             - 結冰或燃燒（隨機）
             - 燃燒
             - 結冰
             - 符咒封印
+            - 咒鎖
+            - 符咒封印或咒鎖（隨機）
             - 搖晃
             - 每次隨機
             - 無
@@ -1645,6 +1647,13 @@ content:
           label: 符咒上的大字
           type: string
           description: 選「符咒封印」時才用到，一到兩個字，留空是「封」。例如「鎮」「禁」「冷靜」
+        - name: chainCount
+          label: 咒鎖有幾條鎖鏈
+          type: number
+          description: 選「咒鎖」時才用到，3～9 條，留空是 5 條（要點 5 下）
+          options:
+            min: 3
+            max: 9
       - name: speaker
         label: 說話的角色（沒設定懲罰角色時用）
         type: reference
@@ -1677,6 +1686,7 @@ content:
           - 結冰
           - 燃燒
           - 符咒封印
+          - 咒鎖
           - 搖晃
           - 搖晃＋結冰
           - 每次隨機
