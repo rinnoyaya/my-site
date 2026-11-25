@@ -9,5 +9,7 @@
   ],
   "adult": false,
   "imageSize": "一般",
-  "hidden": true
+  "hidden": false,
+  "imageUrl": "https://img.obsidianfirelight.com/commissions/3-20261116-210931-93.png",
+  "variantUrls": "https://img.obsidianfirelight.com/commissions/11-20261116-210925-63.png\nhttps://img.obsidianfirelight.com/commissions/2-20261116-210930-91.png\nhttps://img.obsidianfirelight.com/commissions/5-20261116-210926-69.png"
 }
