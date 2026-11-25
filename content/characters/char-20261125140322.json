@@ -2,5 +2,8 @@
   "name": "渡鴉",
   "role": "玄城家的暗部情報官",
   "avatarSize": "自動",
-  "hidden": true
+  "hidden": true,
+  "summary": "凜夜的情報官\n也是玄城家暗部的成員",
+  "order": 3,
+  "publishDate": "2026-11-25"
 }
