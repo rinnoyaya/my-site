@@ -27,6 +27,86 @@ def num(v):
     except (TypeError, ValueError):
         return 1e9  # 沒填排序的放最後
 
+# ---------------- 隱藏與預約公開 ----------------
+# 後台每一篇可以勾「先隱藏」或填「預約公開日期／時間」（台灣時間）。
+# 沒公開的內容不會寫進 data/，網站、分享頁、搜尋都看不到。
+from datetime import datetime, timedelta, timezone
+TPE = timezone(timedelta(hours=8))
+SCHEDULE_FILE = "schedule.json"
+
+def publish_at(obj):
+    """預約公開的時間（台灣時間）；沒填就回傳 None"""
+    d = str(obj.get("publishDate") or "").strip()[:10]
+    if not d:
+        return None
+    t = str(obj.get("publishTime") or "").strip() or "00:00"
+    try:
+        return datetime.strptime(d + " " + t, "%Y-%m-%d %H:%M").replace(tzinfo=TPE)
+    except ValueError:
+        try:
+            return datetime.strptime(d, "%Y-%m-%d").replace(tzinfo=TPE)
+        except ValueError:
+            return None
+
+def is_public(obj, now):
+    if obj.get("hidden") is True or str(obj.get("hidden")).lower() == "true":
+        return False
+    at = publish_at(obj)
+    return at is None or at <= now
+
+def scheduled_state(now):
+    """所有「有預約時間」的內容中，現在已經公開的清單，以及下一個要公開的時間"""
+    live, upcoming = [], []
+    for folder in COLLECTIONS:
+        for f in sorted(glob.glob(os.path.join(ROOT, "content", folder, "*.json"))):
+            try:
+                with open(f, encoding="utf-8") as fh:
+                    obj = json.loads(fh.read() or "null")
+            except Exception:
+                continue
+            if not isinstance(obj, dict) or publish_at(obj) is None:
+                continue
+            key = folder + "/" + os.path.splitext(os.path.basename(f))[0]
+            if is_public(obj, now):
+                live.append(key)
+            elif not obj.get("hidden"):
+                upcoming.append(publish_at(obj))
+    nxt = min(upcoming).isoformat() if upcoming else None
+    return {"published": sorted(live), "next": nxt}
+
+def check_due():
+    """排程檢查用：跟網站上目前的狀態比，有新的內容時間到了才需要重新發布"""
+    import urllib.request
+    now = datetime.now(TPE)
+    want = scheduled_state(now)["published"]
+    go, why = True, ""
+    try:
+        domain = open(os.path.join(ROOT, "CNAME"), encoding="utf-8").read().strip()
+        url = os.environ.get("SCHEDULE_CHECK_URL") or f"https://{domain}/data/{SCHEDULE_FILE}"
+        req = urllib.request.Request(url, headers={"User-Agent": "site-schedule-check", "Cache-Control": "no-cache"})
+        with urllib.request.urlopen(req, timeout=20) as r:
+            have = json.loads(r.read().decode("utf-8")).get("published", [])
+        go = sorted(have) != want
+        why = "有內容時間到了" if go else "沒有新的內容要公開"
+    except Exception as e:
+        # 讀不到網站上的狀態：只在最近 40 分鐘內有內容到期時才發布
+        recent = False
+        for folder in COLLECTIONS:
+            for f in glob.glob(os.path.join(ROOT, "content", folder, "*.json")):
+                try:
+                    obj = json.load(open(f, encoding="utf-8"))
+                    at = publish_at(obj) if isinstance(obj, dict) else None
+                    if at and now - timedelta(minutes=40) < at <= now and not obj.get("hidden"):
+                        recent = True
+                except Exception:
+                    pass
+        go, why = recent, f"讀不到網站上的狀態（{e}），改用時間判斷"
+    print(f"[檢查] {why} → {'要發布' if go else '不用發布'}")
+    out = os.environ.get("GITHUB_OUTPUT")
+    if out:
+        with open(out, "a", encoding="utf-8") as fh:
+            fh.write(f"go={'true' if go else 'false'}\n")
+
 def main():
     if os.path.exists(OUT):
         shutil.rmtree(OUT)
@@ -40,6 +120,7 @@ def main():
     os.makedirs(os.path.join(OUT, "data"), exist_ok=True)
 
     warnings = 0
+    now = datetime.now(TPE)
     for folder, (outname, key, reverse) in COLLECTIONS.items():
         path = os.path.join(ROOT, "content", folder)
         if not os.path.isdir(path):
@@ -62,6 +143,14 @@ def main():
                 obj = json.loads(text)
                 if isinstance(obj, dict):
                     obj["_file"] = os.path.splitext(os.path.basename(f))[0]  # 分享頁網址用
+                    if not is_public(obj, now):
+                        at = publish_at(obj)
+                        print(f"[未公開] content/{folder}/{os.path.basename(f)}" + ("（隱藏）" if obj.get("hidden") else f"（預約 {at:%Y-%m-%d %H:%M}）" if at else ""))
+                        continue
+                    if publish_at(obj) and not str(obj.get("date") or "").strip() and folder not in ("characters", "glossary", "series"):
+                        obj["date"] = str(obj.get("publishDate"))[:10]  # 沒填發布日期的話，用預約公開的日期
+                    for k in ("hidden", "publishDate", "publishTime"):
+                        obj.pop(k, None)
                     items.append((obj, os.path.basename(f)))
                 else:
                     print(f"[警告] {f} 不是單一物件，已略過"); warnings += 1
@@ -72,6 +161,8 @@ def main():
         with open(os.path.join(OUT, "data", outname), "w", encoding="utf-8") as fh:
             json.dump(items, fh, ensure_ascii=False, indent=1)
         print(f"[完成] content/{folder} → data/{outname}（{len(items)} 筆）")
+    with open(os.path.join(OUT, "data", SCHEDULE_FILE), "w", encoding="utf-8") as fh:
+        json.dump(scheduled_state(now), fh, ensure_ascii=False)
     warnings += build_share_pages()
     inject_home_meta()
     write_version()
@@ -270,4 +361,6 @@ def inject_home_meta():
     print("[完成] 首頁標題與預覽資訊")
 
 if __name__ == "__main__":
+    if "--check" in sys.argv:
+        sys.exit(check_due())
     sys.exit(main())
