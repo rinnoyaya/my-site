@@ -10,5 +10,6 @@
   "description": "臉書委託平台",
   "adult": false,
   "imageSize": "一般",
-  "hidden": true
+  "hidden": true,
+  "imageUrl": "https://img.obsidianfirelight.com/commissions/img-7306-20261125-231210.gif"
 }
