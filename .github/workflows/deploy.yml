@@ -1,11 +1,14 @@
 # 每次 push（包含在 Pages CMS 存檔）都會自動整理內容並發佈網站
-# 分成兩個步驟：先整理並打包網站（build），再發佈（deploy）；發佈找不到檔案時會等一下再試一次
+# 另外每 15 分鐘檢查一次「預約公開」：有內容時間到了才會重新發佈，沒有就什麼都不做
+# 分成三個步驟：檢查（check）、整理並打包網站（build）、發佈（deploy）；發佈找不到檔案時會等一下再試一次
 name: 整理內容並發佈網站
 
 on:
   push:
     branches: [main]
   workflow_dispatch:
+  schedule:
+    - cron: '4,19,34,49 * * * *'
 
 permissions:
   contents: read
@@ -13,12 +16,30 @@ permissions:
   id-token: write
   actions: read
 
+# 存檔觸發的發佈：新的會取消舊的；排程檢查自己排隊，不會打斷存檔的發佈
 concurrency:
-  group: pages
-  cancel-in-progress: true
+  group: ${{ github.event_name == 'schedule' && 'pages-schedule' || 'pages' }}
+  cancel-in-progress: ${{ github.event_name != 'schedule' }}
 
 jobs:
+  check:
+    runs-on: ubuntu-latest
+    outputs:
+      go: ${{ steps.due.outputs.go }}
+    steps:
+      - uses: actions/checkout@v5
+      - id: due
+        name: 檢查有沒有預約公開的內容時間到了
+        run: |
+          if [ "${{ github.event_name }}" = "schedule" ]; then
+            python3 scripts/build.py --check
+          else
+            echo "go=true" >> "$GITHUB_OUTPUT"
+          fi
+
   build:
+    needs: check
+    if: needs.check.outputs.go == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -38,13 +59,20 @@ jobs:
     steps:
       - name: 等打包好的網站準備好
         run: sleep 15
+      - name: 排程發佈前，確認這段時間沒有新的存檔（有的話交給存檔那次發佈，避免舊內容蓋掉新內容）
+        id: fresh
+        if: github.event_name == 'schedule'
+        run: |
+          latest=$(git ls-remote "https://github.com/${{ github.repository }}" refs/heads/main | cut -f1)
+          if [ "$latest" != "${{ github.sha }}" ]; then echo "stale=true" >> "$GITHUB_OUTPUT"; echo "main 已經有新的存檔，這次不發佈"; fi
       - id: deployment
+        if: steps.fresh.outputs.stale != 'true'
         uses: actions/deploy-pages@v4
         continue-on-error: true
       - name: 第一次失敗的話，等一分鐘
-        if: steps.deployment.outcome == 'failure'
+        if: steps.fresh.outputs.stale != 'true' && steps.deployment.outcome == 'failure'
         run: sleep 60
       - id: retry
         name: 再發佈一次
-        if: steps.deployment.outcome == 'failure'
+        if: steps.fresh.outputs.stale != 'true' && steps.deployment.outcome == 'failure'
         uses: actions/deploy-pages@v4
