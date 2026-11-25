@@ -9,5 +9,6 @@
   "description": "米畫師",
   "adult": false,
   "imageSize": "一般",
-  "hidden": true
+  "hidden": false,
+  "imageUrl": "https://img.obsidianfirelight.com/commissions/bfaef06cb91420ff674028ab2121a24d-20261117-233034-3.png"
 }
