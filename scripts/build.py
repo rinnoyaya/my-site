@@ -35,11 +35,20 @@ TPE = timezone(timedelta(hours=8))
 SCHEDULE_FILE = "schedule.json"
 
 def publish_at(obj):
-    """預約公開的時間（台灣時間）；沒填就回傳 None"""
-    d = str(obj.get("publishDate") or "").strip()[:10]
+    """預約公開的時間（台灣時間）；沒填就回傳 None
+    新版用一個欄位 publishAt（例如 2026-12-24 20:00）；舊版的 publishDate／publishTime 也看得懂"""
+    at = str(obj.get("publishAt") or "").strip()
+    if at:
+        d, _, t = at.replace("T", " ").partition(" ")
+        d, t = d[:10], (t.strip()[:5] or "00:00")
+    else:
+        d = str(obj.get("publishDate") or "").strip()[:10]
+        t = str(obj.get("publishTime") or "").strip() or "00:00"
+        # 舊版的日期欄位會自動帶入「存檔那天」，2026-11-25 以前的都當作沒填
+        if d and d <= "2026-11-25":
+            return None
     if not d:
         return None
-    t = str(obj.get("publishTime") or "").strip() or "00:00"
     try:
         return datetime.strptime(d + " " + t, "%Y-%m-%d %H:%M").replace(tzinfo=TPE)
     except ValueError:
@@ -48,11 +57,15 @@ def publish_at(obj):
         except ValueError:
             return None
 
+def is_hidden(obj):
+    return obj.get("hidden") is True or str(obj.get("hidden")).lower() == "true"
+
 def is_public(obj, now):
-    if obj.get("hidden") is True or str(obj.get("hidden")).lower() == "true":
-        return False
+    """有預約時間：時間到就公開（不管有沒有勾隱藏）；沒有預約時間：勾了隱藏就不公開"""
     at = publish_at(obj)
-    return at is None or at <= now
+    if at is not None:
+        return at <= now
+    return not is_hidden(obj)
 
 def scheduled_state(now):
     """所有「有預約時間」的內容中，現在已經公開的清單，以及下一個要公開的時間"""
@@ -69,7 +82,7 @@ def scheduled_state(now):
             key = folder + "/" + os.path.splitext(os.path.basename(f))[0]
             if is_public(obj, now):
                 live.append(key)
-            elif not obj.get("hidden"):
+            else:
                 upcoming.append(publish_at(obj))
     nxt = min(upcoming).isoformat() if upcoming else None
     return {"published": sorted(live), "next": nxt}
@@ -96,7 +109,7 @@ def check_due():
                 try:
                     obj = json.load(open(f, encoding="utf-8"))
                     at = publish_at(obj) if isinstance(obj, dict) else None
-                    if at and now - timedelta(minutes=40) < at <= now and not obj.get("hidden"):
+                    if at and now - timedelta(minutes=40) < at <= now:
                         recent = True
                 except Exception:
                     pass
@@ -145,11 +158,11 @@ def main():
                     obj["_file"] = os.path.splitext(os.path.basename(f))[0]  # 分享頁網址用
                     if not is_public(obj, now):
                         at = publish_at(obj)
-                        print(f"[未公開] content/{folder}/{os.path.basename(f)}" + ("（隱藏）" if obj.get("hidden") else f"（預約 {at:%Y-%m-%d %H:%M}）" if at else ""))
+                        print(f"[未公開] content/{folder}/{os.path.basename(f)}" + (f"（預約 {at:%Y-%m-%d %H:%M} 公開）" if at else "（隱藏）"))
                         continue
                     if publish_at(obj) and not str(obj.get("date") or "").strip() and folder not in ("characters", "glossary", "series"):
-                        obj["date"] = str(obj.get("publishDate"))[:10]  # 沒填發布日期的話，用預約公開的日期
-                    for k in ("hidden", "publishDate", "publishTime"):
+                        obj["date"] = publish_at(obj).strftime("%Y-%m-%d")  # 沒填發布日期的話，用預約公開的日期
+                    for k in ("hidden", "publishAt", "publishDate", "publishTime"):
                         obj.pop(k, None)
                     items.append((obj, os.path.basename(f)))
                 else:
