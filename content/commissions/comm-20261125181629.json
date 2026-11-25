@@ -6,5 +6,11 @@
   "type": "雙人",
   "adult": false,
   "hidden": false,
-  "publishDate": "2026-11-25"
+  "characters": [
+    "艾蕾諾雅",
+    "玄城凜夜"
+  ],
+  "description": "CREPE(可麗餅)委託",
+  "variantUrls": "https://img.obsidianfirelight.com/commissions/rinyaelenora2eggx-20261116-210923-38.png",
+  "imageSize": "一般"
 }
