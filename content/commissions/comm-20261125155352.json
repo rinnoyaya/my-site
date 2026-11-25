@@ -6,5 +6,9 @@
   "type": "全身",
   "adult": false,
   "hidden": false,
-  "publishDate": "2026-11-25"
+  "characters": [
+    "玄城凜夜"
+  ],
+  "description": "米畫師",
+  "imageSize": "一般"
 }
