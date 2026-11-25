@@ -28,6 +28,8 @@ content:
       - order
       - date
       - adult
+      - hidden
+      - publishDate
       primary: title
       sort:
       - order
@@ -147,6 +149,22 @@ content:
         - 不縮排
         - 每一行都縮排
         - 只有段落第一行縮排
+    - name: hidden
+      label: 先隱藏（不公開）
+      type: boolean
+      description: 打勾的話，這一篇不會出現在網站上（列表、搜尋、分享頁都不會有）。注意：GitHub 上的原稿還是公開的
+      default: false
+    - name: publishDate
+      label: 預約公開日期
+      type: date
+      description: 選填。到了這天才會出現在網站上（台灣時間）。留空就是馬上公開。網站每 15 分鐘檢查一次，時間到後大約 15～30 分鐘內上線
+    - name: publishTime
+      label: 預約公開時間
+      type: string
+      description: 選填，24 小時制，例如 20:00。留空是當天 00:00
+      pattern:
+        regex: ^(|([01][0-9]|2[0-3]):[0-5][0-9])$
+        message: 請用 24 小時制，例如 08:30、20:00
   - name: side
     label: 角色故事
     description: 主線以外，以某個角色為主角的短篇與番外。
@@ -162,6 +180,8 @@ content:
       - character
       - date
       - adult
+      - hidden
+      - publishDate
       primary: title
       sort:
       - date
@@ -266,6 +286,22 @@ content:
         - 不縮排
         - 每一行都縮排
         - 只有段落第一行縮排
+    - name: hidden
+      label: 先隱藏（不公開）
+      type: boolean
+      description: 打勾的話，這一篇不會出現在網站上（列表、搜尋、分享頁都不會有）。注意：GitHub 上的原稿還是公開的
+      default: false
+    - name: publishDate
+      label: 預約公開日期
+      type: date
+      description: 選填。到了這天才會出現在網站上（台灣時間）。留空就是馬上公開。網站每 15 分鐘檢查一次，時間到後大約 15～30 分鐘內上線
+    - name: publishTime
+      label: 預約公開時間
+      type: string
+      description: 選填，24 小時制，例如 20:00。留空是當天 00:00
+      pattern:
+        regex: ^(|([01][0-9]|2[0-3]):[0-5][0-9])$
+        message: 請用 24 小時制，例如 08:30、20:00
   - name: series
     label: 故事系列
     description: 一部作品就是一個系列。先建立系列，再到「故事章節」新增章節。
@@ -281,6 +317,8 @@ content:
       - genre
       - status
       - order
+      - hidden
+      - publishDate
       primary: title
       sort:
       - order
@@ -334,6 +372,22 @@ content:
       label: 排序
       type: number
       description: 故事頁的排列順序，數字小的排前面
+    - name: hidden
+      label: 先隱藏（不公開）
+      type: boolean
+      description: 打勾的話，這一篇不會出現在網站上（列表、搜尋、分享頁都不會有）。注意：GitHub 上的原稿還是公開的
+      default: false
+    - name: publishDate
+      label: 預約公開日期
+      type: date
+      description: 選填。到了這天才會出現在網站上（台灣時間）。留空就是馬上公開。網站每 15 分鐘檢查一次，時間到後大約 15～30 分鐘內上線
+    - name: publishTime
+      label: 預約公開時間
+      type: string
+      description: 選填，24 小時制，例如 20:00。留空是當天 00:00
+      pattern:
+        regex: ^(|([01][0-9]|2[0-3]):[0-5][0-9])$
+        message: 請用 24 小時制，例如 08:30、20:00
 - name: g-world
   label: 角色與世界觀
   type: group
@@ -352,6 +406,8 @@ content:
       - name
       - role
       - order
+      - hidden
+      - publishDate
       primary: name
       sort:
       - order
@@ -447,6 +503,22 @@ content:
       label: 排序
       type: number
       description: 角色頁的排列順序，數字小的排前面
+    - name: hidden
+      label: 先隱藏（不公開）
+      type: boolean
+      description: 打勾的話，這一篇不會出現在網站上（列表、搜尋、分享頁都不會有）。注意：GitHub 上的原稿還是公開的
+      default: false
+    - name: publishDate
+      label: 預約公開日期
+      type: date
+      description: 選填。到了這天才會出現在網站上（台灣時間）。留空就是馬上公開。網站每 15 分鐘檢查一次，時間到後大約 15～30 分鐘內上線
+    - name: publishTime
+      label: 預約公開時間
+      type: string
+      description: 選填，24 小時制，例如 20:00。留空是當天 00:00
+      pattern:
+        regex: ^(|([01][0-9]|2[0-3]):[0-5][0-9])$
+        message: 請用 24 小時制，例如 08:30、20:00
   - name: glossary
     label: 名詞百科
     description: 故事裡的地名、組織、魔法等名詞。內文出現這些詞時會自動加上虛線，讀者點一下就能看說明。
@@ -461,6 +533,8 @@ content:
       - term
       - category
       - order
+      - hidden
+      - publishDate
       primary: term
       sort:
       - order
@@ -521,6 +595,22 @@ content:
       label: 排序
       type: number
       description: 數字小的排前面；留空就照名稱排
+    - name: hidden
+      label: 先隱藏（不公開）
+      type: boolean
+      description: 打勾的話，這一篇不會出現在網站上（列表、搜尋、分享頁都不會有）。注意：GitHub 上的原稿還是公開的
+      default: false
+    - name: publishDate
+      label: 預約公開日期
+      type: date
+      description: 選填。到了這天才會出現在網站上（台灣時間）。留空就是馬上公開。網站每 15 分鐘檢查一次，時間到後大約 15～30 分鐘內上線
+    - name: publishTime
+      label: 預約公開時間
+      type: string
+      description: 選填，24 小時制，例如 20:00。留空是當天 00:00
+      pattern:
+        regex: ^(|([01][0-9]|2[0-3]):[0-5][0-9])$
+        message: 請用 24 小時制，例如 08:30、20:00
 - name: g-gallery
   label: 圖與工具
   type: group
@@ -541,6 +631,8 @@ content:
       - type
       - date
       - adult
+      - hidden
+      - publishDate
       primary: title
       sort:
       - date
@@ -641,6 +733,22 @@ content:
         values:
         - 一般
         - 加大
+    - name: hidden
+      label: 先隱藏（不公開）
+      type: boolean
+      description: 打勾的話，這一篇不會出現在網站上（列表、搜尋、分享頁都不會有）。注意：GitHub 上的原稿還是公開的
+      default: false
+    - name: publishDate
+      label: 預約公開日期
+      type: date
+      description: 選填。到了這天才會出現在網站上（台灣時間）。留空就是馬上公開。網站每 15 分鐘檢查一次，時間到後大約 15～30 分鐘內上線
+    - name: publishTime
+      label: 預約公開時間
+      type: string
+      description: 選填，24 小時制，例如 20:00。留空是當天 00:00
+      pattern:
+        regex: ^(|([01][0-9]|2[0-3]):[0-5][0-9])$
+        message: 請用 24 小時制，例如 08:30、20:00
   - name: tools
     label: 小工具
     description: 自己做的小工具的介紹頁。
@@ -656,6 +764,8 @@ content:
       - status
       - order
       - date
+      - hidden
+      - publishDate
       primary: title
       sort:
       - order
@@ -764,6 +874,22 @@ content:
       label: 排序
       type: number
       description: 小工具頁的排列順序，數字小的排前面
+    - name: hidden
+      label: 先隱藏（不公開）
+      type: boolean
+      description: 打勾的話，這一篇不會出現在網站上（列表、搜尋、分享頁都不會有）。注意：GitHub 上的原稿還是公開的
+      default: false
+    - name: publishDate
+      label: 預約公開日期
+      type: date
+      description: 選填。到了這天才會出現在網站上（台灣時間）。留空就是馬上公開。網站每 15 分鐘檢查一次，時間到後大約 15～30 分鐘內上線
+    - name: publishTime
+      label: 預約公開時間
+      type: string
+      description: 選填，24 小時制，例如 20:00。留空是當天 00:00
+      pattern:
+        regex: ^(|([01][0-9]|2[0-3]):[0-5][0-9])$
+        message: 請用 24 小時制，例如 08:30、20:00
 - name: notes
   label: 文章
   description: 創作心得、世界觀和角色的設定雜記。
@@ -779,6 +905,8 @@ content:
     - category
     - date
     - adult
+    - hidden
+    - publishDate
     primary: title
     sort:
     - date
@@ -875,6 +1003,22 @@ content:
       - 不縮排
       - 每一行都縮排
       - 只有段落第一行縮排
+  - name: hidden
+    label: 先隱藏（不公開）
+    type: boolean
+    description: 打勾的話，這一篇不會出現在網站上（列表、搜尋、分享頁都不會有）。注意：GitHub 上的原稿還是公開的
+    default: false
+  - name: publishDate
+    label: 預約公開日期
+    type: date
+    description: 選填。到了這天才會出現在網站上（台灣時間）。留空就是馬上公開。網站每 15 分鐘檢查一次，時間到後大約 15～30 分鐘內上線
+  - name: publishTime
+    label: 預約公開時間
+    type: string
+    description: 選填，24 小時制，例如 20:00。留空是當天 00:00
+    pattern:
+      regex: ^(|([01][0-9]|2[0-3]):[0-5][0-9])$
+      message: 請用 24 小時制，例如 08:30、20:00
 - name: eggs
   label: 彩蛋
   description: 讓訪客探索的彩蛋。找到的紀錄只存在訪客自己的瀏覽器。頁尾最右邊的小符號是收藏冊的入口。
