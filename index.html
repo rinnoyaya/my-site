@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' https: data: blob:; connect-src 'self'; frame-src https://www.youtube-nocookie.com https://player.vimeo.com https://player.bilibili.com; media-src 'self' https:; object-src 'none'; base-uri 'self'; form-action 'none'; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' https: data: blob:; connect-src 'self'; frame-src 'self' https://www.youtube-nocookie.com https://player.vimeo.com https://player.bilibili.com; media-src 'self' https:; object-src 'none'; base-uri 'self'; form-action 'none'; upgrade-insecure-requests">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noai, noimageai">
@@ -627,6 +627,29 @@ html.egg-night body::after{content:"";position:fixed;inset:0;pointer-events:none
 .ei-row a{color:#ffe08a}
 @media (max-width:640px){.ei-card{padding:16px 14px 14px}.ei-stage{height:150px}.ei-stage.zoom{height:250px}.ei-icon{width:100px;height:100px}.ei-stage.zoom .ei-icon{width:210px;height:210px}.ei-name{font-size:19px}}
 @media (prefers-reduced-motion:reduce){.ei-card,.ei-rays,.ei-icon,.ei-sparks i,.ei-bar i{animation:none}}
+.egg-pet{display:flex;gap:18px;align-items:center;margin-top:24px;padding:18px 20px;border-radius:16px;border:1px solid var(--line);background:var(--card)}
+.egg-pet.open{border-color:color-mix(in srgb,#ff8a3d 55%,var(--line));background:radial-gradient(120% 140% at 0% 50%,color-mix(in srgb,#4fc3ff 14%,var(--card)),transparent 60%),radial-gradient(120% 140% at 100% 50%,color-mix(in srgb,#ff8a3d 14%,var(--card)),transparent 60%),var(--card)}
+.ep-egg{position:relative;flex:0 0 64px;width:64px;height:80px;border-radius:50% 50% 46% 46%/58% 58% 42% 42%;
+  background:radial-gradient(circle at 30% 25%,rgba(255,255,255,.85) 0 8%,transparent 20%),radial-gradient(circle at 30% 55%,#4fc3ff 0 9%,transparent 10%),radial-gradient(circle at 68% 38%,#ff8a3d 0 8%,transparent 9%),radial-gradient(circle at 60% 75%,#4fc3ff 0 6%,transparent 7%),radial-gradient(circle at 25% 80%,#ff8a3d 0 5%,transparent 6%),linear-gradient(160deg,#f7efe2,#d9c7ad);
+  box-shadow:inset -6px -8px 0 rgba(0,0,0,.12),0 6px 14px rgba(0,0,0,.3);transform-origin:50% 90%;animation:epWobble 4s ease-in-out infinite}
+@keyframes epWobble{0%,70%,100%{transform:rotate(0)}74%{transform:rotate(-7deg)}78%{transform:rotate(6deg)}82%{transform:rotate(-4deg)}86%{transform:rotate(0)}}
+.egg-pet.open .ep-egg{animation:epGlow 2.4s ease-in-out infinite;box-shadow:inset -6px -8px 0 rgba(0,0,0,.12),0 0 22px rgba(255,180,90,.7)}
+.egg-pet.open .ep-egg::after{content:"";position:absolute;left:12%;right:12%;top:38%;height:10px;background:linear-gradient(135deg,transparent 33%,#5a4630 33% 40%,transparent 40% 60%,#5a4630 60% 67%,transparent 67%) 0 0/16px 10px repeat-x}
+@keyframes epGlow{50%{box-shadow:inset -6px -8px 0 rgba(0,0,0,.12),0 0 34px rgba(120,200,255,.8)}}
+.ep-body{flex:1}.ep-body h2{font-size:17px;margin:0 0 4px}.ep-body p{margin:0 0 10px;color:var(--muted);font-size:14px;line-height:1.7}
+.ep-go{display:inline-block;border:0;text-decoration:none}
+.egg-petwin{position:fixed;inset:0;z-index:400;display:none;align-items:center;justify-content:center;padding:max(16px,env(safe-area-inset-top)) 16px max(16px,env(safe-area-inset-bottom));background:rgb(10 6 14/.72);backdrop-filter:blur(4px)}
+.egg-petwin.on{display:flex;animation:eggBmIn .2s ease}
+.egg-petwin .pw-card{position:relative;width:min(1000px,100%);height:min(760px,100%);border-radius:18px;overflow:hidden;background:var(--paper);box-shadow:0 20px 60px rgb(0 0 0/.45)}
+.egg-petwin iframe{display:block;width:100%;height:100%;border:0}
+.egg-petwin .pw-x{position:absolute;top:10px;right:10px;z-index:2;width:44px;height:44px;border-radius:50%;border:0;background:rgb(0 0 0/.55);color:#fff;font-size:18px;cursor:pointer}
+.egg-petwin .pw-x:focus-visible{outline:3px solid #6fb7ff;outline-offset:2px}
+@media (max-width:720px){.egg-petwin{padding:0}.egg-petwin .pw-card{width:100%;height:100%;border-radius:0}.egg-petwin .pw-x{top:max(10px,env(safe-area-inset-top))}}
+@media (prefers-reduced-motion:reduce){.egg-petwin.on{animation:none}}
+.ep-prog{display:flex;align-items:center;gap:10px;font-size:12.5px;color:var(--muted)}
+.ep-bar{flex:1;max-width:220px;height:8px;border-radius:4px;background:color-mix(in srgb,var(--line) 60%,transparent);overflow:hidden}
+.ep-bar i{display:block;height:100%;background:linear-gradient(90deg,#4fc3ff,#ff8a3d)}
+@media (prefers-reduced-motion:reduce){.ep-egg,.egg-pet.open .ep-egg{animation:none}}
 .egg-book{margin-top:24px}
 .egg-book h2{font-size:17px;margin:0 0 4px;display:flex;align-items:baseline;gap:10px}.egg-book h2 small{font-size:13px;color:var(--muted);font-weight:400}
 .egg-book-tip{margin:0 0 10px;font-size:13px;color:var(--muted)}
@@ -1214,7 +1237,7 @@ function newDays(){const v=SITE.newDays;if(v===undefined||v===null||v==="")retur
 function isNew(x){const d=newDays();if(!d||!x||!x.date)return false;const t=Date.parse(String(x.date).slice(0,10)+"T00:00:00+08:00");if(isNaN(t))return false;const age=Date.now()-t;return age>-864e5&&age<d*864e5;}
 const newBadge=x=>isNew(x)?`<span class="new-badge" title="最近更新">NEW</span>`:"";
 
-const SITE_VERSION="2026-11-24 v1.32";
+const SITE_VERSION="2026-11-26 v1.34";
 const BROKEN=[];
 /* 解開建置時打包過的設定檔（data/eggs.dat） */
 function unpk(t){try{const b=atob(t.trim()),u=new Uint8Array(b.length);let x=0x5b1d9e47;for(let i=0;i<b.length;i++){x=(Math.imul(x,1664525)+1013904223)>>>0;u[i]=b.charCodeAt(i)^(x>>>24);}return new TextDecoder().decode(u);}catch(e){return "";}}
@@ -2093,7 +2116,7 @@ $("#skipBtn").onclick=()=>{$("#main").focus();$("#main").scrollIntoView();};
 $("#hdr").addEventListener("focusin",()=>$("#hdr").classList.remove("hide"));
 
 /* 開著大圖或年齡確認時，後面的頁面不要跟著捲動 */
-new MutationObserver(()=>document.documentElement.classList.toggle("modal-lock",$("#lb").classList.contains("on")||$("#gate").classList.contains("on")||!!document.querySelector(".egg-book-modal.on,#eggItem.on")))
+new MutationObserver(()=>document.documentElement.classList.toggle("modal-lock",$("#lb").classList.contains("on")||$("#gate").classList.contains("on")||!!document.querySelector(".egg-book-modal.on,#eggItem.on,#eggPet.on")))
   .observe(document.body,{subtree:true,attributes:true,attributeFilter:["class"]});
 
 /* 電腦：← → 鍵換上一篇／下一篇 */
