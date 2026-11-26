@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Noa 寵物機｜黑曜石堡壘</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
+<style>
+/* VOICE: playful, cozy handheld toy
+   IDEA: the frosted translucent badge itself, sitting on a desk at dusk
+   PICTURE: the device, large, with live screen and three side buttons
+   COLOUR and TYPE: dusk plum ground, ice blue + ember orange from Noa; Noto Sans TC
+   LAYOUT: device centre, short controls column beside it, stacks under 720px */
+:root{color-scheme:light dark;--bg:light-dark(#efe8f1,#17111c);--ink:light-dark(#241a2b,#efe6f3);--mute:light-dark(#6d5f76,#a897b3);--ice:#6fb7ff;--fire:#ff8a3d;--panel:light-dark(#fff,#221a29);--line:light-dark(#dccfe3,#3a2d44)}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 "Noto Sans TC",system-ui,sans-serif;overflow-x:clip}
+main{max-width:1000px;margin:auto;padding:clamp(20px,4vw,48px) max(4vw,14px);display:grid;grid-template-columns:auto minmax(0,1fr);gap:clamp(24px,4vw,56px);align-items:start}
+h1{font-size:clamp(28px,4vw,40px);line-height:1.05;margin:0 0 8px;text-wrap:balance}
+.dev{position:relative;padding:26px 22px 34px;border-radius:30px;background:linear-gradient(160deg,light-dark(#ffffffcc,#ffffff22),light-dark(#e6dcebaa,#ffffff0d));box-shadow:inset 0 0 0 1.5px light-dark(#ffffffee,#ffffff30),0 30px 60px -20px #0006;backdrop-filter:blur(6px)}
+.dev::before{content:"";position:absolute;inset:12px;border-radius:22px;background:repeating-linear-gradient(90deg,transparent 0 23px,light-dark(#b9a8c522,#ffffff08) 23px 24px);pointer-events:none}
+.scr{position:relative;display:block;width:min(72vw,300px);aspect-ratio:3/4;border-radius:6px;background:#000;box-shadow:0 0 0 6px #0b080e,0 0 0 7px light-dark(#cbbdd3,#3b3046);image-rendering:pixelated}
+.btns{position:absolute;right:-22px;top:70px;display:grid;gap:12px}
+.btns button{width:44px;height:52px;border:0;border-radius:0 12px 12px 0;background:linear-gradient(90deg,light-dark(#cfc3d6,#3a2f44),light-dark(#f3edf6,#5a4b66));color:var(--ink);font:700 13px "Noto Sans TC";cursor:pointer;box-shadow:2px 3px 0 #0003;touch-action:manipulation;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+.btns button:active,.btns button.on{transform:translateX(-3px);filter:brightness(.9)}
+.btns button:focus-visible{outline:3px solid var(--ice);outline-offset:2px}
+.home{display:inline-flex;align-items:center;min-height:44px;color:var(--mute);text-decoration:none;font-size:15px}.home:hover{color:var(--ink)}
+.side p{margin:0 0 14px;color:var(--mute);max-width:46ch}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin-top:14px}
+.card h2{font-size:16px;margin:0 0 10px}
+.seg{display:flex;flex-wrap:wrap;gap:8px}
+.seg button,.reset{min-height:44px;padding:0 16px;border-radius:10px;border:1px solid var(--line);background:transparent;color:var(--ink);font:15px "Noto Sans TC";cursor:pointer}
+.seg button[aria-pressed=true]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.reset{margin-top:12px;color:#d9534f;border-color:currentColor}
+dl{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;margin:0;font-size:15px}dt{font-weight:700}dd{margin:0;color:var(--mute)}
+small{display:block;margin-top:14px;color:var(--mute);font-size:13px}
+.st{width:100%;border-collapse:collapse;font-size:14px}.st td{padding:3px 0}.st td:first-child{width:5.5em;white-space:nowrap}.st td:last-child{width:4.5em;text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}.st .b{height:8px;border-radius:4px;background:var(--line);overflow:hidden}.st .b i{display:block;height:100%}
+@media(max-width:720px){main{grid-template-columns:minmax(0,1fr);justify-items:center}.side{width:100%}}
+@media(prefers-reduced-motion:reduce){.btns button{transition:none}}
+</style></head><body>
+<main>
+<div class="dev">
+<canvas class="scr" id="scr" width="240" height="320" aria-label="Noa 寵物機畫面"></canvas>
+<div class="btns"><button id="bU" aria-label="上">上</button><button id="bO" aria-label="確認">OK</button><button id="bD" aria-label="下">下</button></div>
+</div>
+<div class="side">
+<a class="home" href="/">← 回到黑曜石堡壘</a>
+<h1>Noa 寵物機</h1>
+<p>你找到 Noa 的小窩了。冰火雙屬性的小龍 Noa 住在這裡，幫它餵食、洗澡、摸摸頭，記得讓冰和火的魔力保持平衡。照顧得好，Rinya 也會來看它。</p>
+<div class="card"><h2>時間速度</h2><div class="seg" id="spd"><button data-s="1">真實時間</button><button data-s="60">1 分鐘＝1 小時</button><button data-s="600">6 秒＝1 小時</button></div></div>
+<div class="card"><h2>即時數值</h2><table class="st"><tbody id="stat"></tbody></table></div>
+<div class="card"><h2>操作</h2><dl><dt>上／下</dt><dd>切換選單（鍵盤 ↑ ↓）</dd><dt>OK</dt><dd>執行（Enter 或空白鍵）</dd><dt>長按 OK</dt><dd>打開／關閉狀態頁</dd></dl>
+<button class="reset" id="rst">重新開始（從蛋孵化）</button>
+<small>Noa 的進度存在你這台裝置的瀏覽器裡。這是 FoloToy AI Passport 寵物機的網頁版。</small></div>
+</div>
+</main>
+<script>
+{
+// ↓ 把這行換成 noa_sheet20.png 在 R2 上的公開網址
+const SHEET="https://img.obsidianfirelight.com/commissions/img-7451-20261126-162949.png";
+const R={idle:0,blink:1,walk:2,sleep:3,eat:4,jump:5,angry:6,love:7,ice:8,fire:9,hatch:10,hungry:11,sick:12,bath:13,pet:14,over:15,miss:16,rinya:17,ball:18,walkL:19};
+const MENU=[["feed","餵食"],["pet","摸頭"],["ball","玩球"],["bath","洗澡"],["ice","藍色吐息"],["fire","噴火"],["sleep","睡覺"]];
+const cv=document.getElementById('scr'),g=cv.getContext('2d');g.imageSmoothingEnabled=false;
+const img=new Image();let imgErr=false;img.onerror=()=>{imgErr=true};img.src=SHEET;
+const H=3600e3,DAY=24*H,KEY='noa-proto-v1';
+let S,speed=60,sel=0,anim=null,frame=0,ft=0,statusOpen=false,toast=null,walkX=0,walkDir=1,idleMode='idle',idleT=0,last=performance.now();
+function fresh(){return{t:Date.now(),phase:'egg',food:80,clean:90,mood:70,health:100,ice:20,fire:20,bond:0,neglect:0,lastVisit:Date.now(),born:Date.now(),runs:0,petCalm:0,over:false,asleep:false,manualSleep:false,wakeUntil:0}}
+function load(){try{const j=JSON.parse(localStorage.getItem(KEY));if(j&&j.phase){if(j.phase==='hatching')j.phase='egg';return j}}catch(e){}return fresh()}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+S=load();
+const cl=v=>Math.max(0,Math.min(100,v));
+function hourOf(t){return new Date(t).getHours()}
+function night(t){const h=hourOf(t);return h>=23||h<7}
+// advance simulation by ms of game time, in 1-minute steps
+function tick(ms){
+ while(ms>0){const st=Math.min(ms,60e3);ms-=st;S.t+=st;
+  if(S.phase!=='live')continue;
+  if(S.manualSleep&&((!night(S.t)&&night(S.t-st))||(!night(S.t)&&S.t-(S.sleepStart||0)>3*H))){S.manualSleep=false;if(!night(S.t))say('Noa 睡飽醒來了')}
+  const h=st/H,sl=!S.over&&((night(S.t)&&!(S.wakeUntil>S.t))||S.manualSleep);S.asleep=sl;const k=sl?.5:1;
+  S.food=cl(S.food-10*h*k);S.clean=cl(S.clean-5*h*k);
+  const miss=S.bond>=50&&S.t-S.lastVisit>3*DAY;
+  S.mood=cl(S.mood-(miss?12:8)*h*k);
+  S.ice=Math.min(100,S.ice+6*h*k);S.fire=Math.min(100,S.fire+6*h*k);
+  const bad=S.food<20||S.clean<20||S.mood<20;
+  S.health=cl(S.health+(bad?-5:4)*h);
+  if(!S.over&&(S.ice>=100||S.fire>=100||Math.abs(S.ice-S.fire)>60)){S.over=true;S.asleep=false;S.petCalm=0;S.mood=cl(S.mood-20);S.clean=cl(S.clean-20);say('魔力暴走了！摸頭安撫它')}
+  const pb=S.bond;S.bond=Math.max(0,Math.min(100,S.bond+(S.food>50&&S.clean>50&&S.mood>50?0.42:bad?-0.2:0)*h));if(pb<50&&S.bond>=50&&!S.bondMet){S.bondMet=true;S.lastVisit=S.t}
+  if(!sl){
+   if(S.food<20&&S.mood<20){const before=S.neglect;S.neglect+=h;if(before<12&&S.neglect>=12)say('Noa 一直望著外面……');if(S.neglect>=24){S.phase='gone';S.runs++;save();return}}
+   else S.neglect=Math.max(0,S.neglect-h*2);
+   if(S.bond>=50&&!S.over&&Math.random()<h*(S.bond/100)*0.08&&S.t-S.lastVisit>DAY*0.5&&!anim){S.lastVisit=S.t;S.mood=100;play('rinya',5,'Rinya 來看 Noa 了！')}
+  }
+ }
+}
+function say(m){toast={m,until:performance.now()+2600}}
+function play(name,loops,msg){anim={row:R[name],loops,n:name==='ball'?3:4,left:loops*(name==='ball'?3:4)};frame=0;ft=0;if(msg)say(msg)}
+function act(){
+ if(S.phase==='egg'){S.phase='hatching';play('hatch',1);return}
+ if(S.phase==='gone'){const runs=S.runs,bond=S.bond;S=fresh();S.runs=runs;S.bond=Math.floor(bond/2);save();return}
+ if(S.phase!=='live'||anim)return;
+ const id=MENU[sel][0];
+ if(S.over&&id!=='pet'){say('Noa 太激動了，先摸摸頭');return}
+ if(S.asleep&&id!=='sleep'){sel=MENU.findIndex(m=>m[0]==='sleep');say('Noa 在睡覺，按 OK 叫醒');return}
+ S.neglect=0;
+ switch(id){
+  case'feed':if(S.food>95){say('Noa 吃不下了');return}S.food=cl(S.food+40);S.clean=cl(S.clean-3);play('eat',2);break;
+  case'pet':if(S.over){S.petCalm++;if(S.petCalm>=3){S.over=false;S.ice=30;S.fire=30;S.mood=cl(S.mood+10);play('love',2,'Noa 平靜下來了')}else play('pet',1,`再摸 ${3-S.petCalm} 次`)}else{S.mood=cl(S.mood+15);play('pet',2)}break;
+  case'ball':S.mood=cl(S.mood+25);S.food=cl(S.food-5);play('ball',3);break;
+  case'bath':S.clean=100;play('bath',3,'洗得乾乾淨淨');break;
+  case'ice':if(S.ice<15){say('冰魔力不夠');return}S.ice=Math.max(0,S.ice-40);play('ice',1);break;
+  case'fire':if(S.fire<15){say('火魔力不夠');return}S.fire=Math.max(0,S.fire-40);S.clean=cl(S.clean-5);play('fire',1);break;
+  case'sleep':if(S.asleep){S.manualSleep=false;S.asleep=false;if(night(S.t)){S.wakeUntil=S.t+H;S.mood=cl(S.mood-5);say('Noa 揉揉眼睛醒來了')}else say('Noa 醒來了')}else{S.manualSleep=true;S.sleepStart=S.t;S.asleep=true;S.wakeUntil=0;say('晚安，Noa')}break;
+ }
+ save();
+}
+function baseRow(){
+ if(S.phase==='egg')return{row:R.hatch,frames:[0,1],x:24};
+ if(S.asleep)return{row:R.sleep};
+ if(S.over)return{row:R.over};
+ if(S.health<40)return{row:R.sick};
+ if(S.food<30)return{row:R.hungry};
+ if(S.mood<20)return{row:R.angry};
+ if(S.bond>=50&&S.t-S.lastVisit>3*DAY)return{row:R.miss};
+ return{row:idleMode==='walk'&&walkDir<0?R.walkL:R[idleMode],walk:idleMode==='walk'};
+}
+// drawing
+// ---- cozy lair background (drawn once per time-of-day, cached) ----
+const BG={};
+function rnd(seed){let s=seed;return()=>(s=(s*16807)%2147483647)/2147483647}
+function period(t){const h=hourOf(t);return h>=7&&h<17?'day':h>=17&&h<19?'dusk':h>=5&&h<7?'dawn':'night'}
+function buildBg(p){
+ const c=document.createElement('canvas');c.width=240;c.height=320;const b=c.getContext('2d');
+ const px=(x,y,w,h,col)=>{b.fillStyle=col;b.fillRect(x,y,w,h)};const r=rnd(7);
+ const night=p==='night';
+ // wall
+ const wall=night?'#3a2f4a':'#6a5480',wall2=night?'#342a43':'#604c75',mort=night?'#2c2339':'#56436a';
+ px(0,0,240,236,wall);
+ for(let y=0;y<236;y+=12){const off=(y/12)%2?0:14;for(let x=-off;x<240;x+=28){px(x+1,y+1,26,10,r()<.35?wall2:wall);}px(0,y,240,1,mort)}
+ for(let y=0;y<236;y+=12){const off=(y/12)%2?0:14;for(let x=-off;x<240;x+=28)px(x,y,1,12,mort)}
+ // window (left)
+ const sky={day:['#9fd4ff','#c8e8ff'],dusk:['#f39a7a','#ffcf8f'],dawn:['#b7a3e0','#ffd3c2'],night:['#1b2147','#28305e']}[p];
+ const wx=16,wy=70,ww=62,wh=54;
+ px(wx-4,wy-4,ww+8,wh+8,'#3b2a22');px(wx-2,wy-2,ww+4,wh+4,'#8a5a3c');
+ for(let i=0;i<wh;i++)px(wx,wy+i,ww,1,i<wh/2?sky[0]:sky[1]);
+ if(p==='day'){[[wx+8,wy+14],[wx+34,wy+30]].forEach(([x,y])=>{px(x,y,18,5,'#fff');px(x+4,y-3,9,3,'#fff');px(x+2,y+5,14,2,'#e6f3ff')})}
+ if(p==='dusk'||p==='dawn'){px(wx+40,wy+30,10,10,'#ffe7a3');px(wx+38,wy+32,14,6,'#ffe7a3')}
+ if(night){px(wx+42,wy+8,10,10,'#f6f0c8');px(wx+46,wy+8,6,6,'#28305e')}
+ px(wx+ww/2-1,wy,2,wh,'#8a5a3c');px(wx,wy+wh/2-1,ww,2,'#8a5a3c');
+ px(wx-6,wy+wh+2,ww+12,5,'#9c6a48');px(wx-6,wy+wh+7,ww+12,2,'#5e3d2c');
+ // curtains
+ for(let i=0;i<wh+6;i++){const sw=Math.max(2,9-Math.abs(i-(wh*0.55))/6|0);px(wx-8,wy-6+i,sw,1,'#e58aa8');px(wx+ww+8-sw,wy-6+i,sw,1,'#e58aa8')}
+ px(wx-10,wy-8,ww+20,3,'#b9663f');
+ // shelf (right) with crystals + little book
+ const sx=166,sy=112;
+ px(sx,sy,62,4,'#9c6a48');px(sx,sy+4,62,2,'#5e3d2c');px(sx+6,sy+6,3,6,'#5e3d2c');px(sx+53,sy+6,3,6,'#5e3d2c');
+ const crys=(x,h,c1,c2)=>{for(let i=0;i<h;i++){const w=Math.min(i+1,Math.max(1,(h-i)>>1)+1);px(x-w+1,sy-h+i,w*2-1,1,i<h/3?c2:c1)}};
+ crys(176,14,'#6fb7ff','#d9efff');crys(188,10,'#c58bff','#ead7ff');crys(214,13,'#ff8a3d','#ffd24a');
+ px(196,sy-12,5,12,'#e58aa8');px(201,sy-11,5,11,'#7fc6a4');px(206,sy-12,4,12,'#f3ead9');
+ // hanging garland across top of scene
+ for(let x=0;x<240;x++){const y=64+Math.round(Math.sin(x/240*Math.PI)*6);px(x,y,1,1,'#3b2a22')}
+ const flags=['#ff8fa3','#ffd24a','#6fb7ff','#c58bff','#8fd18f','#ff8a3d'];
+ for(let i=0;i<9;i++){const x=96+i*14;if(x>226)break;const y=64+Math.round(Math.sin(x/240*Math.PI)*6);for(let k=0;k<6;k++)px(x-3+(k>>1),y+1+k,7-(k>>1)*2,1,flags[i%flags.length])}
+ // floor planks
+ const fl=night?'#4a3530':'#8a5e45',fl2=night?'#42302b':'#7d543e',fln=night?'#2e211d':'#5e3d2c';
+ px(0,232,240,30,fl);px(0,232,240,2,fln);
+ for(let y=234;y<262;y+=7){px(0,y+6,240,1,fln);const o=(y/7|0)%2?0:22;for(let x=o;x<240;x+=44){px(x,y,1,6,fln);px(x+1,y+1,20,5,r()<.4?fl2:fl)}}
+ // rug under Noa
+ const cx=120,cy=249,rx=88,ry=11;
+ for(let y=-ry;y<=ry;y++){const w=Math.round(rx*Math.sqrt(1-(y*y)/(ry*ry)));px(cx-w,cy+y,w*2,1,Math.abs(y)>ry-3?'#c2577a':'#f2a7bd')}
+ for(let x=-60;x<=60;x+=12)px(cx+x-1,cy-1,3,3,'#fff0d6');
+ // cushion + plant
+ px(10,214,26,18,'#7fc6a4');px(12,216,22,14,'#9fdcbf');px(22,212,6,4,'#5e8f78');
+ px(210,206,18,26,'#b9663f');px(212,208,14,4,'#d98a5c');
+ [[214,196],[219,190],[224,198],[217,202],[222,204]].forEach(([x,y])=>{px(x-3,y,7,4,'#5fae6e');px(x-1,y-2,3,2,'#7fd18f')});
+ px(0,262,240,58,'#14111a');
+ // HUD shade
+ b.fillStyle=night?'#0d0a14cc':'#2a1f35b3';b.fillRect(0,0,240,62);
+ return c;
+}
+function bgFor(t){const p=period(t);return BG[p]||(BG[p]=buildBg(p))}
+
+const PAL={M:'#c98b4f',W:'#f3ead9',S:'#a897b3',B:'#6fb7ff',L:'#d9efff',H:'#ff8fa3',P:'#ffd0da',G:'#8fd18f',D:'#4f9a5a',I:'#bfe4ff',F:'#ff8a3d',Y:'#ffd24a',R:'#e0533d',V:'#c58bff'};
+const ICON={
+food:['.S.S...','..S.S..','.......','WWWWWWW','.MMMMM.','.MMMMM.','..MMM..'],
+clean:['...B...','..BBB..','..BBB..','.BBBBB.','BBLBBBB','BBBLBBB','.BBBBB.'],
+mood:['.HH.HH.','HPHHHHH','HHHHHHH','HHHHHHH','.HHHHH.','..HHH..','...H...'],
+health:['..GGG..','..GWG..','GGGWGGG','GWWWWWG','GGGWGGG','..GWG..','..GGG..'],
+ice:['...I...','.I.I.I.','..III..','IIIBIII','..III..','.I.I.I.','...I...'],
+fire:['...F...','..FF...','..FFF.F','.FFYFFF','.FYYYF.','FRYYYRF','.RRYRR.'],
+magic:['...V...','...V...','.V.V.V.','..VVV..','VVVWVVV','..VVV..','.V.V.V.']};
+function icon(k,x,y,s){const m=ICON[k];for(let r=0;r<m.length;r++)for(let c=0;c<m[r].length;c++){const ch=m[r][c];if(ch!=='.'){g.fillStyle=PAL[ch];g.fillRect(x+c*s,y+r*s,s,s)}}}
+function txt(s,x,y,sz,c,al){g.font=`${al||400} ${sz}px "Noto Sans TC",sans-serif`;g.fillStyle=c;g.fillText(s,x,y)}
+function bar(x,y,w,v,c,label,k){if(k){icon(k,x,y-2,2);x+=18}txt(label,x,y+10,12,'#c9bcd3');g.fillStyle='#2d2436';g.fillRect(x+62,y,w,10);g.fillStyle=c;g.fillRect(x+62,y,w*v/100,10);txt(String(Math.round(v)),x+66+w,y+10,12,'#efe6f3')}
+function draw(){
+ g.drawImage(bgFor(S.t),0,0);
+ if(period(S.t)==='night'){for(let i=0;i<5;i++){if((frame+i*3)%7<5){g.fillStyle='#fff8d0';g.fillRect(20+(i*13)%56,74+(i*17)%22,1,1)}}}
+ if(S.asleep&&S.phase==='live'){g.fillStyle='#0a0814aa';g.fillRect(0,62,240,200)}
+ g.textBaseline='alphabetic';
+ if(S.phase==='gone'){g.fillStyle='#f3ead9';g.fillRect(50,90,140,110);g.fillStyle='#d8cbb2';g.fillRect(50,190,140,10);
+  txt('Noa 去找 Rinya 了',62,130,14,'#3b2c22',700);txt('……好好照顧自己喔',62,155,12,'#5a4636');txt('按 OK 重新孵蛋',74,280,13,'#c9bcd3');return}
+ // status bar
+ const d=new Date(S.t);txt(`${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`,10,20,14,'#efe6f3',700);
+ if(S.phase==='live'){let ix=220;const ic=[];if(S.food<30)ic.push('food');if(S.clean<30)ic.push('clean');if(S.health<40)ic.push('health');if(Math.max(S.ice,S.fire)>80||Math.abs(S.ice-S.fire)>45)ic.push('magic');
+  const blink=frame%4<3;for(const k of ic){g.fillStyle='#3a2030';g.fillRect(ix-4,5,20,20);if(blink)icon(k,ix-1,8,2);ix-=24}}
+ // mini stat bars
+ if(S.phase==='live'&&!statusOpen){const ms=[['food',S.food,'#ffb347'],['clean',S.clean,'#cdb98b'],['mood',S.mood,'#ff8fa3'],['health',S.health,'#8fd18f'],['ice',S.ice,'#6fb7ff'],['fire',S.fire,'#ff8a3d']];
+  ms.forEach(([k,v,c],i)=>{const x=8+(i%3)*78,y=31+Math.floor(i/3)*17;icon(k,x,y,2);g.fillStyle='#2d2436';g.fillRect(x+18,y+4,52,7);g.fillStyle=(k==='ice'||k==='fire')?(v>80?'#c58bff':c):(v<30?'#ff5d5d':c);g.fillRect(x+18,y+4,52*v/100,7)})}
+ // sprite
+ let row,fr,x=24;
+ if(anim){row=anim.row;fr=frame%anim.n}else{const b=baseRow();row=b.row;fr=b.frames?b.frames[frame%2]:frame%4;if(b.walk){x=24+walkX}}
+ if(imgErr){txt('Noa 的圖片沒有載入',56,170,14,'#efe6f3',700)}
+ if(img.complete&&!imgErr){{g.fillStyle='#0000002e';for(let yy=-3;yy<=3;yy++){const w=Math.round(62*Math.sqrt(1-yy*yy/12.25));g.fillRect(x+96-w,251+yy,w*2,1)}}g.drawImage(img,fr*64,row*64,64,64,x,77,192,192)}
+ if(S.phase==='live'&&S.clean<30&&!anim){g.strokeStyle='#9c8a63';g.lineWidth=3;for(let i=0;i<3;i++){const sx=58+i*62,o=(frame%2)*3;g.beginPath();g.moveTo(sx,150+o);g.quadraticCurveTo(sx+8,140+o,sx,130+o);g.quadraticCurveTo(sx-8,120+o,sx,110+o);g.stroke()}}
+ // menu or prompts
+ if(S.phase==='egg'){txt('按 OK 孵化',82,290,15,'#efe6f3',700)}
+ else if(S.phase==='live'){
+  g.fillStyle='#14111a';g.fillRect(0,262,240,58);
+  const lab=MENU[sel][0]==='sleep'&&S.asleep?'叫醒':MENU[sel][1];g.font='700 17px "Noto Sans TC"';const w=g.measureText(lab).width;
+  txt('▲',112,276,10,'#7f7090');txt(lab,120-w/2,297,17,S.over&&MENU[sel][0]!=='pet'?'#6d5f76':'#efe6f3',700);
+  for(let i=0;i<MENU.length;i++){g.fillStyle=i===sel?'#6fb7ff':'#3a3046';g.fillRect(120-MENU.length*7+i*14,308,8,4)}
+ }
+ if(statusOpen&&S.phase==='live'){
+  g.fillStyle='#141019ee';g.fillRect(10,34,220,226);txt('Noa 的狀態',22,58,15,'#efe6f3',700);
+  const age=Math.floor((S.t-S.born)/DAY);txt(`第 ${age+1} 天`,170,58,12,'#a897b3');
+  bar(22,72,92,S.food,'#ffb347','飽足','food');bar(22,94,92,S.clean,'#cdb98b','清潔','clean');bar(22,116,92,S.mood,'#ff8fa3','心情','mood');bar(22,138,92,S.health,'#8fd18f','健康','health');
+  bar(22,166,92,S.ice,'#6fb7ff','冰魔力','ice');bar(22,188,92,S.fire,'#ff8a3d','火魔力','fire');bar(22,216,92,S.bond,'#c58bff','羈絆','magic');
+  txt(S.bond>=50?'Rinya 可能會來訪':'羈絆 50 以上 Rinya 會來訪',22,250,11,'#a897b3');
+ }
+ if(toast&&performance.now()<toast.until){g.font='700 13px "Noto Sans TC"';const w=g.measureText(toast.m).width+20;g.fillStyle='#efe6f3';g.fillRect(120-w/2,68,w,24);txt(toast.m,130-w/2,85,13,'#1c1e28',700)}
+}
+function loop(now){
+ const dt=Math.min(now-last,1000);last=now;
+ tick(dt*speed);
+ ft+=dt;if(ft>=220){ft-=220;frame++;
+  if(anim){anim.left--;if(anim.left<=0){if(S.phase==='hatching'){S.phase='live';S.t=Date.now();S.born=S.t;S.lastVisit=S.t;save();anim=null;play('jump',2,'Noa 誕生了！')}else anim=null}}
+  else if(S.phase==='live'){idleT++;
+   if(idleMode==='idle'&&idleT>18&&Math.random()<.12){idleMode=Math.random()<.6?'blink':'walk';idleT=0}
+   else if(idleMode==='blink'&&idleT>=4){idleMode='idle';idleT=0}
+   else if(idleMode==='walk'){walkX+=walkDir*4;if(Math.abs(walkX)>20)walkDir*=-1;if(idleT>16&&Math.abs(walkX)<4){idleMode='idle';walkX=0;idleT=0}}}
+ }
+ draw();requestAnimationFrame(loop);
+}
+// input
+function up(){if(S.phase==='live'&&!statusOpen)sel=(sel+MENU.length-1)%MENU.length}
+function dn(){if(S.phase==='live'&&!statusOpen)sel=(sel+1)%MENU.length}
+let okT=0,okLong=false,okTimer;
+function okDown(){okT=performance.now();okLong=false;clearTimeout(okTimer);okTimer=setTimeout(()=>{okLong=true;if(S.phase==='live')statusOpen=!statusOpen},500)}
+function okUp(){clearTimeout(okTimer);if(!okLong){if(statusOpen)statusOpen=false;else act()}}
+const bU=document.getElementById('bU'),bD=document.getElementById('bD'),bO=document.getElementById('bO');
+bU.addEventListener('click',up);bD.addEventListener('click',dn);
+bO.addEventListener('pointerdown',e=>{e.preventDefault();bO.classList.add('on');okDown()});
+bO.addEventListener('pointerup',()=>{bO.classList.remove('on');okUp()});
+bO.addEventListener('pointerleave',()=>{if(bO.classList.contains('on')){bO.classList.remove('on');clearTimeout(okTimer)}});
+bO.addEventListener('pointercancel',()=>{bO.classList.remove('on');clearTimeout(okTimer)});
+bO.addEventListener('contextmenu',e=>e.preventDefault());
+bO.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' ')e.preventDefault()});
+let kDown=false;
+const ownKey=e=>{const b=e.target.closest&&e.target.closest('button');return b&&b!==bO};
+addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&ownKey(e))return;if(e.key==='ArrowUp'){e.preventDefault();up()}else if(e.key==='ArrowDown'){e.preventDefault();dn()}else if((e.key==='Enter'||e.key===' ')&&!kDown){e.preventDefault();kDown=true;okDown()}});
+addEventListener('keyup',e=>{if((e.key==='Enter'||e.key===' ')&&kDown){kDown=false;okUp()}});
+const spd=document.getElementById('spd');
+function setSpd(v){speed=v;try{localStorage.setItem(KEY+'-spd',v)}catch(e){}for(const b of spd.children)b.setAttribute('aria-pressed',String(+b.dataset.s===v))}
+spd.addEventListener('click',e=>{const b=e.target.closest('button');if(b)setSpd(+b.dataset.s)});{let v=60;try{v=+localStorage.getItem(KEY+'-spd')||60}catch(e){}setSpd([1,60,600].includes(v)?v:60)}
+document.getElementById('rst').addEventListener('click',()=>{S=fresh();anim=null;statusOpen=false;sel=0;save()});
+// catch up time passed while page was closed (real time)
+if(S.phase==='live'){const gap=Date.now()-S.t;if(gap>0)tick(Math.min(gap,7*DAY))}else S.t=Date.now();
+
+const stat=document.getElementById('stat');
+function panel(){const live=S.phase==='live';const sinceV=(S.t-S.lastVisit)/H;
+ const rows=[['飽足',S.food,'#ffb347'],['清潔',S.clean,'#cdb98b'],['心情',S.mood,'#ff8fa3'],['健康',S.health,'#8fd18f'],['冰魔力',S.ice,'#6fb7ff'],['火魔力',S.fire,'#ff8a3d'],['羈絆',S.bond,'#c58bff']];
+ let h=rows.map(([n,v,c])=>`<tr><td>${n}</td><td><div class="b"><i style="width:${live?v:0}%;background:${c}"></i></div></td><td>${live?Math.round(v):'–'}</td></tr>`).join('');
+ h+=`<tr><td>冷落時數</td><td></td><td>${live?S.neglect.toFixed(1)+' h':'–'}</td></tr><tr><td>Rinya 上次來訪</td><td></td><td>${live?(sinceV<1?'剛剛':Math.floor(sinceV)+' h 前'):'–'}</td></tr><tr><td>狀態</td><td></td><td>${!live?(S.phase==='gone'?'離家':'蛋'):S.over?'魔力暴走':S.asleep?'睡覺':S.health<40?'生病':S.food<30?'肚子餓':S.mood<20?'生氣':S.bond>=50&&S.t-S.lastVisit>3*DAY?'想念 Rinya':'清醒'}</td></tr>`;
+ stat.innerHTML=h}
+setInterval(panel,300);panel();
+setInterval(save,10000);
+(document.fonts?document.fonts.ready:Promise.resolve()).then(()=>requestAnimationFrame(loop));
+}
+</script></body></html>
