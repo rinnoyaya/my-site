@@ -646,6 +646,27 @@ html.egg-night body::after{content:"";position:fixed;inset:0;pointer-events:none
 .egg-petwin .pw-x:focus-visible{outline:3px solid #6fb7ff;outline-offset:2px}
 @media (max-width:720px){.egg-petwin{padding:0}.egg-petwin .pw-card{width:100%;height:100%;border-radius:0}.egg-petwin .pw-x{top:max(10px,env(safe-area-inset-top))}}
 @media (prefers-reduced-motion:reduce){.egg-petwin.on{animation:none}}
+.ep-acts{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px}
+.ep-big{color:var(--muted,inherit);font-size:14px;min-height:44px;display:inline-flex;align-items:center}
+.egg-buddy{position:fixed;right:14px;bottom:72px;z-index:8;display:flex;flex-direction:column;align-items:flex-end;filter:drop-shadow(0 8px 18px rgb(0 0 0/.35));animation:ebuIn .35s ease}
+@keyframes ebuIn{from{opacity:0;transform:translateY(16px) scale(.9)}}
+.egg-buddy .eb2-bar{display:flex;align-items:center;gap:2px;margin:0 0 4px;padding:2px 2px 2px 8px;border-radius:99px;background:rgb(20 14 28/.82);color:#efe6f3;font-size:12px;backdrop-filter:blur(4px)}
+.egg-buddy .eb2-grip{cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;padding:6px 6px 6px 0;letter-spacing:.02em}
+.egg-buddy.drag .eb2-grip{cursor:grabbing}
+.egg-buddy .eb2-bar button{width:32px;height:32px;border:0;border-radius:50%;background:transparent;color:inherit;font-size:14px;cursor:pointer;line-height:1}
+.egg-buddy .eb2-bar button:hover{background:rgb(255 255 255/.14)}
+.egg-buddy button:focus-visible{outline:2px solid #6fb7ff;outline-offset:1px}
+.egg-buddy .eb2-view{line-height:0}
+.egg-buddy iframe{display:block;border:0;background:transparent;color-scheme:normal;width:180px;height:200px}
+.egg-buddy .eb2-bubble{display:none}
+.egg-buddy.min .eb2-bar{display:none}
+.egg-buddy.min .eb2-view{position:absolute;right:0;bottom:0;width:60px;height:60px;border-radius:50%;overflow:hidden;pointer-events:none;background:#000;box-shadow:0 0 0 3px #6fb7ff,0 0 0 5px #ff8a3d}
+.egg-buddy.min iframe{transform-origin:0 0;transform:translate(var(--bx,0),var(--by,0)) scale(var(--bk,.5))}
+.egg-buddy.min .eb2-bubble{display:block;position:relative;z-index:1;width:60px;height:60px;border-radius:50%;border:0;background:transparent;cursor:pointer;touch-action:none}
+.egg-buddy.paused{visibility:hidden}
+html.modal-lock .egg-buddy{visibility:hidden}
+@media print{.egg-buddy{display:none}}
+@media (prefers-reduced-motion:reduce){.egg-buddy{animation:none}}
 .ep-prog{display:flex;align-items:center;gap:10px;font-size:12.5px;color:var(--muted)}
 .ep-bar{flex:1;max-width:220px;height:8px;border-radius:4px;background:color-mix(in srgb,var(--line) 60%,transparent);overflow:hidden}
 .ep-bar i{display:block;height:100%;background:linear-gradient(90deg,#4fc3ff,#ff8a3d)}
@@ -1237,7 +1258,7 @@ function newDays(){const v=SITE.newDays;if(v===undefined||v===null||v==="")retur
 function isNew(x){const d=newDays();if(!d||!x||!x.date)return false;const t=Date.parse(String(x.date).slice(0,10)+"T00:00:00+08:00");if(isNaN(t))return false;const age=Date.now()-t;return age>-864e5&&age<d*864e5;}
 const newBadge=x=>isNew(x)?`<span class="new-badge" title="最近更新">NEW</span>`:"";
 
-const SITE_VERSION="2026-11-26 v1.34";
+const SITE_VERSION="2026-11-26 v1.35";
 const BROKEN=[];
 /* 解開建置時打包過的設定檔（data/eggs.dat） */
 function unpk(t){try{const b=atob(t.trim()),u=new Uint8Array(b.length);let x=0x5b1d9e47;for(let i=0;i<b.length;i++){x=(Math.imul(x,1664525)+1013904223)>>>0;u[i]=b.charCodeAt(i)^(x>>>24);}return new TextDecoder().decode(u);}catch(e){return "";}}
