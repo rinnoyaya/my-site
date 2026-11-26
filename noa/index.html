@@ -234,7 +234,7 @@ function draw(){
  if(S.phase==='live'){let ix=220;const ic=[];if(S.food<30)ic.push('food');if(S.clean<30)ic.push('clean');if(S.health<40)ic.push('health');if(Math.max(S.ice,S.fire)>80||Math.abs(S.ice-S.fire)>45)ic.push('magic');
   const blink=frame%4<3;for(const k of ic){g.fillStyle='#3a2030';g.fillRect(ix-4,5,20,20);if(blink)icon(k,ix-1,8,2);ix-=24}}
  // mini stat bars
- if(S.phase==='live'&&!statusOpen){const ms=[['food',S.food,'#ffb347'],['clean',S.clean,'#cdb98b'],['mood',S.mood,'#ff8fa3'],['health',S.health,'#8fd18f'],['ice',S.ice,'#6fb7ff'],['fire',S.fire,'#ff8a3d']];
+ if(S.phase==='live'&&!statusOpen&&mode!=='pomo'){const ms=[['food',S.food,'#ffb347'],['clean',S.clean,'#cdb98b'],['mood',S.mood,'#ff8fa3'],['health',S.health,'#8fd18f'],['ice',S.ice,'#6fb7ff'],['fire',S.fire,'#ff8a3d']];
   ms.forEach(([k,v,c],i)=>{const x=8+(i%3)*78,y=31+Math.floor(i/3)*17;icon(k,x,y,2);g.fillStyle='#2d2436';g.fillRect(x+18,y+4,52,7);g.fillStyle=(k==='ice'||k==='fire')?(v>80?'#c58bff':c):(v<30?'#ff5d5d':c);g.fillRect(x+18,y+4,52*v/100,7)})}
  // sprite
  let row,fr,x=24;
@@ -262,7 +262,7 @@ function draw(){
   txt(S.bond>=50?'Rinya 可能會來訪':'羈絆 50 以上 Rinya 會來訪',22,250,11,'#a897b3');
  }
  if(S.phase==='live')drawModeOverlay();
- if(toast&&performance.now()<toast.until){g.font='700 13px "Noto Sans TC"';const w=g.measureText(toast.m).width+20;g.fillStyle='#efe6f3';const ty=mode==='pomo'?134:68;g.fillRect(120-w/2,ty,w,24);txt(toast.m,130-w/2,ty+17,13,'#1c1e28',700)}
+ if(toast&&performance.now()<toast.until){g.font='700 13px "Noto Sans TC"';const w=g.measureText(toast.m).width+20;g.fillStyle='#efe6f3';const ty=68;g.fillRect(120-w/2,ty,w,24);txt(toast.m,130-w/2,ty+17,13,'#1c1e28',700)}
 }
 
 // ---- modes: more menu, pomodoro, jump game ----
@@ -270,14 +270,14 @@ let mode='pet',moreSel=0,pomoIdx=1,G=null,pomoConfirm=0;const POMO=[15,25,50];co
 function today(){const d=new Date();return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate()}
 function box(x,y,w,h){g.fillStyle='#141019ee';g.fillRect(x,y,w,h);g.fillStyle='#6fb7ff';g.fillRect(x,y,w,2)}
 function startGame(){toast=null;G={t:0,dist:0,y:0,vy:0,obs:[],snk:[],next:1.2,bonus:0,over:false};mode='game';sfx('ok')}
-function jump(){if(G&&!G.over&&G.y<=0){G.vy=300;sfx('move');buzz()}}
+function jump(){if(!G||G.over)return;if(G.y<=0){G.vy=300;sfx('move');buzz()}else if(G.vy<0&&G.y<26)G.buf=.15}
 function gameScore(){return Math.floor(G.t*10)+G.bonus}
-function gameStep(dt){if(!G||G.over)return;dt=Math.min(dt,.05);G.t+=dt;const sp=Math.min(320,170+G.t*5);G.dist+=sp*dt;
- if(G.y>0||G.vy>0){G.y+=G.vy*dt;G.vy-=820*dt;if(G.y<=0){G.y=0;G.vy=0}}
+function gameStep(dt){if(!G||G.over)return;dt=Math.min(dt,.05);G.t+=dt;const sp=Math.min(320,200+G.t*4);G.dist+=sp*dt;
+ if(G.y>0||G.vy>0){G.y+=G.vy*dt;G.vy-=820*dt;if(G.y<=0){G.y=0;G.vy=0;if(G.buf>0){G.buf=0;G.vy=300;sfx('move')}}}if(G.buf>0)G.buf-=dt;
  G.next-=dt;if(G.next<=0){G.obs.push({x:250,k:Math.random()<.5?'fire':'ice'});if(Math.random()<.35)G.snk.push({x:250+sp*.45,k:'food'});G.next=Math.max(.75,1.5-G.t*.02)+Math.random()*.9}
  for(const o of G.obs)o.x-=sp*dt;for(const o of G.snk)o.x-=sp*dt;G.obs=G.obs.filter(o=>o.x>-30);
- const nl=6+34,nr=6+96,nb=232-G.y,nt=nb-64;
- for(const o of G.obs){if(o.x+18>nl&&o.x+3<nr&&nb>214){G.over=true;sfx('deny');buzz();break}}
+ const nl=6+52,nr=6+88,nb=232-G.y,nt=nb-64;
+ for(const o of G.obs){if(o.x+15>nl&&o.x+6<nr&&nb>219){G.over=true;sfx('deny');buzz();break}}
  G.snk=G.snk.filter(o=>{if(o.x>-30&&o.x+18>nl&&o.x+3<nr&&nt<151&&nb>130){G.bonus+=20;sfx('move');return false}return o.x>-30})}
 function endGame(){const sc=gameScore(),st=snap();S.best=Math.max(S.best||0,sc);S.mood=cl(S.mood+Math.min(30,5+Math.floor(sc/30)));S.food=cl(S.food-5);mode='pet';G=null;gain(st);play('jump',1,sc>=(S.best||0)&&sc>0?'新紀錄！'+sc+' 分':'得到 '+sc+' 分');save()}
 function startPomo(){S.pomo={end:Date.now()+POMO[pomoIdx]*60e3,len:POMO[pomoIdx]};mode='pomo';sfx('ok');say('開始專心 '+POMO[pomoIdx]+' 分鐘');save()}
@@ -294,9 +294,10 @@ function drawGame(){
 function drawModeOverlay(){
  if(mode==='more'){box(40,92,160,112);txt('更多',54,116,15,'#efe6f3',700);MORE.forEach(([,l],i)=>{const y=132+i*22;if(i===moreSel){g.fillStyle='#262640';g.fillRect(48,y,144,20);g.fillStyle='#6fb7ff';g.fillRect(48,y,3,20)}txt(l,60,y+15,14,i===moreSel?'#efe6f3':'#a897b3',700)})}
  if(mode==='pomoSet'){box(40,92,160,112);txt('番茄鐘',54,116,15,'#efe6f3',700);POMO.forEach((m,i)=>{const y=132+i*22;if(i===pomoIdx){g.fillStyle='#262640';g.fillRect(48,y,144,20);g.fillStyle='#ff8a3d';g.fillRect(48,y,3,20)}txt(m+' 分鐘',60,y+15,14,i===pomoIdx?'#efe6f3':'#a897b3',700)})}
- if(mode==='pomo'&&S.pomo){const left=Math.max(0,S.pomo.end-Date.now()),mm=Math.floor(left/60e3),ss=Math.floor(left/1e3)%60;box(30,66,180,62);txt('專心中・Noa 陪著你',44,86,12,'#a897b3',700);
-  const s=`${String(mm).padStart(2,'0')}:${String(ss).padStart(2,'0')}`;g.font='700 28px "Noto Sans TC"';txt(s,120-g.measureText(s).width/2,116,28,'#efe6f3',700);
-  g.fillStyle='#2d2436';g.fillRect(40,121,160,4);g.fillStyle='#ff8a3d';g.fillRect(40,121,160*(1-left/(S.pomo.len*60e3)),4)}
+ if(mode==='pomo'&&S.pomo){const left=Math.max(0,S.pomo.end-Date.now()),mm=Math.floor(left/60e3),ss=Math.floor(left/1e3)%60;
+  g.fillStyle='#14111a';g.fillRect(0,26,240,36);icon('fire',10,33,2);txt('專心中',28,47,12,'#a897b3',700);txt(S.pomo.len+' 分鐘',28,59,11,'#7f7090');
+  const s=`${String(mm).padStart(2,'0')}:${String(ss).padStart(2,'0')}`;g.font='700 26px "Noto Sans TC"';txt(s,228-g.measureText(s).width,55,26,'#efe6f3',700);
+  g.fillStyle='#2d2436';g.fillRect(0,60,240,3);g.fillStyle='#ff8a3d';g.fillRect(0,60,240*(1-left/(S.pomo.len*60e3)),3)}
 }
 function modeBar(){g.fillStyle='#14111a';g.fillRect(0,262,240,58);const t={more:'上下選擇・OK 確定・長按返回',pomoSet:'上下選時間・OK 開始・長按返回',pomo:pomoConfirm>performance.now()?'再長按一次放棄':'長按 OK 放棄'}[mode];g.font='700 13px "Noto Sans TC"';txt(t,120-g.measureText(t).width/2,296,13,'#efe6f3',700)}
 
@@ -339,11 +340,22 @@ function loop(now){
  ft+=dt;if(ft>=220){ft-=220;frameStep()}
  draw();requestAnimationFrame(loop);
 }
+let lastIdle='';
+function idleAct(){const hr=hourOf(S.t),m=S.mood,P=[];const add=(n,w)=>{if(n!==lastIdle)P.push([n,w])};
+ const okIce=S.ice>=20&&S.fire-(S.ice-5)<=45,okFire=S.fire>=20&&S.ice-(S.fire-5)<=45;
+ if(mode==='pomo'){add('hoard',3);add('stretch',2);if(okIce)add('icesc',2);if(okFire)add('smoke',2);add('love',1)}
+ else if(m>=70){add('chase',3);add('roll',3);add('ball',2);add('fly',2);add('hoard',2);add('love',2);if(okIce)add('icesc',1);if(okFire)add('smoke',1)}
+ else if(m>=40){add('hoard',3);add('ball',2);add('stretch',2);if(okIce)add('icesc',1);if(okFire)add('smoke',1)}
+ else{add('hoard',2);add('stretch',1)}
+ if(hr>=7&&hr<10)add('stretch',3);
+ const tot=P.reduce((a,b)=>a+b[1],0);if(!tot)return false;let r=Math.random()*tot,pick=P[0][0];for(const[n,w]of P){if((r-=w)<0){pick=n;break}}
+ lastIdle=pick;if(pick==='icesc')S.ice=Math.max(0,S.ice-5);if(pick==='smoke')S.fire=Math.max(0,S.fire-5);
+ play(pick,2,mode==='pomo'&&pick==='love'?'Noa 在幫你加油':'');return true}
 function calm(){return S.phase==='live'&&!S.asleep&&!S.over&&S.health>=40&&S.food>=30&&S.mood>=20}
 function frameStep(){frame++;
   if(anim){anim.left--;if(anim.left<=0){if(S.phase==='hatching'){S.phase='live';S.t=Date.now();S.born=S.t;S.lastVisit=S.t;save();anim=null;play('jump',2,'Noa 誕生了！')}else{if(anim.row===R.rinya){S.missAfter=S.t+0.6*H;missReal=performance.now()+8000;facing='R';idleMode='idle'}const nx=anim.then;anim=null;if(nx)play(nx[0],nx[1],nx[2])}}}
-  else if(calm()){idleT++;
-   if(idleMode==='idle'&&idleT>18&&Math.random()<.12){const hr=hourOf(S.t),since=(S.t-S.lastVisit)/DAY;const pc=Math.min(.15,(hr>=18&&hr<23?.08:.03)+since*.03);const r=Math.random();const sleepy=(hr>=21&&hr<23)||night(S.t);if(S.ice>80&&S.ice>=S.fire){S.ice-=20;play('ice',1,'Noa 忍不住吐了一口冰息');idleT=0}else if(S.fire>80){S.fire-=20;S.clean=cl(S.clean-3);play('fire',1,'Noa 忍不住噴了一小口火');idleT=0}else if(sleepy&&Math.random()<.3){play('yawn',1);idleT=0}else{idleMode=r<pc?'crystal':r<pc+.55?'blink':'walk';if(idleMode==='crystal')facing='R';idleT=0}}
+  else if(calm()&&(mode==='pet'||mode==='pomo')){idleT++;
+   if(idleMode==='idle'&&idleT>18&&Math.random()<.12){const hr=hourOf(S.t),since=(S.t-S.lastVisit)/DAY;const pc=Math.min(.15,(hr>=18&&hr<23?.08:.03)+since*.03);const r=Math.random();const sleepy=(hr>=21&&hr<23)||night(S.t);if(S.ice>80&&S.ice>=S.fire){S.ice-=20;play('ice',1,'Noa 忍不住吐了一口冰息');idleT=0}else if(S.fire>80){S.fire-=20;S.clean=cl(S.clean-3);play('fire',1,'Noa 忍不住噴了一小口火');idleT=0}else if(sleepy&&Math.random()<.3){play('yawn',1);idleT=0}else if(Math.random()<(mode==='pomo'?.25:.3)&&idleAct()){idleT=0}else{idleMode=r<pc?'crystal':r<pc+.55?'blink':'walk';if(idleMode==='crystal')facing='R';idleT=0}}
    else if(idleMode==='crystal'&&idleT>=20){idleMode='idle';idleT=0}
    else if(idleMode==='blink'&&idleT>=4){idleMode='idle';idleT=0}
    else if(idleMode==='walk'){walkX+=walkDir*4;if(Math.abs(walkX)>20)walkDir*=-1;if(idleT>8&&Math.abs(walkX)<4){facing=walkDir<0?'L':'R';idleMode='idle';walkX=0;idleT=0}}}
