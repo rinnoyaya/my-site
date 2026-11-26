@@ -54,9 +54,9 @@ small{display:block;margin-top:14px;color:var(--mute);font-size:13px}
 </main>
 <script>
 {
-// ↓ 把這行換成 noa_sheet30.png 在 R2 上的公開網址
-const SHEET="https://img.obsidianfirelight.com/commissions/noa-sheet30-20261126-205908.png";
-const R={idle:0,blink:1,walk:2,sleep:3,eat:4,jump:5,angry:6,love:7,ice:8,fire:9,hatch:10,hungry:11,sick:12,bath:13,pet:14,over:15,miss:16,rinya:17,ball:18,walkL:19,blinkL:20,stretch:21,smoke:22,icesc:23,idleL:24,hoard:25,chase:26,roll:27,fly:28,yawn:29};
+// ↓ 把這行換成 noa_sheet31.png 在 R2 上的公開網址
+const SHEET="https://img.obsidianfirelight.com/commissions/noa-sheet31-20261126-212107.png";
+const R={idle:0,blink:1,walk:2,sleep:3,eat:4,jump:5,angry:6,love:7,ice:8,fire:9,hatch:10,hungry:11,sick:12,bath:13,pet:14,over:15,miss:16,rinya:17,ball:18,walkL:19,blinkL:20,stretch:21,smoke:22,icesc:23,idleL:24,hoard:25,chase:26,roll:27,fly:28,yawn:29,note:30};
 const YOFF={29:-2,21:-2,22:-2,23:-2,24:-2,25:-2,26:-2,27:1,28:-2};const LEFT=new Set(['walkL','blinkL','idleL','chase','roll','fly']);
 const PLAYS=[['ball',3,'玩球'],['chase',3,'追光點'],['hoard',3,'囤寶物'],['roll',3,'打滾'],['fly',2,'練習飛行'],['icesc',3,'做冰雕'],['smoke',3,'吐煙圈']];let lastPlay='';
 const MENU=[["feed","餵食"],["pet","摸頭"],["ball","玩耍"],["bath","洗澡"],["ice","藍色吐息"],["fire","噴火"],["sleep","睡覺"]];
@@ -203,8 +203,9 @@ function draw(){
  if(period(S.t)==='night'){for(let i=0;i<5;i++){if((frame+i*3)%7<5){g.fillStyle='#fff8d0';g.fillRect(20+(i*13)%56,74+(i*17)%22,1,1)}}}
  if(S.asleep&&S.phase==='live'){g.fillStyle='#0a0814aa';g.fillRect(0,62,240,200)}
  g.textBaseline='alphabetic';
- if(S.phase==='gone'){g.fillStyle='#f3ead9';g.fillRect(50,90,140,110);g.fillStyle='#d8cbb2';g.fillRect(50,190,140,10);
-  txt('Noa 去找 Rinya 了',62,130,14,'#3b2c22',700);txt('……好好照顧自己喔',62,155,12,'#5a4636');txt('按 OK 重新孵蛋',74,280,13,'#c9bcd3');return}
+ if(S.phase==='gone'){if(img.complete&&!imgErr)g.drawImage(img,(frame%4)*64,R.note*64,64,64,24,77,192,192);
+  g.font='700 15px "Noto Sans TC"';const m1='Noa 去找 Rinya 了';const w1=g.measureText(m1).width+28;g.fillStyle='#f3ead9';g.fillRect(120-w1/2,92,w1,58);g.fillStyle='#d8cbb2';g.fillRect(120-w1/2,146,w1,4);
+  txt(m1,134-w1/2,116,15,'#3b2c22',700);txt('……好好照顧自己喔',134-w1/2,139,12,'#5a4636');txt('按 OK 重新孵蛋',74,295,14,'#efe6f3',700);return}
  // status bar
  const d=new Date(S.t);txt(`${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`,10,20,14,'#efe6f3',700);
  if(S.phase==='live'){let ix=220;const ic=[];if(S.food<30)ic.push('food');if(S.clean<30)ic.push('clean');if(S.health<40)ic.push('health');if(Math.max(S.ice,S.fire)>80||Math.abs(S.ice-S.fire)>45)ic.push('magic');
