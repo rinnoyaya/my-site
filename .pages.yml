@@ -1507,6 +1507,55 @@ content:
         pattern:
           regex: ^(|https?://\S+|/\S+)$
           message: 請貼上 https:// 開頭的圖片網址（前後不要有空白）
+  - name: pet
+    label: ⑥ 諾雅的蛋（寵物機）
+    type: object
+    description: 收藏冊裡會有一顆蛋。訪客收集龍鱗到指定數量後蛋會孵化，出現前往寵物機的按鈕。寵物機不會出現在網站的其他地方
+    fields:
+    - name: enabled
+      label: 開啟
+      type: boolean
+      default: true
+    - name: url
+      label: 寵物機的網址
+      type: string
+      description: 留空是 /noa/（就是 noa 資料夾）
+    - name: need
+      label: 要收集幾片龍鱗才會孵化
+      type: number
+      description: 留空是全部找齊。填 0 的話一開始就孵化好了
+      options:
+        min: 0
+        max: 99
+    - name: title
+      label: 蛋的名稱
+      type: string
+      description: 留空是「諾雅的蛋」
+    - name: lockedText
+      label: 還沒孵化時的說明
+      type: text
+      description: 留空是「一顆有藍色和橘色花紋的蛋，摸起來暖暖的。好像在等著什麼……」
+    - name: openText
+      label: 孵化後的說明
+      type: text
+      description: 留空是「蛋殼裂開了，諾雅在裡面等你。」
+    - name: buttonText
+      label: 按鈕文字
+      type: string
+      description: 留空是「去看諾雅」
+    - name: wakeText
+      label: 剛好收集到指定數量時角色說的話
+      type: string
+      description: 留空是「收藏冊裡的那顆蛋……好像動了一下？」
+    - name: speaker
+      label: 說話的角色
+      type: reference
+      description: 留空就用龍鱗設定裡的說話角色
+      options:
+        collection: characters
+        value: '{fields.name}'
+        label: '{fields.name}'
+        search: fields.name
 - name: g-site
   label: 網站設定
   type: group
