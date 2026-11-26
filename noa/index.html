@@ -104,7 +104,7 @@ const SFX={move:[[880,.035]],ok:[[660,.06],[990,.09,.06]],deny:[[150,.16,0,'sawt
 function sfx(n){if(muted||catching||!AC||AC.state!=='running')return;try{const t=AC.currentTime;for(const[f,d,o=0,ty='square']of SFX[n]){const os=AC.createOscillator(),gn=AC.createGain();os.type=ty;os.frequency.value=f;gn.gain.setValueAtTime(.05,t+o);gn.gain.exponentialRampToValueAtTime(.0001,t+o+d);os.connect(gn).connect(AC.destination);os.start(t+o);os.stop(t+o+d+.03)}}catch(e){}}
 function buzz(){try{navigator.vibrate&&navigator.vibrate(8)}catch(e){}}
 function say(m){toast={m,until:performance.now()+2600}}
-function play(name,loops,msg){facing=LEFT.has(name)?'L':'R';anim={row:R[name],loops,n:4,left:loops*4};frame=0;ft=0;if(msg)say(msg)}
+function play(name,loops,msg,then){facing=LEFT.has(name)?'L':'R';anim={row:R[name],loops,n:4,left:loops*4,then};frame=0;ft=0;if(msg)say(msg)}
 function act(){
  if(S.phase==='egg'){S.phase='hatching';play('hatch',1);return}
  if(S.phase==='gone'){const runs=S.runs,bond=S.bond;S=fresh();S.runs=runs;S.bond=Math.floor(bond/2);save();return}
@@ -115,7 +115,7 @@ function act(){
  S.neglect=0;
  switch(id){
   case'feed':if(S.food>95){say('Noa 吃不下了');return}S.food=cl(S.food+40);S.clean=cl(S.clean-3);play('eat',2);break;
-  case'pet':if(S.over){S.petCalm++;if(S.petCalm>=3){S.over=false;S.ice=30;S.fire=30;S.mood=cl(S.mood+10);play('love',2,'Noa 平靜下來了')}else play('pet',1,`再摸 ${3-S.petCalm} 次`)}else{const hi=S.mood>=80;S.mood=cl(S.mood+15);play(hi?'love':'pet',2,hi?'Noa 撒嬌了':'')}break;
+  case'pet':if(S.over){S.petCalm++;if(S.petCalm>=3){S.over=false;S.ice=30;S.fire=30;S.mood=cl(S.mood+10);play('love',2,'Noa 平靜下來了')}else play('pet',1,`再摸 ${3-S.petCalm} 次`)}else{const hi=S.mood>=80;S.mood=cl(S.mood+15);play('pet',2,'',hi?['love',2,'Noa 撒嬌了']:null)}break;
   case'ball':{const opts=PLAYS.filter(p=>p[0]!==lastPlay&&!(p[0]==='icesc'&&(S.ice<15||S.fire-(S.ice-15)>45))&&!(p[0]==='smoke'&&(S.fire<15||S.ice-(S.fire-15)>45)));const [nm,lp,lab]=opts[Math.floor(Math.random()*opts.length)];lastPlay=nm;
    if(nm==='icesc'){S.ice=Math.max(0,S.ice-15);S.mood=cl(S.mood+20)}else if(nm==='smoke'){S.fire=Math.max(0,S.fire-15);S.mood=cl(S.mood+20)}else{S.mood=cl(S.mood+25);S.food=cl(S.food-(nm==='fly'?8:5))}
    play(nm,lp,'Noa '+lab);break}
@@ -220,11 +220,11 @@ function icon(k,x,y,s,grey){const m=ICON[k];for(let r=0;r<m.length;r++)for(let c
 function txt(s,x,y,sz,c,al){g.font=`${al||400} ${sz}px "Noto Sans TC",sans-serif`;g.fillStyle=c;g.fillText(s,x,y)}
 function bar(x,y,w,v,c,label,k){if(k){icon(k,x,y-2,2);x+=18}txt(label,x,y+10,12,'#c9bcd3');g.fillStyle='#2d2436';g.fillRect(x+62,y,w,10);g.fillStyle=c;g.fillRect(x+62,y,w*v/100,10);txt(String(Math.round(v)),x+66+w,y+10,12,'#efe6f3')}
 function draw(){
+ if(S.phase==='live'&&mode==='game'&&G){const B=GBG||buildGameBg();g.drawImage(B.sky,0,0);drawScroll(B.far,G.dist*.12,0);drawScroll(B.mid,G.dist*.4,0);drawScroll(B.gr,G.dist,232);g.textBaseline='alphabetic';drawGame();if(toast&&performance.now()<toast.until){g.font='700 13px "Noto Sans TC"';const w=g.measureText(toast.m).width+20;g.fillStyle='#efe6f3';g.fillRect(120-w/2,36,w,24);txt(toast.m,130-w/2,53,13,'#1c1e28',700)}return}
  g.drawImage(bgFor(S.t),0,0);
  if(period(S.t)==='night'){for(let i=0;i<5;i++){if((frame+i*3)%7<5){g.fillStyle='#fff8d0';g.fillRect(20+(i*13)%56,74+(i*17)%22,1,1)}}}
  if(S.asleep&&S.phase==='live'){g.fillStyle='#0a0814aa';g.fillRect(0,62,240,200)}
  g.textBaseline='alphabetic';
- if(S.phase==='live'&&(mode==='game')&&G){drawGame();if(toast&&performance.now()<toast.until){g.font='700 13px "Noto Sans TC"';const w=g.measureText(toast.m).width+20;g.fillStyle='#efe6f3';g.fillRect(120-w/2,36,w,24);txt(toast.m,130-w/2,53,13,'#1c1e28',700)}return}
  if(S.phase==='gone'){if(img.complete&&!imgErr)g.drawImage(img,(frame%4)*64,R.note*64,64,64,24,77,192,192);
   g.font='700 15px "Noto Sans TC"';const m1='Noa 去找 Rinya 了';const w1=g.measureText(m1).width+28;g.fillStyle='#f3ead9';g.fillRect(120-w1/2,92,w1,58);g.fillStyle='#d8cbb2';g.fillRect(120-w1/2,146,w1,4);
   txt(m1,134-w1/2,116,15,'#3b2c22',700);txt('……好好照顧自己喔',134-w1/2,139,12,'#5a4636');txt('按 OK 重新孵蛋',74,295,14,'#efe6f3',700);return}
@@ -283,7 +283,6 @@ function endGame(){const sc=gameScore(),st=snap();S.best=Math.max(S.best||0,sc);
 function startPomo(){S.pomo={end:Date.now()+POMO[pomoIdx]*60e3,len:POMO[pomoIdx]};mode='pomo';sfx('ok');say('開始專心 '+POMO[pomoIdx]+' 分鐘');save()}
 function pomoCheck(){if(mode==='pomo'&&S.pomo&&Date.now()>=S.pomo.end){const st=snap(),len=S.pomo.len;S.pomo=null;mode='pet';const td=today();if(S.pomoDay!==td){S.pomoDay=td;S.pomoN=0}S.pomoN++;S.bond=Math.min(100,S.bond+Math.round(len/8));S.mood=cl(S.mood+20);gain(st);play('jump',2,'專心完成！羈絆 +'+Math.round(len/8));sfx('hatch');save()}}
 function drawGame(){
- g.fillStyle='#5e3d2c';for(let i=0;i<7;i++){const x=((i*44-G.dist)%308+308)%308-34;g.fillRect(x,244,16,2);g.fillRect(x+22,254,10,2)}
  for(const o of G.snk)icon(o.k,o.x,130,3);
  for(const o of G.obs)icon(o.k,o.x,211,3);
  g.fillStyle='#0000002e';const sw=Math.max(14,34-G.y/3);g.fillRect(6+66-sw,233,sw*2,3);
@@ -300,6 +299,39 @@ function drawModeOverlay(){
   g.fillStyle='#2d2436';g.fillRect(40,121,160,4);g.fillStyle='#ff8a3d';g.fillRect(40,121,160*(1-left/(S.pomo.len*60e3)),4)}
 }
 function modeBar(){g.fillStyle='#14111a';g.fillRect(0,262,240,58);const t={more:'上下選擇・OK 確定・長按返回',pomoSet:'上下選時間・OK 開始・長按返回',pomo:pomoConfirm>performance.now()?'再長按一次放棄':'長按 OK 放棄'}[mode];g.font='700 13px "Noto Sans TC"';txt(t,120-g.measureText(t).width/2,296,13,'#efe6f3',700)}
+
+// ---- jump-game scenery: 冰火之境 (parallax, drawn once) ----
+let GBG=null;
+function buildGameBg(){
+ const mk=(w,h)=>{const c=document.createElement('canvas');c.width=w;c.height=h;return[c,c.getContext('2d')]};
+ const r=rnd(42);
+ // sky
+ const[sky,s]=mk(240,262);const bands=['#1d1633','#241a3d','#2c2047','#352652','#3f2d5c','#4b3566','#5a3f6e','#6d4a74','#835576'];
+ bands.forEach((c,i)=>{s.fillStyle=c;s.fillRect(0,i*24,240,24);if(i){s.fillStyle=bands[i-1];for(let x=(i%2)*2;x<240;x+=4)s.fillRect(x,i*24,2,2)}});
+ for(let i=0;i<40;i++){s.fillStyle=r()<.3?'#fff8d0':'#cdbde6';s.fillRect(Math.floor(r()*240),Math.floor(r()*120),1,1)}
+ s.fillStyle='#f6f0c8';s.fillRect(182,48,14,14);s.fillRect(180,50,18,10);s.fillRect(184,46,10,18);s.fillStyle='#e8dfb0';s.fillRect(186,52,3,3);s.fillRect(191,57,2,2);
+ // far mountains: icy peaks + a volcano, 480 wide tile
+ const[far,f]=mk(480,262);
+ const peak=(cx,h,w,snow)=>{for(let x=-w;x<=w;x++){const y=Math.round(h*(1-Math.abs(x)/w));const top=190-y;f.fillStyle='#3a2f58';f.fillRect((cx+x+480)%480,top,1,262-top);if(snow&&y>h*.62){f.fillStyle='#cfe3ff';f.fillRect((cx+x+480)%480,top,1,Math.max(2,Math.round((y-h*.62)*.6)))}}};
+ peak(40,70,60,true);peak(120,46,40,true);peak(200,58,50,true);
+ // volcano
+ for(let x=-70;x<=70;x++){const ax=Math.abs(x);const y=ax<12?80:Math.round(80*(1-(ax-12)/58));const top=190-y;f.fillStyle='#43283a';f.fillRect(330+x,top,1,262-top);if(ax<12){f.fillStyle=ax<8?'#ff8a3d':'#e0533d';f.fillRect(330+x,top,1,2)}}
+ [[326,96],[332,90],[322,86],[334,80],[328,74]].forEach(([x,y],i)=>{f.fillStyle=i<2?'#7a5a6e':'#5e4a62';f.fillRect(x,y,6+i,4)});
+ for(let i=0;i<6;i++){f.fillStyle='#ff8a3d';f.fillRect(318+i*5,112+((i*7)%9),2,6)}
+ peak(430,50,46,true);
+ // mid hills with pines
+ const[mid,m]=mk(320,262);
+ for(let x=0;x<320;x++){const y=Math.round(196+8*Math.sin(x/320*Math.PI*4)+4*Math.sin(x/320*Math.PI*10));m.fillStyle='#2a2140';m.fillRect(x,y,1,262-y)}
+ for(let i=0;i<14;i++){const x=Math.floor(i*23+r()*10),base=Math.round(196+8*Math.sin(x/320*Math.PI*4)+4*Math.sin(x/320*Math.PI*10));const h=10+Math.floor(r()*10);
+  for(let k=0;k<h;k++){const w=Math.max(1,Math.floor((k)/2));m.fillStyle='#1f1832';m.fillRect(x-w,base-h+k,w*2+1,1)}
+  if(r()<.5){m.fillStyle='#bfe4ff';m.fillRect(x,base-h,1,2)}}
+ // ground strip 240..262, 96-wide tile: frost on the left half, embers on the right
+ const[gr,q]=mk(96,30);
+ q.fillStyle='#4a3530';q.fillRect(0,0,96,30);q.fillStyle='#3a2a28';for(let i=0;i<12;i++)q.fillRect(Math.floor(r()*96),6+Math.floor(r()*22),3,2);
+ for(let x=0;x<96;x++){const ice=x<48;q.fillStyle=ice?'#bfe4ff':'#7a4a3a';q.fillRect(x,0,1,2);q.fillStyle=ice?'#6fb7ff':'#ff8a3d';if(x%7===0)q.fillRect(x,2,2,1)}
+ q.fillStyle='#ffd24a';q.fillRect(60,10,1,1);q.fillRect(80,16,1,1);q.fillStyle='#ffffff';q.fillRect(12,9,1,1);q.fillRect(30,15,1,1);
+ GBG={sky,far,mid,gr};return GBG}
+function drawScroll(c,off,y){const w=c.width;let x=-((Math.floor(off)%w+w)%w);for(;x<240;x+=w)g.drawImage(c,x,y)}
 function loop(now){
  const dt=Math.min(now-last,1000);last=now;
  tick(dt*speed);
@@ -309,7 +341,7 @@ function loop(now){
 }
 function calm(){return S.phase==='live'&&!S.asleep&&!S.over&&S.health>=40&&S.food>=30&&S.mood>=20}
 function frameStep(){frame++;
-  if(anim){anim.left--;if(anim.left<=0){if(S.phase==='hatching'){S.phase='live';S.t=Date.now();S.born=S.t;S.lastVisit=S.t;save();anim=null;play('jump',2,'Noa 誕生了！')}else{if(anim.row===R.rinya){S.missAfter=S.t+0.6*H;missReal=performance.now()+8000;facing='R';idleMode='idle'}anim=null}}}
+  if(anim){anim.left--;if(anim.left<=0){if(S.phase==='hatching'){S.phase='live';S.t=Date.now();S.born=S.t;S.lastVisit=S.t;save();anim=null;play('jump',2,'Noa 誕生了！')}else{if(anim.row===R.rinya){S.missAfter=S.t+0.6*H;missReal=performance.now()+8000;facing='R';idleMode='idle'}const nx=anim.then;anim=null;if(nx)play(nx[0],nx[1],nx[2])}}}
   else if(calm()){idleT++;
    if(idleMode==='idle'&&idleT>18&&Math.random()<.12){const hr=hourOf(S.t),since=(S.t-S.lastVisit)/DAY;const pc=Math.min(.15,(hr>=18&&hr<23?.08:.03)+since*.03);const r=Math.random();const sleepy=(hr>=21&&hr<23)||night(S.t);if(S.ice>80&&S.ice>=S.fire){S.ice-=20;play('ice',1,'Noa 忍不住吐了一口冰息');idleT=0}else if(S.fire>80){S.fire-=20;S.clean=cl(S.clean-3);play('fire',1,'Noa 忍不住噴了一小口火');idleT=0}else if(sleepy&&Math.random()<.3){play('yawn',1);idleT=0}else{idleMode=r<pc?'crystal':r<pc+.55?'blink':'walk';if(idleMode==='crystal')facing='R';idleT=0}}
    else if(idleMode==='crystal'&&idleT>=20){idleMode='idle';idleT=0}
