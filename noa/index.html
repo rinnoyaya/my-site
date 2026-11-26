@@ -54,14 +54,14 @@ small{display:block;margin-top:14px;color:var(--mute);font-size:13px}
 </main>
 <script>
 {
-// ↓ 把這行換成 noa_sheet20.png 在 R2 上的公開網址
-const SHEET="https://img.obsidianfirelight.com/commissions/img-7451-20261126-162949.png";
-const R={idle:0,blink:1,walk:2,sleep:3,eat:4,jump:5,angry:6,love:7,ice:8,fire:9,hatch:10,hungry:11,sick:12,bath:13,pet:14,over:15,miss:16,rinya:17,ball:18,walkL:19};
+// ↓ 把這行換成 noa_sheet21.png 在 R2 上的公開網址
+const SHEET="https://img.obsidianfirelight.com/commissions/img-7453-20261126-165331.png";
+const R={idle:0,blink:1,walk:2,sleep:3,eat:4,jump:5,angry:6,love:7,ice:8,fire:9,hatch:10,hungry:11,sick:12,bath:13,pet:14,over:15,miss:16,rinya:17,ball:18,walkL:19,blinkL:20};
 const MENU=[["feed","餵食"],["pet","摸頭"],["ball","玩球"],["bath","洗澡"],["ice","藍色吐息"],["fire","噴火"],["sleep","睡覺"]];
 const cv=document.getElementById('scr'),g=cv.getContext('2d');g.imageSmoothingEnabled=false;
 const img=new Image();let imgErr=false;img.onerror=()=>{imgErr=true};img.src=SHEET;
 const H=3600e3,DAY=24*H,KEY='noa-proto-v1';
-let S,speed=60,sel=0,anim=null,frame=0,ft=0,statusOpen=false,toast=null,walkX=0,walkDir=1,idleMode='idle',idleT=0,last=performance.now();
+let S,speed=60,sel=0,anim=null,frame=0,ft=0,statusOpen=false,toast=null,walkX=0,walkDir=1,facing='R',idleMode='idle',idleT=0,last=performance.now();
 function fresh(){return{t:Date.now(),phase:'egg',food:80,clean:90,mood:70,health:100,ice:20,fire:20,bond:0,neglect:0,lastVisit:Date.now(),born:Date.now(),runs:0,petCalm:0,over:false,asleep:false,manualSleep:false,wakeUntil:0}}
 function load(){try{const j=JSON.parse(localStorage.getItem(KEY));if(j&&j.phase){if(j.phase==='hatching')j.phase='egg';return j}}catch(e){}return fresh()}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
@@ -91,7 +91,7 @@ function tick(ms){
  }
 }
 function say(m){toast={m,until:performance.now()+2600}}
-function play(name,loops,msg){anim={row:R[name],loops,n:name==='ball'?3:4,left:loops*(name==='ball'?3:4)};frame=0;ft=0;if(msg)say(msg)}
+function play(name,loops,msg){facing='R';anim={row:R[name],loops,n:name==='ball'?3:4,left:loops*(name==='ball'?3:4)};frame=0;ft=0;if(msg)say(msg)}
 function act(){
  if(S.phase==='egg'){S.phase='hatching';play('hatch',1);return}
  if(S.phase==='gone'){const runs=S.runs,bond=S.bond;S=fresh();S.runs=runs;S.bond=Math.floor(bond/2);save();return}
@@ -119,7 +119,9 @@ function baseRow(){
  if(S.food<30)return{row:R.hungry};
  if(S.mood<20)return{row:R.angry};
  if(S.bond>=50&&S.t-S.lastVisit>3*DAY)return{row:R.miss};
- return{row:idleMode==='walk'&&walkDir<0?R.walkL:R[idleMode],walk:idleMode==='walk'};
+ if(idleMode==='walk')return{row:walkDir<0?R.walkL:R.walk,walk:true};
+ if(facing==='L')return idleMode==='blink'?{row:R.blinkL}:{row:R.blinkL,frames:[0,0]};
+ return{row:R[idleMode]};
 }
 // drawing
 // ---- cozy lair background (drawn once per time-of-day, cached) ----
@@ -234,7 +236,7 @@ function loop(now){
   else if(S.phase==='live'){idleT++;
    if(idleMode==='idle'&&idleT>18&&Math.random()<.12){idleMode=Math.random()<.6?'blink':'walk';idleT=0}
    else if(idleMode==='blink'&&idleT>=4){idleMode='idle';idleT=0}
-   else if(idleMode==='walk'){walkX+=walkDir*4;if(Math.abs(walkX)>20)walkDir*=-1;if(idleT>16&&Math.abs(walkX)<4){idleMode='idle';walkX=0;idleT=0}}}
+   else if(idleMode==='walk'){walkX+=walkDir*4;if(Math.abs(walkX)>20)walkDir*=-1;if(idleT>8&&Math.abs(walkX)<4){facing=walkDir<0?'L':'R';idleMode='idle';walkX=0;idleT=0}}}
  }
  draw();requestAnimationFrame(loop);
 }
