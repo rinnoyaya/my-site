@@ -56,7 +56,7 @@ small{display:block;margin-top:14px;color:var(--mute);font-size:13px}
 </main>
 <script>
 {
-// ↓ 把這行換成 noa_sheet31.png 在 R2 上的公開網址
+// Noa 素材表（R2）；換新素材表時只要改這一行
 const SHEET="https://img.obsidianfirelight.com/commissions/noa-sheet31-20261126-212107.png";
 const R={idle:0,blink:1,walk:2,sleep:3,eat:4,jump:5,angry:6,love:7,ice:8,fire:9,hatch:10,hungry:11,sick:12,bath:13,pet:14,over:15,miss:16,rinya:17,ball:18,walkL:19,blinkL:20,stretch:21,smoke:22,icesc:23,idleL:24,hoard:25,chase:26,roll:27,fly:28,yawn:29,note:30};
 const YOFF={29:-2,21:-2,22:-2,23:-2,24:-2,25:-2,26:-2,27:1,28:-2};const LEFT=new Set(['walkL','blinkL','idleL','chase','roll','fly']);
@@ -65,7 +65,7 @@ const MENU=[["feed","餵食"],["pet","摸頭"],["ball","玩耍"],["bath","洗澡
 const cv=document.getElementById('scr'),g=cv.getContext('2d');g.imageSmoothingEnabled=false;
 const img=new Image();let imgErr=false;img.onerror=()=>{imgErr=true};img.src=SHEET;
 const H=3600e3,DAY=24*H,KEY='noa-proto-v1';
-let floats=[],AC=null,muted=false,breathWarn={},catching=false,S,speed=60,sel=0,anim=null,frame=0,ft=0,statusOpen=false,toast=null,walkX=0,walkDir=1,facing='R',idleMode='idle',idleT=0,last=performance.now();
+let missReal=0,floats=[],AC=null,muted=false,breathWarn={},catching=false,S,speed=60,sel=0,anim=null,frame=0,ft=0,statusOpen=false,toast=null,walkX=0,walkDir=1,facing='R',idleMode='idle',idleT=0,last=performance.now();
 function fresh(){return{t:Date.now(),phase:'egg',food:80,clean:90,mood:70,health:100,ice:20,fire:20,bond:0,neglect:0,lastVisit:Date.now(),born:Date.now(),runs:0,petCalm:0,over:false,asleep:false,manualSleep:false,wakeUntil:0}}
 function load(){try{const j=JSON.parse(localStorage.getItem(KEY));if(j&&j.phase){if(j.phase==='hatching')j.phase='egg';return j}}catch(e){}return fresh()}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
@@ -91,7 +91,7 @@ function tick(ms){
   if(!sl){
    if(S.food<20&&S.mood<20){const before=S.neglect;S.neglect+=h;if(before<12&&S.neglect>=12)say('Noa 一直望著外面……');if(S.neglect>=24){S.phase='gone';S.runs++;save();return}}
    else S.neglect=Math.max(0,S.neglect-h*2);
-   const due=S.firstVisitAt&&S.t>=S.firstVisitAt;const hr=hourOf(S.t);if(S.bond>=50&&!S.over&&!anim&&!catching&&hr>=9&&hr<21&&(due||(Math.random()<h*(S.bond/100)*0.15&&S.t-S.lastVisit>DAY*0.5))){S.firstVisitAt=0;{const st=snap();S.lastVisit=S.t;S.missAfter=S.t+0.6*H;S.mood=100;statusOpen=false;gain(st);sfx('rinya')}play('rinya',5,'Rinya 來看 Noa 了！')}
+   const due=S.firstVisitAt&&S.t>=S.firstVisitAt;const hr=hourOf(S.t);if(S.bond>=50&&!S.over&&!anim&&!catching&&hr>=9&&hr<21&&(due||(Math.random()<h*(S.bond/100)*0.15&&S.t-S.lastVisit>DAY*0.5))){S.firstVisitAt=0;{const st=snap();S.lastVisit=S.t;S.missAfter=0;S.mood=100;statusOpen=false;gain(st);sfx('rinya')}play('rinya',5,'Rinya 來看 Noa 了！')}
   }
  }
 }
@@ -133,7 +133,7 @@ function baseRow(){
  if(S.food<30)return{row:R.hungry};
  if(S.mood<20)return{row:R.angry};
  if(S.bond>=50&&S.t-S.lastVisit>1.5*DAY)return{row:R.miss};
- if(S.missAfter>S.t)return{row:R.miss};
+ if(S.missAfter>S.t||performance.now()<missReal)return{row:R.miss};
  if(idleMode==='crystal')return{row:R.miss};
  if(idleMode==='walk')return{row:walkDir<0?R.walkL:R.walk,walk:true};
  if(facing==='L')return idleMode==='blink'?{row:R.blinkL}:{row:R.idleL};
@@ -266,7 +266,7 @@ function loop(now){
 }
 function calm(){return S.phase==='live'&&!S.asleep&&!S.over&&S.health>=40&&S.food>=30&&S.mood>=20}
 function frameStep(){frame++;
-  if(anim){anim.left--;if(anim.left<=0){if(S.phase==='hatching'){S.phase='live';S.t=Date.now();S.born=S.t;S.lastVisit=S.t;save();anim=null;play('jump',2,'Noa 誕生了！')}else anim=null}}
+  if(anim){anim.left--;if(anim.left<=0){if(S.phase==='hatching'){S.phase='live';S.t=Date.now();S.born=S.t;S.lastVisit=S.t;save();anim=null;play('jump',2,'Noa 誕生了！')}else{if(anim.row===R.rinya){S.missAfter=S.t+0.6*H;missReal=performance.now()+8000;facing='R';idleMode='idle'}anim=null}}}
   else if(calm()){idleT++;
    if(idleMode==='idle'&&idleT>18&&Math.random()<.12){const hr=hourOf(S.t),since=(S.t-S.lastVisit)/DAY;const pc=Math.min(.35,(hr>=18&&hr<23?.12:.04)+since*.08);const r=Math.random();const sleepy=(hr>=21&&hr<23)||night(S.t);if(sleepy&&Math.random()<.3){play('yawn',1);idleT=0}else{idleMode=r<pc?'crystal':r<pc+.55?'blink':'walk';if(idleMode==='crystal')facing='R';idleT=0}}
    else if(idleMode==='crystal'&&idleT>=28){idleMode='idle';idleT=0}
