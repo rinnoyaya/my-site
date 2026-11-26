@@ -66,7 +66,7 @@ const cv=document.getElementById('scr'),g=cv.getContext('2d');g.imageSmoothingEn
 const img=new Image();let imgErr=false;img.onerror=()=>{imgErr=true};img.src=SHEET;
 const H=3600e3,DAY=24*H,KEY='noa-proto-v1';
 let missReal=0,floats=[],AC=null,muted=false,breathWarn={},catching=false,S,speed=60,sel=0,anim=null,frame=0,ft=0,statusOpen=false,toast=null,walkX=0,walkDir=1,facing='R',idleMode='idle',idleT=0,last=performance.now();
-function fresh(){return{t:Date.now(),phase:'egg',food:80,clean:90,mood:70,health:100,ice:20,fire:20,bond:0,neglect:0,lastVisit:Date.now(),born:Date.now(),runs:0,petCalm:0,over:false,asleep:false,manualSleep:false,wakeUntil:0}}
+function fresh(){return{t:Date.now(),phase:'egg',food:80,clean:90,mood:70,health:100,ice:20,fire:20,bond:0,neglect:0,lastVisit:Date.now(),born:Date.now(),runs:0,petCalm:0,over:false,asleep:false,manualSleep:false,wakeUntil:0,mem:[]}}
 function load(){try{const j=JSON.parse(localStorage.getItem(KEY));if(j&&j.phase){if(j.phase==='hatching')j.phase='egg';return j}}catch(e){}return fresh()}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
 S=load();
@@ -87,11 +87,11 @@ function tick(ms){
   const bad=S.food<20||S.clean<20||S.mood<20;
   S.health=cl(S.health+(bad?-5:4)*h);
   if(!S.over&&!sl&&(S.ice>=100||S.fire>=100||Math.abs(S.ice-S.fire)>60)){S.over=true;S.asleep=false;S.petCalm=0;sfx('alarm');S.mood=cl(S.mood-20);S.clean=cl(S.clean-20);say('魔力暴走了！摸頭安撫它')}
-  const low=Math.min(S.food,S.clean,S.mood),avg=(S.food+S.clean+S.mood)/3;const pb=S.bond;S.bond=Math.max(0,Math.min(100,S.bond+(low>=30&&avg>=50?0.9:low>=20?0.3:-0.3)*h));if(Math.floor(S.bond/20)>Math.floor(pb/20)&&!catching&&!anim&&!sl&&mode==='pet')play('love',2,'和 Noa 更親近了');if(pb<50&&S.bond>=50&&!S.bondMet){S.bondMet=true;S.lastVisit=S.t;S.firstVisitAt=S.t+(1+Math.random()*3)*H}
+  const low=Math.min(S.food,S.clean,S.mood),avg=(S.food+S.clean+S.mood)/3;const pb=S.bond;S.bond=Math.max(0,Math.min(100,S.bond+(low>=30&&avg>=50?0.9:low>=20?0.3:-0.3)*h));if(Math.floor(S.bond/20)>Math.floor(pb/20)&&!catching&&!anim&&!sl&&mode==='pet'){play('love',2,'和 Noa 更親近了');addMem('羈絆升到 '+Math.floor(S.bond/20)+' 顆心')}if(pb<50&&S.bond>=50&&!S.bondMet){S.bondMet=true;S.lastVisit=S.t;S.firstVisitAt=S.t+(1+Math.random()*3)*H}
   if(!sl){
-   if(S.food<20&&S.mood<20){const before=S.neglect;S.neglect+=h;if(before<12&&S.neglect>=12)say('Noa 一直望著外面……');if(S.neglect>=24){S.phase='gone';S.runs++;save();return}}
+   if(S.food<20&&S.mood<20){const before=S.neglect;S.neglect+=h;if(before<12&&S.neglect>=12)say('Noa 一直望著外面……');if(S.neglect>=24){S.phase='gone';S.runs++;addMem('Noa 去找 Rinya 了');save();return}}
    else S.neglect=Math.max(0,S.neglect-h*2);
-   const due=S.firstVisitAt&&S.t>=S.firstVisitAt;const hr=hourOf(S.t);if(S.bond>=50&&!S.over&&!anim&&!catching&&(mode==='pet'||mode==='pomo')&&hr>=9&&hr<21&&(due||(Math.random()<h*(S.bond/100)*0.15&&S.t-S.lastVisit>DAY*0.5))){S.firstVisitAt=0;{const st=snap();S.lastVisit=S.t;S.missAfter=0;S.mood=100;statusOpen=false;gain(st);sfx('rinya')}play('rinya',5,'Rinya 來看 Noa 了！')}
+   const due=S.firstVisitAt&&S.t>=S.firstVisitAt;const hr=hourOf(S.t);if(S.bond>=50&&!S.over&&!anim&&!catching&&(mode==='pet'||mode==='pomo')&&hr>=9&&hr<21&&(due||(Math.random()<h*(S.bond/100)*0.15&&S.t-S.lastVisit>DAY*0.5))){S.firstVisitAt=0;{const st=snap();addMem('Rinya 來看 Noa');S.lastVisit=S.t;S.missAfter=0;S.mood=100;statusOpen=false;gain(st);sfx('rinya')}play('rinya',5,'Rinya 來看 Noa 了！')}
   }
  }
 }
@@ -106,7 +106,7 @@ function say(m){toast={m,until:performance.now()+2600}}
 function play(name,loops,msg,then){facing=LEFT.has(name)?'L':'R';anim={row:R[name],loops,n:4,left:loops*4,then};frame=0;ft=0;if(msg)say(msg)}
 function act(){
  if(S.phase==='egg'){S.phase='hatching';play('hatch',1);return}
- if(S.phase==='gone'){const runs=S.runs,bond=S.bond;S=fresh();S.runs=runs;S.bond=Math.floor(bond/2);save();return}
+ if(S.phase==='gone'){const runs=S.runs,bond=S.bond,mem=S.mem||[],best=S.best;S=fresh();S.runs=runs;S.bond=Math.floor(bond/2);S.mem=mem;S.best=best;save();return}
  if(S.phase!=='live')return;if(anim&&MENU[sel][0]!=='more')return;
  const id=MENU[sel][0];
  if(S.over&&id!=='pet'){say('Noa 太激動了，先摸摸頭');return}
@@ -212,6 +212,8 @@ moon:['..OOO..','.OO....','OO.....','OO.....','OO.....','.OO....','..OOO..'],
 sun:['Y..Y..Y','.Y.Y.Y.','..YYY..','YYYYYYY','..YYY..','.Y.Y.Y.','Y..Y..Y'],
 heart:['.H.H.','HHHHH','HHHHH','.HHH.','..H..'],
 heart0:['.Q.Q.','QQQQQ','QQQQQ','.QQQ.','..Q..'],
+cloud:['.......','..WWW..','.WWWWW.','WWWWWWW','WWWWWWW','.......','.......'],
+rain:['..SSS..','.SSSSS.','SSSSSSS','.......','.B.B.B.','B.B.B..','.......'],
 star:['...Y...','..YYY..','YYYYYYY','.YYYYY.','..YYY..','.YY.YY.','YY...YY']};
 const MICON={more:'star',feed:'food',pet:'hand',ball:'ball',bath:'bubble',ice:'ice',fire:'fire',sleep:'moon',wake:'sun'};
 function reason(id){if(S.phase!=='live')return'';if(S.asleep&&id!=='sleep')return'睡覺中';if(S.over&&id!=='pet')return'太激動';if(id==='feed'&&S.food>95)return'吃不下';if(id==='ice'&&S.ice<15)return'冰魔力不足';if(id==='fire'&&S.fire<15)return'火魔力不足';return''}
@@ -222,6 +224,7 @@ function draw(){
  if(S.phase==='live'&&mode==='game'&&G){const B=GBG||buildGameBg();g.drawImage(B.sky,0,0);drawScroll(B.far,G.dist*.12,0);drawScroll(B.mid,G.dist*.4,0);drawScroll(B.gr,G.dist,232);g.textBaseline='alphabetic';drawGame();if(toast&&performance.now()<toast.until){g.font='700 13px "Noto Sans TC"';const w=g.measureText(toast.m).width+20;g.fillStyle='#efe6f3';g.fillRect(120-w/2,36,w,24);txt(toast.m,130-w/2,53,13,'#1c1e28',700)}return}
  g.drawImage(bgFor(S.t),0,0);
  if(period(S.t)==='night'){for(let i=0;i<5;i++){if((frame+i*3)%7<5){g.fillStyle='#fff8d0';g.fillRect(20+(i*13)%56,74+(i*17)%22,1,1)}}}
+ if(S.phase!=='gone')drawWeather();
  if(S.asleep&&S.phase==='live'){g.fillStyle='#0a0814aa';g.fillRect(0,62,240,200)}
  g.textBaseline='alphabetic';
  if(S.phase==='gone'){if(img.complete&&!imgErr)g.drawImage(img,(frame%4)*64,R.note*64,64,64,24,77,192,192);
@@ -229,7 +232,7 @@ function draw(){
   txt(m1,134-w1/2,116,15,'#3b2c22',700);txt('……好好照顧自己喔',134-w1/2,139,12,'#5a4636');txt('按 OK 重新孵蛋',74,295,14,'#efe6f3',700);return}
  // status bar
  const d=new Date(S.t);txt(`${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`,10,20,14,'#efe6f3',700);
- if(S.phase==='live'){const hb=Math.round(S.bond/20);for(let i=0;i<5;i++)icon(i<hb?'heart':'heart0',58+i*13,9,2)}
+ if(S.phase==='live'){const hb=Math.round(S.bond/20);for(let i=0;i<5;i++)icon(i<hb?'heart':'heart0',58+i*13,9,2);const wi={sun:'sun',cloud:'cloud',rain:'rain',snow:'ice'}[weatherOf(S.t)];icon(wi,128,8,2)}
  if(S.phase==='live'){let ix=220;const ic=[];if(S.food<30)ic.push('food');if(S.clean<30)ic.push('clean');if(S.health<40)ic.push('health');if(Math.max(S.ice,S.fire)>80||Math.abs(S.ice-S.fire)>45)ic.push('magic');
   const blink=frame%4<3;for(const k of ic){g.fillStyle='#3a2030';g.fillRect(ix-4,5,20,20);if(blink)icon(k,ix-1,8,2);ix-=24}}
  // mini stat bars
@@ -253,15 +256,18 @@ function draw(){
   {const id=MENU[sel][0],why=reason(id);const lab=(id==='sleep'&&S.asleep?'叫醒':MENU[sel][1])+(why?'・'+why:'');
    g.font='700 14px "Noto Sans TC"';const w=g.measureText(lab).width;txt(lab,120-w/2,311,14,why?'#8a7d96':'#efe6f3',700)}
  }
- if(statusOpen&&S.phase==='live'){
+ if(statusOpen&&S.phase==='live'&&statusPage===1){g.fillStyle='#141019ee';g.fillRect(10,34,220,226);txt('回憶錄',22,58,15,'#efe6f3',700);txt('上下切換',172,58,11,'#7f7090');
+  const L=(S.mem||[]).slice(0,8);if(!L.length)txt('還沒有回憶，和 Noa 一起創造吧',22,90,12,'#a897b3');
+  L.forEach((m,i)=>{const d=new Date(m.t),y=84+i*22;txt(`${d.getMonth()+1}/${d.getDate()}`,22,y,11,'#7f7090',700);g.font='400 12px "Noto Sans TC"';let s=m.s;while(g.measureText(s).width>156&&s.length>2)s=s.slice(0,-2)+'…';txt(s,62,y,12,'#efe6f3')})}
+ else if(statusOpen&&S.phase==='live'){
   g.fillStyle='#141019ee';g.fillRect(10,34,220,226);txt('Noa 的狀態',22,58,15,'#efe6f3',700);
-  const age=Math.floor((S.t-S.born)/DAY);txt(`第 ${age+1} 天`,170,58,12,'#a897b3');
+  const age=Math.floor((S.t-S.born)/DAY);if((S.ms||[]).length)icon('star',154,47,2);txt(`第 ${age+1} 天`,170,58,12,'#a897b3');
   bar(22,72,92,S.food,'#ffb347','飽足','food');bar(22,94,92,S.clean,'#cdb98b','清潔','clean');bar(22,116,92,S.mood,'#ff8fa3','心情','mood');bar(22,138,92,S.health,'#8fd18f','健康','health');
   bar(22,166,92,S.ice,'#6fb7ff','冰魔力','ice');bar(22,188,92,S.fire,'#ff8a3d','火魔力','fire');bar(22,216,92,S.bond,'#c58bff','羈絆','magic');
-  txt(S.bond>=50?'Rinya 可能會來訪':'羈絆 50 以上 Rinya 會來訪',22,250,11,'#a897b3');
+  txt(S.bond>=50?'Rinya 可能會來訪':'羈絆 50 以上 Rinya 會來訪',22,250,11,'#a897b3');txt('▼ 回憶錄',176,250,11,'#7f7090',700);
  }
  if(S.phase==='live')drawModeOverlay();
- if(toast&&performance.now()<toast.until){g.font='700 13px "Noto Sans TC"';const w=g.measureText(toast.m).width+20;g.fillStyle='#efe6f3';const ty=68;g.fillRect(120-w/2,ty,w,24);txt(toast.m,130-w/2,ty+17,13,'#1c1e28',700)}
+ if(toast&&!statusOpen&&performance.now()<toast.until){g.font='700 13px "Noto Sans TC"';const w=g.measureText(toast.m).width+20;g.fillStyle='#efe6f3';const ty=68;g.fillRect(120-w/2,ty,w,24);txt(toast.m,130-w/2,ty+17,13,'#1c1e28',700)}
 }
 
 // ---- modes: more menu, pomodoro, jump game ----
@@ -278,9 +284,9 @@ function gameStep(dt){if(!G||G.over)return;dt=Math.min(dt,.05);G.t+=dt;const sp=
  const nl=6+52,nr=6+88,nb=232-G.y,nt=nb-64;
  for(const o of G.obs){if(o.x+15>nl&&o.x+6<nr&&nb>219){G.over=true;sfx('deny');buzz();break}}
  G.snk=G.snk.filter(o=>{if(o.x>-30&&o.x+18>nl&&o.x+3<nr&&nt<151&&nb>130){G.bonus+=20;sfx('move');return false}return o.x>-30})}
-function endGame(){const sc=gameScore(),st=snap();S.best=Math.max(S.best||0,sc);S.mood=cl(S.mood+Math.min(30,5+Math.floor(sc/30)));S.food=cl(S.food-5);mode='pet';G=null;gain(st);play('jump',1,sc>=(S.best||0)&&sc>0?'新紀錄！'+sc+' 分':'得到 '+sc+' 分');save()}
+function endGame(){const sc=gameScore(),st=snap();if(sc>(S.best||0)&&sc>0)addMem('跳跳火球新紀錄 '+sc+' 分');S.best=Math.max(S.best||0,sc);S.mood=cl(S.mood+Math.min(30,5+Math.floor(sc/30)));S.food=cl(S.food-5);mode='pet';G=null;gain(st);play('jump',1,sc>=(S.best||0)&&sc>0?'新紀錄！'+sc+' 分':'得到 '+sc+' 分');save()}
 function startPomo(){S.pomo={end:Date.now()+POMO[pomoIdx]*60e3,len:POMO[pomoIdx]};mode='pomo';sfx('ok');say('開始專心 '+POMO[pomoIdx]+' 分鐘');save()}
-function pomoCheck(){if(mode==='pomo'&&S.pomo&&Date.now()>=S.pomo.end){const st=snap(),len=S.pomo.len;S.pomo=null;mode='pet';const td=today();if(S.pomoDay!==td){S.pomoDay=td;S.pomoN=0}S.pomoN++;S.bond=Math.min(100,S.bond+Math.round(len/8));S.mood=cl(S.mood+20);gain(st);play('jump',2,'專心完成！羈絆 +'+Math.round(len/8));sfx('hatch');save()}}
+function pomoCheck(){if(mode==='pomo'&&S.pomo&&Date.now()>=S.pomo.end){const st=snap(),len=S.pomo.len;S.pomo=null;mode='pet';const td=today();if(S.pomoDay!==td){S.pomoDay=td;S.pomoN=0}S.pomoN++;S.bond=Math.min(100,S.bond+Math.round(len/8));S.mood=cl(S.mood+20);gain(st);play('jump',2,'專心完成！羈絆 +'+Math.round(len/8));addMem('一起專心 '+len+' 分鐘');sfx('hatch');save()}}
 function drawGame(){
  for(const o of G.snk)icon(o.k,o.x,130,3);
  for(const o of G.obs)icon(o.k,o.x,211,3);
@@ -333,6 +339,27 @@ function buildGameBg(){
  GBG={sky,far,mid,gr};return GBG}
 function drawScroll(c,off,y){const w=c.width;let x=-((Math.floor(off)%w+w)%w);for(;x<240;x+=w)g.drawImage(c,x,y)}
 let lastWall=Date.now();
+
+// ---- weather, daily gift, milestones, memories ----
+const MS=[3,7,14,30,50,100,200,365];let statusPage=0;
+const GIFTS=['亮晶晶的鱗片','一顆小冰晶','溫暖的火石','漂亮的羽毛','一枚金幣','會發光的石頭','Rinya 給的糖果','一片楓葉','小小的貝殼'];
+function gday(t){const d=new Date(t);return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate()}
+function weatherOf(t){const d=new Date(t),key=d.getFullYear()*1000+(d.getMonth()+1)*40+d.getDate();const r=rnd(key*7+13);r();r();const x=r(),mon=d.getMonth()+1,sn=(mon===12||mon<=2)?.18:.05;return x<sn?'snow':x<sn+.2?'rain':x<sn+.4?'cloud':'sun'}
+const WNAME={sun:'晴天',cloud:'多雲',rain:'下雨',snow:'下雪'};
+function addMem(s){S.mem=S.mem||[];S.mem.unshift({t:S.t,s});if(S.mem.length>30)S.mem.length=30}
+function ageDay(){return Math.floor((S.t-S.born)/DAY)+1}
+function specialEvent(){
+ if(S.giftDay!==gday(S.t)){S.giftDay=gday(S.t);const gname=GIFTS[Math.floor(Math.random()*GIFTS.length)],st=snap();S.mood=cl(S.mood+10);gain(st);play('hoard',2,'Noa 送你：'+gname);sfx('ok');addMem('收到禮物：'+gname);save();return true}
+ const a=ageDay();if(!S.ms)S.ms=MS.filter(x=>x<a);const due=MS.filter(x=>a>=x&&!S.ms.includes(x));
+ if(due.length){const m=due[due.length-1];S.ms=S.ms.concat(due);play('jump',2,'Noa 第 '+m+' 天了！',['love',1]);sfx('hatch');addMem('一起度過第 '+m+' 天');save();return true}
+ return false}
+function drawWeather(){const w=weatherOf(S.t);if(w==='sun')return;const wx=16,wy=70,ww=62,wh=54,nt=period(S.t)==='night';
+ g.save();g.beginPath();g.rect(wx,wy,ww,wh);g.clip();
+ g.fillStyle=w==='snow'?(nt?'#28305e99':'#c8d6ea88'):(nt?'#0c1024aa':'#5a6680aa');g.fillRect(wx,wy,ww,wh);
+ g.fillStyle=nt?'#3a4266':(w==='snow'?'#eef3fb':'#c9cfdc');for(const[cx,cy]of[[wx+2,wy+7],[wx+26,wy+3],[wx+44,wy+13]]){g.fillRect(cx,cy,18,5);g.fillRect(cx+4,cy-3,10,3)}
+ if(w==='rain'){g.fillStyle='#9fc4ff';for(let i=0;i<16;i++){const x=wx+((i*13+frame*3)%ww),y=wy+((i*29+frame*9)%wh);g.fillRect(x,y,1,4)}}
+ if(w==='snow'){g.fillStyle='#ffffff';for(let i=0;i<18;i++){const x=wx+(((i*17+(frame>>1)*(i%2?1:-1))%ww)+ww)%ww,y=wy+((i*23+frame*2)%wh);g.fillRect(x,y,2,2)}}
+ g.restore();g.fillStyle='#8a5a3c';g.fillRect(wx+ww/2-1,wy,2,wh);g.fillRect(wx,wy+wh/2-1,ww,2)}
 function loop(now){
  try{
  const dt=Math.min(now-last,1000);last=now;
@@ -354,13 +381,15 @@ function idleAct(){const hr=hourOf(S.t),m=S.mood,P=[];const add=(n,w)=>{if(n!==l
  else if(m>=70){add('chase',3);add('roll',3);add('ball',2);add('fly',2);add('hoard',2);add('love',2);if(okIce)add('icesc',1);if(okFire)add('smoke',1)}
  else if(m>=40){add('hoard',3);add('ball',2);add('stretch',2);if(okIce)add('icesc',1);if(okFire)add('smoke',1)}
  else{add('hoard',2);add('stretch',1)}
+ {const w=weatherOf(S.t);if(w==='snow'&&okIce&&mode!=='pomo')add('icesc',3);if(w==='rain')add('yawn',2);if(w==='sun'&&m>=40&&mode!=='pomo')add('chase',1)}
  if(hr>=7&&hr<10)add('stretch',3);
  const tot=P.reduce((a,b)=>a+b[1],0);if(!tot)return false;let r=Math.random()*tot,pick=P[0][0];for(const[n,w]of P){if((r-=w)<0){pick=n;break}}
  lastIdle=pick;if(pick==='icesc')S.ice=Math.max(0,S.ice-5);if(pick==='smoke')S.fire=Math.max(0,S.fire-5);
  play(pick,2,mode==='pomo'&&pick==='love'?'Noa 在幫你加油':'');return true}
 function calm(){return S.phase==='live'&&!S.asleep&&!S.over&&S.health>=40&&S.food>=30&&S.mood>=20}
 function frameStep(){frame++;
-  if(anim){anim.left--;if(anim.left<=0){if(S.phase==='hatching'){S.phase='live';S.t=Date.now();S.born=S.t;S.lastVisit=S.t;save();anim=null;play('jump',2,'Noa 誕生了！')}else{if(anim.row===R.rinya){S.missAfter=S.t+0.6*H;missReal=performance.now()+8000;facing='R';idleMode='idle'}const nx=anim.then;anim=null;if(nx)play(nx[0],nx[1],nx[2])}}}
+  if(anim){anim.left--;if(anim.left<=0){if(S.phase==='hatching'){S.phase='live';S.t=Date.now();S.born=S.t;S.lastVisit=S.t;save();anim=null;play('jump',2,'Noa 誕生了！');addMem('Noa 誕生了');S.giftDay=gday(S.t);S.ms=[]}else{if(anim.row===R.rinya){S.missAfter=S.t+0.6*H;missReal=performance.now()+8000;facing='R';idleMode='idle'}const nx=anim.then;anim=null;if(nx)play(nx[0],nx[1],nx[2])}}}
+  else if(calm()&&mode==='pet'&&!catching&&specialEvent()){idleT=0}
   else if(calm()&&(mode==='pet'||mode==='pomo')){idleT++;
    if(idleMode==='idle'&&idleT>18&&Math.random()<.12){const hr=hourOf(S.t),since=(S.t-S.lastVisit)/DAY;const pc=Math.min(.15,(hr>=18&&hr<23?.08:.03)+since*.03);const r=Math.random();const sleepy=(hr>=21&&hr<23)||night(S.t);if(S.ice>80&&S.ice>=S.fire){S.ice-=20;play('ice',1,'Noa 忍不住吐了一口冰息');idleT=0}else if(S.fire>80){S.fire-=20;S.clean=cl(S.clean-3);play('fire',1,'Noa 忍不住噴了一小口火');idleT=0}else if(sleepy&&Math.random()<.3){play('yawn',1);idleT=0}else if(Math.random()<(mode==='pomo'?.25:.3)&&idleAct()){idleT=0}else{idleMode=r<pc?'crystal':r<pc+.55?'blink':'walk';if(idleMode==='crystal')facing='R';idleT=0}}
    else if(idleMode==='crystal'&&idleT>=20){idleMode='idle';idleT=0}
@@ -368,12 +397,12 @@ function frameStep(){frame++;
    else if(idleMode==='walk'){walkX+=walkDir*4;if(Math.abs(walkX)>20)walkDir*=-1;if(idleT>8&&Math.abs(walkX)<4){facing=walkDir<0?'L':'R';idleMode='idle';walkX=0;idleT=0}}}
 }
 // input
-function up(){ac();buzz();if(mode==='more'){moreSel=(moreSel+MORE.length-1)%MORE.length;sfx('move');return}if(mode==='pomoSet'){pomoIdx=(pomoIdx+POMO.length-1)%POMO.length;sfx('move');return}if(mode==='game'){jump();return}if(mode==='pomo')return;if(S.phase==='live'&&!statusOpen){sel=(sel+MENU.length-1)%MENU.length;sfx('move')}}
-function dn(){ac();buzz();if(mode==='more'){moreSel=(moreSel+1)%MORE.length;sfx('move');return}if(mode==='pomoSet'){pomoIdx=(pomoIdx+1)%POMO.length;sfx('move');return}if(mode==='game'){jump();return}if(mode==='pomo')return;if(S.phase==='live'&&!statusOpen){sel=(sel+1)%MENU.length;sfx('move')}}
+function up(){ac();buzz();if(mode==='more'){moreSel=(moreSel+MORE.length-1)%MORE.length;sfx('move');return}if(mode==='pomoSet'){pomoIdx=(pomoIdx+POMO.length-1)%POMO.length;sfx('move');return}if(mode==='game'){jump();return}if(mode==='pomo')return;if(statusOpen){statusPage=1-statusPage;sfx('move');return}if(S.phase==='live'&&!statusOpen){sel=(sel+MENU.length-1)%MENU.length;sfx('move')}}
+function dn(){ac();buzz();if(mode==='more'){moreSel=(moreSel+1)%MORE.length;sfx('move');return}if(mode==='pomoSet'){pomoIdx=(pomoIdx+1)%POMO.length;sfx('move');return}if(mode==='game'){jump();return}if(mode==='pomo')return;if(statusOpen){statusPage=1-statusPage;sfx('move');return}if(S.phase==='live'&&!statusOpen){sel=(sel+1)%MENU.length;sfx('move')}}
 let okT=0,okLong=false,okTimer;
 let ringRaf=0;function ring(on){cancelAnimationFrame(ringRaf);const b=document.getElementById('bO');if(!on||S.phase!=='live'){b.style.setProperty('--p',0);return}const t0=performance.now();const LP=mode==='game'?1500:500;const f=()=>{const p=Math.min(1,(performance.now()-t0)/LP);b.style.setProperty('--p',p);if(p<1)ringRaf=requestAnimationFrame(f)};f()}
 function okDown(){ac();buzz();if(mode==='game'&&G&&!G.over)jump();ring(true);okT=performance.now();okLong=false;clearTimeout(okTimer);okTimer=setTimeout(()=>{okLong=true;ring(false);if(S.phase!=='live')return;buzz();
-  if(mode==='pet'){statusOpen=!statusOpen;sfx('move')}
+  if(mode==='pet'){statusOpen=!statusOpen;statusPage=0;sfx('move')}
   else if(mode==='game'){if(G&&!G.over){G.over=true;sfx('deny')}}
   else if(mode==='pomo'){if(pomoConfirm>performance.now()){S.pomo=null;mode='pet';pomoConfirm=0;say('放棄了，下次再一起加油');sfx('deny');save()}else{pomoConfirm=performance.now()+3000;sfx('warn')}}
   else{mode='pet';sfx('move')}},mode==='game'?1500:500)}
@@ -403,7 +432,7 @@ const stat=document.getElementById('stat');
 function panel(){const live=S.phase==='live';const sinceV=(S.t-S.lastVisit)/H;
  const rows=[['飽足',S.food,'#ffb347'],['清潔',S.clean,'#cdb98b'],['心情',S.mood,'#ff8fa3'],['健康',S.health,'#8fd18f'],['冰魔力',S.ice,'#6fb7ff'],['火魔力',S.fire,'#ff8a3d'],['羈絆',S.bond,'#c58bff']];
  let h=rows.map(([n,v,c])=>`<tr><td>${n}</td><td><div class="b"><i style="width:${live?v:0}%;background:${c}"></i></div></td><td>${live?Math.round(v):'–'}</td></tr>`).join('');
- h+=`<tr><td>今天專心</td><td></td><td>${S.pomoDay===today()?S.pomoN:0} 次</td></tr><tr><td>小遊戲最高分</td><td></td><td>${S.best||0}</td></tr><tr><td>冷落時數</td><td></td><td>${live?S.neglect.toFixed(1)+' h':'–'}</td></tr><tr><td>Rinya 上次來訪</td><td></td><td>${live?(sinceV<1?'剛剛':Math.floor(sinceV)+' h 前'):'–'}</td></tr><tr><td>狀態</td><td></td><td>${!live?(S.phase==='gone'?'離家':'蛋'):S.over?'魔力暴走':S.asleep?'睡覺':S.health<40?'生病':S.food<30?'肚子餓':S.mood<20?'生氣':S.bond>=50&&S.t-S.lastVisit>1.5*DAY?'想念 Rinya':S.missAfter>S.t?'送走 Rinya':'清醒'}</td></tr>`;
+ h+=`<tr><td>天氣</td><td></td><td>${WNAME[weatherOf(S.t)]}</td></tr><tr><td>Noa 年紀</td><td></td><td>${live?'第 '+ageDay()+' 天':'–'}</td></tr><tr><td>今天專心</td><td></td><td>${S.pomoDay===today()?S.pomoN:0} 次</td></tr><tr><td>小遊戲最高分</td><td></td><td>${S.best||0}</td></tr><tr><td>冷落時數</td><td></td><td>${live?S.neglect.toFixed(1)+' h':'–'}</td></tr><tr><td>Rinya 上次來訪</td><td></td><td>${live?(sinceV<1?'剛剛':Math.floor(sinceV)+' h 前'):'–'}</td></tr><tr><td>狀態</td><td></td><td>${!live?(S.phase==='gone'?'離家':'蛋'):S.over?'魔力暴走':S.asleep?'睡覺':S.health<40?'生病':S.food<30?'肚子餓':S.mood<20?'生氣':S.bond>=50&&S.t-S.lastVisit>1.5*DAY?'想念 Rinya':S.missAfter>S.t?'送走 Rinya':'清醒'}</td></tr>`;
  stat.innerHTML=h}
 setInterval(panel,300);panel();
 if(S.phase==='live'&&S.pomo){mode='pomo';}
