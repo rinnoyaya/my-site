@@ -55,13 +55,13 @@ small{display:block;margin-top:14px;color:var(--mute);font-size:13px}
 <script>
 {
 // ↓ 把這行換成 noa_sheet21.png 在 R2 上的公開網址
-const SHEET="https://img.obsidianfirelight.com/commissions/img-7453-20261126-165331.png";
+const SHEET="https://YOUR-R2-DOMAIN/noa/noa_sheet21.png";
 const R={idle:0,blink:1,walk:2,sleep:3,eat:4,jump:5,angry:6,love:7,ice:8,fire:9,hatch:10,hungry:11,sick:12,bath:13,pet:14,over:15,miss:16,rinya:17,ball:18,walkL:19,blinkL:20};
 const MENU=[["feed","餵食"],["pet","摸頭"],["ball","玩球"],["bath","洗澡"],["ice","藍色吐息"],["fire","噴火"],["sleep","睡覺"]];
 const cv=document.getElementById('scr'),g=cv.getContext('2d');g.imageSmoothingEnabled=false;
 const img=new Image();let imgErr=false;img.onerror=()=>{imgErr=true};img.src=SHEET;
 const H=3600e3,DAY=24*H,KEY='noa-proto-v1';
-let S,speed=60,sel=0,anim=null,frame=0,ft=0,statusOpen=false,toast=null,walkX=0,walkDir=1,facing='R',idleMode='idle',idleT=0,last=performance.now();
+let catching=false,S,speed=60,sel=0,anim=null,frame=0,ft=0,statusOpen=false,toast=null,walkX=0,walkDir=1,facing='R',idleMode='idle',idleT=0,last=performance.now();
 function fresh(){return{t:Date.now(),phase:'egg',food:80,clean:90,mood:70,health:100,ice:20,fire:20,bond:0,neglect:0,lastVisit:Date.now(),born:Date.now(),runs:0,petCalm:0,over:false,asleep:false,manualSleep:false,wakeUntil:0}}
 function load(){try{const j=JSON.parse(localStorage.getItem(KEY));if(j&&j.phase){if(j.phase==='hatching')j.phase='egg';return j}}catch(e){}return fresh()}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
@@ -76,17 +76,17 @@ function tick(ms){
   if(S.manualSleep&&((!night(S.t)&&night(S.t-st))||(!night(S.t)&&S.t-(S.sleepStart||0)>3*H))){S.manualSleep=false;if(!night(S.t))say('Noa 睡飽醒來了')}
   const h=st/H,sl=!S.over&&((night(S.t)&&!(S.wakeUntil>S.t))||S.manualSleep);S.asleep=sl;const k=sl?.5:1;
   S.food=cl(S.food-10*h*k);S.clean=cl(S.clean-5*h*k);
-  const miss=S.bond>=50&&S.t-S.lastVisit>3*DAY;
+  const miss=S.bond>=50&&S.t-S.lastVisit>1.5*DAY;
   S.mood=cl(S.mood-(miss?12:8)*h*k);
   S.ice=Math.min(100,S.ice+6*h*k);S.fire=Math.min(100,S.fire+6*h*k);
   const bad=S.food<20||S.clean<20||S.mood<20;
   S.health=cl(S.health+(bad?-5:4)*h);
   if(!S.over&&(S.ice>=100||S.fire>=100||Math.abs(S.ice-S.fire)>60)){S.over=true;S.asleep=false;S.petCalm=0;S.mood=cl(S.mood-20);S.clean=cl(S.clean-20);say('魔力暴走了！摸頭安撫它')}
-  const pb=S.bond;S.bond=Math.max(0,Math.min(100,S.bond+(S.food>50&&S.clean>50&&S.mood>50?0.42:bad?-0.2:0)*h));if(pb<50&&S.bond>=50&&!S.bondMet){S.bondMet=true;S.lastVisit=S.t}
+  const low=Math.min(S.food,S.clean,S.mood),avg=(S.food+S.clean+S.mood)/3;const pb=S.bond;S.bond=Math.max(0,Math.min(100,S.bond+(low>=30&&avg>=50?0.9:low>=20?0.3:-0.3)*h));if(pb<50&&S.bond>=50&&!S.bondMet){S.bondMet=true;S.lastVisit=S.t;S.firstVisitAt=S.t+(1+Math.random()*3)*H}
   if(!sl){
    if(S.food<20&&S.mood<20){const before=S.neglect;S.neglect+=h;if(before<12&&S.neglect>=12)say('Noa 一直望著外面……');if(S.neglect>=24){S.phase='gone';S.runs++;save();return}}
    else S.neglect=Math.max(0,S.neglect-h*2);
-   if(S.bond>=50&&!S.over&&Math.random()<h*(S.bond/100)*0.08&&S.t-S.lastVisit>DAY*0.5&&!anim){S.lastVisit=S.t;S.mood=100;play('rinya',5,'Rinya 來看 Noa 了！')}
+   const due=S.firstVisitAt&&S.t>=S.firstVisitAt;const hr=hourOf(S.t);if(S.bond>=50&&!S.over&&!anim&&!catching&&hr>=9&&hr<21&&(due||(Math.random()<h*(S.bond/100)*0.15&&S.t-S.lastVisit>DAY*0.5))){S.firstVisitAt=0;S.lastVisit=S.t;S.missAfter=S.t+0.6*H;S.mood=100;play('rinya',5,'Rinya 來看 Noa 了！')}
   }
  }
 }
@@ -118,7 +118,9 @@ function baseRow(){
  if(S.health<40)return{row:R.sick};
  if(S.food<30)return{row:R.hungry};
  if(S.mood<20)return{row:R.angry};
- if(S.bond>=50&&S.t-S.lastVisit>3*DAY)return{row:R.miss};
+ if(S.bond>=50&&S.t-S.lastVisit>1.5*DAY)return{row:R.miss};
+ if(S.missAfter>S.t)return{row:R.miss};
+ if(idleMode==='crystal')return{row:R.miss};
  if(idleMode==='walk')return{row:walkDir<0?R.walkL:R.walk,walk:true};
  if(facing==='L')return idleMode==='blink'?{row:R.blinkL}:{row:R.blinkL,frames:[0,0]};
  return{row:R[idleMode]};
@@ -234,7 +236,8 @@ function loop(now){
  ft+=dt;if(ft>=220){ft-=220;frame++;
   if(anim){anim.left--;if(anim.left<=0){if(S.phase==='hatching'){S.phase='live';S.t=Date.now();S.born=S.t;S.lastVisit=S.t;save();anim=null;play('jump',2,'Noa 誕生了！')}else anim=null}}
   else if(S.phase==='live'){idleT++;
-   if(idleMode==='idle'&&idleT>18&&Math.random()<.12){idleMode=Math.random()<.6?'blink':'walk';idleT=0}
+   if(idleMode==='idle'&&idleT>18&&Math.random()<.12){const hr=hourOf(S.t),since=(S.t-S.lastVisit)/DAY;const pc=Math.min(.35,(hr>=18&&hr<23?.12:.04)+since*.08);const r=Math.random();idleMode=r<pc?'crystal':r<pc+.55?'blink':'walk';if(idleMode==='crystal')facing='R';idleT=0}
+   else if(idleMode==='crystal'&&idleT>=28){idleMode='idle';idleT=0}
    else if(idleMode==='blink'&&idleT>=4){idleMode='idle';idleT=0}
    else if(idleMode==='walk'){walkX+=walkDir*4;if(Math.abs(walkX)>20)walkDir*=-1;if(idleT>8&&Math.abs(walkX)<4){facing=walkDir<0?'L':'R';idleMode='idle';walkX=0;idleT=0}}}
  }
@@ -263,13 +266,13 @@ function setSpd(v){speed=v;try{localStorage.setItem(KEY+'-spd',v)}catch(e){}for(
 spd.addEventListener('click',e=>{const b=e.target.closest('button');if(b)setSpd(+b.dataset.s)});{let v=60;try{v=+localStorage.getItem(KEY+'-spd')||60}catch(e){}setSpd([1,60,600].includes(v)?v:60)}
 document.getElementById('rst').addEventListener('click',()=>{S=fresh();anim=null;statusOpen=false;sel=0;save()});
 // catch up time passed while page was closed (real time)
-if(S.phase==='live'){const gap=Date.now()-S.t;if(gap>0)tick(Math.min(gap,7*DAY))}else S.t=Date.now();
+if(S.phase==='live'){const gap=Date.now()-S.t;if(gap>0){catching=true;tick(Math.min(gap,7*DAY));catching=false}}else S.t=Date.now();
 
 const stat=document.getElementById('stat');
 function panel(){const live=S.phase==='live';const sinceV=(S.t-S.lastVisit)/H;
  const rows=[['飽足',S.food,'#ffb347'],['清潔',S.clean,'#cdb98b'],['心情',S.mood,'#ff8fa3'],['健康',S.health,'#8fd18f'],['冰魔力',S.ice,'#6fb7ff'],['火魔力',S.fire,'#ff8a3d'],['羈絆',S.bond,'#c58bff']];
  let h=rows.map(([n,v,c])=>`<tr><td>${n}</td><td><div class="b"><i style="width:${live?v:0}%;background:${c}"></i></div></td><td>${live?Math.round(v):'–'}</td></tr>`).join('');
- h+=`<tr><td>冷落時數</td><td></td><td>${live?S.neglect.toFixed(1)+' h':'–'}</td></tr><tr><td>Rinya 上次來訪</td><td></td><td>${live?(sinceV<1?'剛剛':Math.floor(sinceV)+' h 前'):'–'}</td></tr><tr><td>狀態</td><td></td><td>${!live?(S.phase==='gone'?'離家':'蛋'):S.over?'魔力暴走':S.asleep?'睡覺':S.health<40?'生病':S.food<30?'肚子餓':S.mood<20?'生氣':S.bond>=50&&S.t-S.lastVisit>3*DAY?'想念 Rinya':'清醒'}</td></tr>`;
+ h+=`<tr><td>冷落時數</td><td></td><td>${live?S.neglect.toFixed(1)+' h':'–'}</td></tr><tr><td>Rinya 上次來訪</td><td></td><td>${live?(sinceV<1?'剛剛':Math.floor(sinceV)+' h 前'):'–'}</td></tr><tr><td>狀態</td><td></td><td>${!live?(S.phase==='gone'?'離家':'蛋'):S.over?'魔力暴走':S.asleep?'睡覺':S.health<40?'生病':S.food<30?'肚子餓':S.mood<20?'生氣':S.bond>=50&&S.t-S.lastVisit>1.5*DAY?'想念 Rinya':S.missAfter>S.t?'送走 Rinya':'清醒'}</td></tr>`;
  stat.innerHTML=h}
 setInterval(panel,300);panel();
 setInterval(save,10000);
