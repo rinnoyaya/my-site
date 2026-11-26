@@ -1543,6 +1543,14 @@ content:
       label: 按鈕文字
       type: string
       description: 留空是「去看諾雅」
+    - name: openIn
+      label: 怎麼打開寵物機
+      type: select
+      description: 留空是「網站內視窗」：在收藏冊上面開一個視窗玩，關掉就回到收藏冊
+      options:
+        values:
+        - 網站內視窗
+        - 整頁開啟
     - name: wakeText
       label: 剛好收集到指定數量時角色說的話
       type: string
