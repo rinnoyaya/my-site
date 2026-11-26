@@ -656,7 +656,13 @@ html.egg-night body::after{content:"";position:fixed;inset:0;pointer-events:none
 .egg-buddy .eb2-bar button{width:32px;height:32px;border:0;border-radius:50%;background:transparent;color:inherit;font-size:14px;cursor:pointer;line-height:1}
 .egg-buddy .eb2-bar button:hover{background:rgb(255 255 255/.14)}
 .egg-buddy button:focus-visible{outline:2px solid #6fb7ff;outline-offset:1px}
-.egg-buddy .eb2-view{line-height:0}
+.egg-buddy .eb2-view{line-height:0;position:relative}
+.egg-buddy .eb2-size{position:absolute;left:-6px;bottom:-6px;width:32px;height:32px;padding:0;border:0;border-radius:50%;background:rgb(20 14 28/.82);cursor:nesw-resize;touch-action:none;opacity:.75;transition:opacity .2s}
+.egg-buddy .eb2-size::before{content:"";position:absolute;inset:9px;border-left:2px solid #efe6f3;border-bottom:2px solid #efe6f3;transform:rotate(0deg)}
+.egg-buddy .eb2-size::after{content:"";position:absolute;left:9px;right:9px;bottom:9px;top:9px;background:linear-gradient(45deg,transparent 45%,#efe6f3 45% 55%,transparent 55%)}
+.egg-buddy:hover .eb2-size,.egg-buddy .eb2-size:focus-visible,.egg-buddy.sizing .eb2-size{opacity:1}
+.egg-buddy.sizing iframe{pointer-events:none}
+.egg-buddy.min .eb2-size{display:none}
 .egg-buddy iframe{display:block;border:0;background:transparent;color-scheme:normal;width:180px;height:200px}
 .egg-buddy .eb2-bubble{display:none}
 .egg-buddy.min .eb2-bar{display:none}
@@ -1258,7 +1264,7 @@ function newDays(){const v=SITE.newDays;if(v===undefined||v===null||v==="")retur
 function isNew(x){const d=newDays();if(!d||!x||!x.date)return false;const t=Date.parse(String(x.date).slice(0,10)+"T00:00:00+08:00");if(isNaN(t))return false;const age=Date.now()-t;return age>-864e5&&age<d*864e5;}
 const newBadge=x=>isNew(x)?`<span class="new-badge" title="最近更新">NEW</span>`:"";
 
-const SITE_VERSION="2026-11-26 v1.35";
+const SITE_VERSION="2026-11-26 v1.36";
 const BROKEN=[];
 /* 解開建置時打包過的設定檔（data/eggs.dat） */
 function unpk(t){try{const b=atob(t.trim()),u=new Uint8Array(b.length);let x=0x5b1d9e47;for(let i=0;i<b.length;i++){x=(Math.imul(x,1664525)+1013904223)>>>0;u[i]=b.charCodeAt(i)^(x>>>24);}return new TextDecoder().decode(u);}catch(e){return "";}}
