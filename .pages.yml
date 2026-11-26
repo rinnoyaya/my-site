@@ -1539,18 +1539,31 @@ content:
       label: 孵化後的說明
       type: text
       description: 留空是「蛋殼裂開了，諾雅在裡面等你。」
-    - name: buttonText
-      label: 按鈕文字
-      type: string
-      description: 留空是「去看諾雅」
     - name: openIn
       label: 怎麼打開寵物機
       type: select
-      description: 留空是「網站內視窗」：在收藏冊上面開一個視窗玩，關掉就回到收藏冊
+      description: 留空是「跟著逛」：諾雅會變成畫面角落的小掌機，換頁也一直跟著訪客。另外兩種是開大視窗或換到寵物機頁面
       options:
         values:
+        - 跟著逛（角落小掌機）
         - 網站內視窗
         - 整頁開啟
+    - name: buttonText
+      label: 「帶諾雅一起逛」按鈕文字
+      type: string
+      description: 留空是「帶諾雅一起逛」（選「網站內視窗／整頁開啟」時留空是「去看諾雅」）
+    - name: followingText
+      label: 諾雅跟著時，收藏冊裡顯示的話
+      type: string
+      description: 留空是「諾雅正跟著你逛堡壘，就在畫面的角落。」
+    - name: homeText
+      label: 收回按鈕文字
+      type: string
+      description: 留空是「讓諾雅回蛋裡休息」
+    - name: buddyName
+      label: 小掌機上方顯示的名字
+      type: string
+      description: 留空是「Noa」
     - name: wakeText
       label: 剛好收集到指定數量時角色說的話
       type: string
