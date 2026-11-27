@@ -48,7 +48,7 @@ small{display:block;margin-top:14px;color:var(--mute);font-size:13px}
 <p>你找到 Noa 的小窩了。冰火雙屬性的小龍 Noa 住在這裡，幫它餵食、洗澡、摸摸頭，記得讓冰和火的魔力保持平衡。照顧得好，Rinya 也會來看它。</p>
 <div class="card"><h2>時間速度</h2><div class="seg" id="spd"><button data-s="1">真實時間</button><button data-s="60">1 分鐘＝1 小時</button><button data-s="600">6 秒＝1 小時</button></div></div>
 <div class="card"><h2>音效</h2><div class="seg"><button id="mute" aria-pressed="false">音效開啟</button></div></div>
-<div class="card"><h2>即時數值</h2><table class="st"><tbody id="stat"></tbody></table></div>
+<div class="card"><h2 id="stTitle">即時數值</h2><table class="st"><tbody id="stat"></tbody></table></div>
 <div class="card"><h2>操作</h2><dl><dt>上／下</dt><dd>切換選單（鍵盤 ↑ ↓）</dd><dt>OK</dt><dd>執行（Enter 或空白鍵）</dd><dt>長按 OK</dt><dd>打開／關閉狀態頁</dd></dl>
 <button class="reset" id="rst">重新開始（從蛋孵化）</button>
 <small>Noa 的進度存在你這台裝置的瀏覽器裡。這是 FoloToy AI Passport 寵物機的網頁版。</small></div>
@@ -57,9 +57,9 @@ small{display:block;margin-top:14px;color:var(--mute);font-size:13px}
 <script>
 {
 // Noa 素材表（R2）；換新素材表時只要改這一行
-// Rinya 素材表（R2）：上傳後把下一行換成它的網址
-const SHEET_R="https://img.obsidianfirelight.com/commissions/noa-sheet31-20261126-212107.png";
-const SHEET="https://img.obsidianfirelight.com/commissions/rinya-sheet23-20261127-130059.png";
+// Rinya 素材表（R2）；換新素材表時只要改這一行
+const SHEET_R="https://img.obsidianfirelight.com/commissions/rinya-sheet23-20261127-130059.png";
+const SHEET="https://img.obsidianfirelight.com/commissions/noa-sheet31-20261126-212107.png";
 const RN={idle:0,blink:1,walk:2,sleep:3,eat:4,jump:5,angry:6,love:7,ice:8,fire:9,hatch:10,hungry:11,sick:12,bath:13,pet:14,over:15,miss:16,rinya:17,ball:18,walkL:19,blinkL:20,stretch:21,smoke:22,icesc:23,idleL:24,hoard:25,chase:26,roll:27,fly:28,yawn:29,note:30};
 const RR={idle:0,sleep:1,walk:2,blink:3,eat:4,jump:5,angry:6,love:7,hungry:8,sick:9,bath:10,pet:11,ball:12,chase:13,roll:14,spin:15,yawn:16,sneeze:17,stretch:18,sneezeLie:19,cast:20,over:21,miss:22,hatch:5,hoard:7,fly:5,icesc:15,smoke:15,ice:15,fire:15,rinya:-9,note:2030,walkL:1002,idleL:1000,blinkL:1003};
 let R=RN;
@@ -467,10 +467,11 @@ document.getElementById('rst').addEventListener('click',()=>{mode='pet';G=null;W
 if(S.phase==='live'){const gap=Date.now()-S.t;if(gap>0){catching=true;tick(Math.min(gap,7*DAY));catching=false}}else S.t=Date.now();
 
 const stat=document.getElementById('stat');
-function panel(){const live=S.phase==='live';const sinceV=(S.t-S.lastVisit)/H;
+function panel(){const tt=document.getElementById('stTitle');if(tt)tt.textContent='即時數值・'+(W.active==='noa'?'Noa':'Rinya')+'（照顧中）';const live=S.phase==='live';const sinceV=(S.t-S.lastVisit)/H;
  const rows=[['飽足',S.food,'#ffb347'],['清潔',S.clean,'#cdb98b'],['心情',S.mood,'#ff8fa3'],['健康',S.health,'#8fd18f']].concat(W.active==='noa'?[['冰魔力',S.ice,'#6fb7ff'],['火魔力',S.fire,'#ff8a3d']]:[['符文能量',S.rune||0,'#c58bff']],[['羈絆',S.bond,'#c58bff']]);
  let h=rows.map(([n,v,c])=>`<tr><td>${n}</td><td><div class="b"><i style="width:${live?v:0}%;background:${c}"></i></div></td><td>${live?Math.round(v):'–'}</td></tr>`).join('');
- h+=`<tr><td>天氣</td><td></td><td>${WNAME[weatherOf(S.t)]}</td></tr><tr><td>${NM()} 年紀</td><td></td><td>${live?'第 '+ageDay()+' 天':'–'}</td></tr><tr><td>今天專心</td><td></td><td>${S.pomoDay===today()?S.pomoN:0} 次</td></tr><tr><td>小遊戲最高分</td><td></td><td>${S.best||0}</td></tr><tr><td>冷落時數</td><td></td><td>${live?S.neglect.toFixed(1)+' h':'–'}</td></tr><tr><td>Rinya 上次來訪</td><td></td><td>${live?(sinceV<1?'剛剛':Math.floor(sinceV)+' h 前'):'–'}</td></tr><tr><td>狀態</td><td></td><td>${!live?(S.phase==='gone'?'離家':'蛋'):S.over?'魔力暴走':S.asleep?'睡覺':S.health<40?'生病':S.food<30?'肚子餓':S.mood<20?'生氣':S.bond>=50&&S.t-S.lastVisit>1.5*DAY?'想念 Rinya':S.missAfter>S.t?'送走 Rinya':'清醒'}</td></tr>`;
+ {const oid=W.active==='noa'?'rinya':'noa',O=W.pets[oid];if(O&&O.phase==='live')h+=`<tr><td colspan="3" style="padding-top:8px;font-weight:700;text-align:left">休息中的 ${oid==='noa'?'Noa':'Rinya'}</td></tr><tr><td colspan="3" style="text-align:left">飽足 ${Math.round(O.food)}・清潔 ${Math.round(O.clean)}・心情 ${Math.round(O.mood)}・羈絆 ${Math.round(O.bond)}</td></tr>`}
+ h+=`<tr><td>天氣</td><td></td><td>${WNAME[weatherOf(S.t)]}</td></tr><tr><td>${NM()} 年紀</td><td></td><td>${live?'第 '+ageDay()+' 天':'–'}</td></tr><tr><td>今天專心</td><td></td><td>${S.pomoDay===today()?S.pomoN:0} 次</td></tr><tr><td>小遊戲最高分</td><td></td><td>${S.best||0}</td></tr><tr><td>冷落時數</td><td></td><td>${live?S.neglect.toFixed(1)+' h':'–'}</td></tr><tr><td>${OTHER()} 上次來訪</td><td></td><td>${live?(sinceV<1?'剛剛':Math.floor(sinceV)+' h 前'):'–'}</td></tr><tr><td>狀態</td><td></td><td>${!live?(S.phase==='gone'?'離家':'蛋'):S.over?'魔力暴走':S.asleep?'睡覺':S.health<40?'生病':S.food<30?'肚子餓':S.mood<20?'生氣':S.bond>=50&&S.t-S.lastVisit>1.5*DAY?'想念 '+OTHER():S.missAfter>S.t?'送走 '+OTHER():'清醒'}</td></tr>`;
  stat.innerHTML=h}
 setInterval(panel,300);panel();
 if(S.phase==='live'&&S.pomo){mode='pomo';}
