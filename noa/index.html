@@ -58,13 +58,13 @@ small{display:block;margin-top:14px;color:var(--mute);font-size:13px}
 {
 // Noa 素材表（R2）；換新素材表時只要改這一行
 // Rinya 素材表（R2）；換新素材表時只要改這一行
-const SHEET_R="https://img.obsidianfirelight.com/commissions/rinya-sheet23-crisp-20261127-163408.png";
-const SHEET="https://img.obsidianfirelight.com/commissions/noa-sheet31-20261126-212107.png";
-const RN={idle:0,blink:1,walk:2,sleep:3,eat:4,jump:5,angry:6,love:7,ice:8,fire:9,hatch:10,hungry:11,sick:12,bath:13,pet:14,over:15,miss:16,rinya:17,ball:18,walkL:19,blinkL:20,stretch:21,smoke:22,icesc:23,idleL:24,hoard:25,chase:26,roll:27,fly:28,yawn:29,note:30};
+const SHEET_R="https://img.obsidianfirelight.com/commissions/img-7484-20261127-195215.png";
+const SHEET="https://img.obsidianfirelight.com/commissions/img-7489-20261127-200505.png";
+const RN={idle:0,blink:1,walk:2,sleep:3,eat:4,jump:5,angry:6,love:7,ice:8,fire:9,hatch:10,hungry:11,sick:12,bath:13,pet:14,over:15,miss:16,rinya:17,ball:18,walkL:19,blinkL:20,stretch:21,smoke:22,icesc:23,idleL:24,hoard:25,chase:26,roll:27,fly:28,yawn:29,note:30,read:31,hour:32,sneeze:33,belly:34,sneezeL:35};
 const RIF=[0,0,0,0,0,0,0,0,0,1,2,3];
-const RR={idle:0,sleep:1,walk:2,blink:3,eat:4,jump:5,angry:6,love:7,hungry:8,sick:9,bath:10,pet:11,ball:12,chase:13,roll:14,spin:15,yawn:16,sneeze:17,stretch:18,sneezeLie:19,cast:20,over:21,miss:22,hatch:5,hoard:7,fly:5,icesc:15,smoke:15,ice:15,fire:15,rinya:-9,note:2030,walkL:1002,idleL:1000,blinkL:1003};
+const RR={idle:0,sleep:1,walk:2,blink:3,eat:4,jump:5,angry:6,love:7,hungry:8,sick:9,bath:10,pet:11,ball:12,chase:13,roll:14,spin:15,yawn:16,sneeze:17,stretch:18,sneezeLie:19,cast:20,over:21,miss:22,scroll:23,doze:24,hatch:5,hoard:7,fly:5,icesc:15,smoke:15,ice:15,fire:15,rinya:-9,note:2030,walkL:1002,idleL:1000,blinkL:1003};
 let R=RN;
-const YN={0:3,1:3,2:2,3:1,4:3,6:2,7:3,8:3,9:3,13:1,14:2,15:2,16:2,17:2,18:1,19:2,20:3,21:1,22:1,23:1,24:1,25:1,26:1,27:1,28:1,29:1};const LN=new Set(['walkL','blinkL','idleL','chase','roll','fly']),LR=new Set(['walkL','blinkL','idleL']);let LEFT=LN,YO=YN;
+const YN={33:1,34:2,35:1,32:-2,0:3,1:3,2:2,3:1,4:3,6:2,7:3,8:3,9:3,13:1,14:2,15:2,16:2,17:2,18:1,19:2,20:3,21:1,22:1,23:1,24:1,25:1,26:1,27:1,28:1,29:1};const LN=new Set(['walkL','blinkL','idleL','chase','roll','fly','sneezeL']),LR=new Set(['walkL','blinkL','idleL']);let LEFT=LN,YO=YN;
 const PN=[['ball',3,'玩球'],['chase',3,'追光點'],['hoard',3,'囤寶物'],['roll',3,'打滾'],['fly',2,'練習飛行'],['icesc',3,'做冰雕'],['smoke',3,'吐煙圈']];let lastPlay='';
 const PR=[['ball',3,'玩球'],['chase',3,'追光點'],['roll',2,'打滾'],['spin',2,'轉圈']];
 const MN=[["feed","餵食"],["pet","摸頭"],["ball","玩耍"],["bath","洗澡"],["ice","藍色吐息"],["fire","噴火"],["sleep","睡覺"],["more","更多"]],MR=[["feed","餵食"],["pet","摸頭"],["ball","玩耍"],["bath","洗澡"],["rune","施放符文"],["sleep","睡覺"],["more","更多"]];let MENU=MN;
@@ -127,9 +127,13 @@ function decayOther(st){const O=W.pets[W.active==='noa'?'rinya':'noa'];if(!O)ret
 function snap(){return{food:S.food,clean:S.clean,mood:S.mood,ice:S.ice,fire:S.fire,rune:S.rune||0}}
 function gain(st){const ks=[['food','#ffb347'],['clean','#cdb98b'],['mood','#ff8fa3'],['ice','#6fb7ff'],['fire','#ff8a3d'],['rune','#c58bff']];const L=[];for(const[k,c]of ks){const dd=Math.round(S[k]-st[k]);if(Math.abs(dd)>=1)L.push({k,s:(dd>0?'+':'')+dd,c})}L.forEach((f,i)=>{f.i=i;f.n=L.length;f.t0=performance.now()});floats=L}
 try{muted=localStorage.getItem('noa-proto-v1-mute')==='1'}catch(e){}
-function ac(){if(!AC){try{AC=new(window.AudioContext||window.webkitAudioContext)()}catch(e){}}try{if(AC&&AC.state==='suspended')AC.resume()}catch(e){}return AC}
+function ac(){try{if(navigator.audioSession&&navigator.audioSession.type!=='playback')navigator.audioSession.type='playback'}catch(e){}
+ if(AC&&AC.state==='closed')AC=null;if(!AC){try{AC=new(window.AudioContext||window.webkitAudioContext)()}catch(e){}}
+ try{if(AC&&AC.state!=='running'){AC.resume();const b=AC.createBuffer(1,1,22050),s=AC.createBufferSource();s.buffer=b;s.connect(AC.destination);s.start(0)}}catch(e){}return AC}
+['touchend','click','keydown','pointerup'].forEach(ev=>document.addEventListener(ev,()=>ac(),{capture:true,passive:true}));
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&AC&&AC.state!=='running'){try{AC.resume()}catch(e){}}});
 const SFX={move:[[880,.035]],ok:[[660,.06],[990,.09,.06]],deny:[[150,.16,0,'sawtooth']],warn:[[520,.08],[520,.08,.12]],rinya:[[523,.12],[659,.12,.13],[784,.12,.26],[1047,.24,.39]],alarm:[[330,.1,0,'sawtooth'],[220,.16,.12,'sawtooth']],hatch:[[392,.1],[523,.1,.11],[659,.1,.22],[784,.28,.33]]};
-function sfx(n){if(muted||catching||!AC||AC.state!=='running')return;try{const t=AC.currentTime;for(const[f,d,o=0,ty='square']of SFX[n]){const os=AC.createOscillator(),gn=AC.createGain();os.type=ty;os.frequency.value=f;gn.gain.setValueAtTime(.05,t+o);gn.gain.exponentialRampToValueAtTime(.0001,t+o+d);os.connect(gn).connect(AC.destination);os.start(t+o);os.stop(t+o+d+.03)}}catch(e){}}
+function sfx(n){if(muted||catching||!AC)return;if(AC.state!=='running'){try{AC.resume()}catch(e){}if(AC.state!=='running')return}try{const t=AC.currentTime;for(const[f,d,o=0,ty='square']of SFX[n]){const os=AC.createOscillator(),gn=AC.createGain();os.type=ty;os.frequency.value=f;gn.gain.setValueAtTime(.05,t+o);gn.gain.exponentialRampToValueAtTime(.0001,t+o+d);os.connect(gn).connect(AC.destination);os.start(t+o);os.stop(t+o+d+.03)}}catch(e){}}
 function buzz(){try{navigator.vibrate&&navigator.vibrate(8)}catch(e){}}
 function say(m){toast={m,until:performance.now()+2600}}
 function play(name,loops,msg,then){facing=LEFT.has(name)?'L':'R';anim={row:R[name],loops,n:4,left:loops*4,then};frame=0;ft=0;if(msg)say(msg)}
@@ -143,7 +147,7 @@ function act(){
  S.neglect=0;
  switch(id){
   case'feed':if(S.food>95){say(NM()+' 吃不下了');return}S.food=cl(S.food+40);S.clean=cl(S.clean-3);play('eat',2);break;
-  case'pet':if(S.over){S.petCalm++;if(S.petCalm>=3){S.over=false;calmMagic();S.mood=cl(S.mood+10);play('love',2,NM()+' 平靜下來了')}else play('pet',1,`再摸 ${3-S.petCalm} 次`)}else{const hi=S.mood>=80;S.mood=cl(S.mood+15);play('pet',2,'',hi?['love',2,NM()+' 撒嬌了']:null)}break;
+  case'pet':if(S.over){S.petCalm++;if(S.petCalm>=3){S.over=false;calmMagic();S.mood=cl(S.mood+10);play('love',2,NM()+' 平靜下來了')}else play('pet',1,`再摸 ${3-S.petCalm} 次`)}else{const hi=S.mood>=80;S.mood=cl(S.mood+15);play('pet',2,'',hi?(W.active==='noa'&&Math.random()<.5?['belly',2,'Noa 翻肚子要你繼續摸']:['love',2,NM()+' 撒嬌了']):null)}break;
   case'ball':{const opts=curPlays().filter(p=>p[0]!==lastPlay&&!(p[0]==='icesc'&&(S.ice<15||S.fire-(S.ice-15)>45))&&!(p[0]==='smoke'&&(S.fire<15||S.ice-(S.fire-15)>45)));const [nm,lp,lab]=opts[Math.floor(Math.random()*opts.length)];lastPlay=nm;
    if(nm==='icesc'){S.ice=Math.max(0,S.ice-15);S.mood=cl(S.mood+20)}else if(nm==='smoke'){S.fire=Math.max(0,S.fire-15);S.mood=cl(S.mood+20)}else{S.mood=cl(S.mood+25);S.food=cl(S.food-(nm==='fly'?8:5))}
    play(nm,lp,NM()+' '+lab);break}
@@ -410,7 +414,7 @@ function flushSave(){lastWall=Date.now();save()}
 addEventListener('pagehide',flushSave);document.addEventListener('visibilitychange',()=>{if(document.hidden)save()});
 let lastIdle='';
 function idleActR(){const m=S.mood,P=[],hr=hourOf(S.t),wx=weatherOf(S.t),okRune=(S.rune||0)>=20;const add=(n,w)=>{if(n!==lastIdle)P.push([n,w])};
- if(mode==='pomo'){add('stretch',2);add('love',2);add('sneezeLie',2);add('yawn',1)}
+ if(mode==='pomo'){add('scroll',3);add('doze',2);add('stretch',2);add('love',2);add('sneezeLie',1)}
  else if(m>=70){add('chase',3);add('roll',3);add('ball',3);add('spin',2);add('jump',2);add('love',2);if(okRune)add('cast',2)}
  else if(m>=40){add('ball',2);add('chase',1);add('roll',1);add('spin',2);add('stretch',2);add('sneezeLie',1);if(okRune)add('cast',1)}
  else{add('stretch',1);add('sneezeLie',2)}
@@ -418,23 +422,28 @@ function idleActR(){const m=S.mood,P=[],hr=hourOf(S.t),wx=weatherOf(S.t),okRune=
  if(hr>=7&&hr<10)add('stretch',3);if(hr>=19&&mode!=='pomo')add('sneezeLie',1);
  const tot=P.reduce((a,b)=>a+b[1],0);if(!tot)return false;let r=Math.random()*tot,pick=P[0][0];for(const[n,w]of P){if((r-=w)<0){pick=n;break}}lastIdle=pick;
  if(pick==='cast'){S.rune=Math.max(0,S.rune-5);play('cast',1,'Rinya 用符文畫了個小光點');return true}
- play(pick,pick==='jump'?3:2,mode==='pomo'&&pick==='love'?'Rinya 在幫你加油':'');return true}
+ play(pick,PSP[pick]?PSP[pick][0]:pick==='jump'?3:2,mode==='pomo'&&pick==='love'?'Rinya 在幫你加油':'');return true}
 function idleAct(){if(W.active==='rinya')return idleActR();const hr=hourOf(S.t),m=S.mood,P=[];const add=(n,w)=>{if(n!==lastIdle)P.push([n,w])};
  const okIce=S.ice>=20&&S.fire-(S.ice-5)<=45,okFire=S.fire>=20&&S.ice-(S.fire-5)<=45;
- if(mode==='pomo'){add('hoard',3);add('stretch',2);if(okIce)add('icesc',2);if(okFire)add('smoke',2);add('love',1)}
- else if(m>=70){add('chase',3);add('roll',3);add('ball',2);add('fly',2);add('hoard',2);add('love',2);if(okIce)add('icesc',1);if(okFire)add('smoke',1)}
+ if(mode==='pomo'){add('read',3);add('hour',2);add('hoard',2);add('stretch',1);if(okIce)add('icesc',2);if(okFire)add('smoke',2);add('love',1)}
+ else if(m>=70){add('chase',3);add('roll',3);add('belly',2);add('ball',2);add('fly',2);add('hoard',2);add('love',2);if(okIce)add('icesc',1);if(okFire)add('smoke',1)}
  else if(m>=40){add('hoard',3);add('ball',2);add('stretch',2);if(okIce)add('icesc',1);if(okFire)add('smoke',1)}
  else{add('hoard',2);add('stretch',1)}
- {const w=weatherOf(S.t);if(w==='snow'&&okIce&&mode!=='pomo')add('icesc',3);if(w==='rain')add('yawn',2);if(w==='sun'&&m>=40&&mode!=='pomo')add('chase',1)}
+ if(mode!=='pomo'){add('sneeze',1);if(S.fire>=60)add('sneezeL',2)}
+ {const w=weatherOf(S.t);if((w==='rain'||w==='snow')&&mode!=='pomo')add('sneeze',2);if(w==='snow'&&okIce&&mode!=='pomo')add('icesc',3);if(w==='rain')add('yawn',2);if(w==='sun'&&m>=40&&mode!=='pomo')add('chase',1)}
  if(hr>=7&&hr<10)add('stretch',3);
  const tot=P.reduce((a,b)=>a+b[1],0);if(!tot)return false;let r=Math.random()*tot,pick=P[0][0];for(const[n,w]of P){if((r-=w)<0){pick=n;break}}
  lastIdle=pick;if(pick==='icesc')S.ice=Math.max(0,S.ice-5);if(pick==='smoke')S.fire=Math.max(0,S.fire-5);
- play(pick,2,mode==='pomo'&&pick==='love'?NM()+' 在幫你加油':'');return true}
+ if(pick==='sneezeL'){S.fire=Math.max(0,S.fire-8);play('sneezeL',2,'Noa 打了個噴嚏，噴出小火花');return true}
+ play(pick,PSP[pick]?PSP[pick][0]:2,mode==='pomo'&&pick==='love'?NM()+' 在幫你加油':'');return true}
 function needNow(){if(S.food<30)return'hungry';if(S.mood<20)return'angry';if(S.bond>=50&&S.t-S.lastVisit>1.5*DAY)return'miss';return''}
 function awake(){return S.phase==='live'&&!S.asleep&&!S.over&&S.health>=40}
 const WR=24;function setB(k,d){idleMode=k;idleT=0;idleD=d}const rn=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
 function startWalk(){let t=rn(-WR,WR);if(Math.abs(t-walkX)<10)t=walkX>0?rn(-WR,-6):rn(6,WR);tx=t;walkDir=tx<walkX?-1:1;setB('walk',60)}
+const PSP={read:[3,'Noa 陪你一起看書'],hour:[2,'Noa 幫你看著時間'],scroll:[2,'Rinya 在寫符文筆記'],doze:[2,'Rinya 差點睡著了…']};
+function pomoSpecial(){const k=W.active==='noa'?(Math.random()<.6?'read':'hour'):(Math.random()<.6?'scroll':'doze');lastIdle=k;play(k,PSP[k][0],PSP[k][1]);setB('idle',rn(8,14))}
 function brain(){const nd=needNow();
+ if(mode==='pomo'&&S.pomo&&!nd){const rem=S.pomo.end-Date.now(),L=S.pomo.len*60e3;S.pomo.sp=S.pomo.sp||0;if((S.pomo.sp<1&&rem<=L/2)||(S.pomo.sp<2&&rem<=60e3&&L>120e3)){S.pomo.sp=rem<=60e3?2:1;pomoSpecial();return}}
  if(nd!==curNeed){if(nd&&mode==='pet'){sfx('warn');buzz()}curNeed=nd;if(nd){setB('need',rn(24,34));return}}
  idleT++;
  if(idleMode==='walk'){const d=tx-walkX;if(Math.abs(d)<=3){walkX=tx;facing=walkDir<0?'L':'R';setB('idle',rn(8,16))}else walkX+=walkDir*3;return}
