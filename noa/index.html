@@ -58,9 +58,10 @@ small{display:block;margin-top:14px;color:var(--mute);font-size:13px}
 {
 // Noa 素材表（R2）；換新素材表時只要改這一行
 // Rinya 素材表（R2）；換新素材表時只要改這一行
-const SHEET_R="https://img.obsidianfirelight.com/commissions/rinya-sheet23-20261127-130059.png";
+const SHEET_R="https://img.obsidianfirelight.com/commissions/img-7474-20261127-144007.png";
 const SHEET="https://img.obsidianfirelight.com/commissions/noa-sheet31-20261126-212107.png";
 const RN={idle:0,blink:1,walk:2,sleep:3,eat:4,jump:5,angry:6,love:7,ice:8,fire:9,hatch:10,hungry:11,sick:12,bath:13,pet:14,over:15,miss:16,rinya:17,ball:18,walkL:19,blinkL:20,stretch:21,smoke:22,icesc:23,idleL:24,hoard:25,chase:26,roll:27,fly:28,yawn:29,note:30};
+const RIF=[0,0,0,0,0,0,0,0,0,1,2,3];
 const RR={idle:0,sleep:1,walk:2,blink:3,eat:4,jump:5,angry:6,love:7,hungry:8,sick:9,bath:10,pet:11,ball:12,chase:13,roll:14,spin:15,yawn:16,sneeze:17,stretch:18,sneezeLie:19,cast:20,over:21,miss:22,hatch:5,hoard:7,fly:5,icesc:15,smoke:15,ice:15,fire:15,rinya:-9,note:2030,walkL:1002,idleL:1000,blinkL:1003};
 let R=RN;
 const YN={29:-2,21:-2,22:-2,23:-2,24:-2,25:-2,26:-2,27:1,28:-2};const LN=new Set(['walkL','blinkL','idleL','chase','roll','fly']),LR=new Set(['walkL','blinkL','idleL']);let LEFT=LN,YO=YN;
@@ -242,10 +243,10 @@ rain:['..SSS..','.SSSSS.','SSSSSSS','.......','.B.B.B.','B.B.B..','.......'],
 star:['...Y...','..YYY..','YYYYYYY','.YYYYY.','..YYY..','.YY.YY.','YY...YY']};
 const MICON={rune:'magic',more:'star',feed:'food',pet:'hand',ball:'ball',bath:'bubble',ice:'ice',fire:'fire',sleep:'moon',wake:'sun'};
 function reason(id){if(S.phase!=='live')return'';if(S.asleep&&id!=='sleep')return'睡覺中';if(S.over&&id!=='pet')return'太激動';if(id==='feed'&&S.food>95)return'吃不下';if(id==='ice'&&S.ice<15)return'冰魔力不足';if(id==='fire'&&S.fire<15)return'火魔力不足';if(id==='rune'&&(S.rune||0)<15)return'能量不足';return''}
-function icon(k,x,y,s,grey){const m=ICON[k];for(let r=0;r<m.length;r++)for(let c=0;c<m[r].length;c++){const ch=m[r][c];if(ch!=='.'){g.fillStyle=grey?'#4e4558':PAL[ch];g.fillRect(x+c*s,y+r*s,s,s)}}}
+function icon(k,x,y,s,grey){const m=ICON[k==='rune'?'magic':k];if(!m)return;for(let r=0;r<m.length;r++)for(let c=0;c<m[r].length;c++){const ch=m[r][c];if(ch!=='.'){g.fillStyle=grey?'#4e4558':PAL[ch];g.fillRect(x+c*s,y+r*s,s,s)}}}
 function txt(s,x,y,sz,c,al){g.font=`${al||400} ${sz}px "Noto Sans TC",sans-serif`;g.fillStyle=c;g.fillText(s,x,y)}
 function bar(x,y,w,v,c,label,k){if(k){icon(k,x,y-2,2);x+=18}txt(label,x,y+10,12,'#c9bcd3');g.fillStyle='#2d2436';g.fillRect(x+62,y,w,10);g.fillStyle=c;g.fillRect(x+62,y,w*v/100,10);txt(String(Math.round(v)),x+66+w,y+10,12,'#efe6f3')}
-function draw(){
+function draw(){g.globalAlpha=1;g.setTransform(1,0,0,1,0,0);
  if(S.phase==='live'&&mode==='game'&&G){const B=GBG||buildGameBg();g.drawImage(B.sky,0,0);drawScroll(B.far,G.dist*.12,0);drawScroll(B.mid,G.dist*.4,0);drawScroll(B.gr,G.dist,232);g.textBaseline='alphabetic';drawGame();if(toast&&performance.now()<toast.until){g.font='700 13px "Noto Sans TC"';const w=g.measureText(toast.m).width+20;g.fillStyle='#efe6f3';g.fillRect(120-w/2,36,w,24);txt(toast.m,130-w/2,53,13,'#1c1e28',700)}return}
  g.drawImage(bgFor(S.t),0,0);
  if(period(S.t)==='night'){for(let i=0;i<5;i++){if((frame+i*3)%7<5){g.fillStyle='#fff8d0';g.fillRect(20+(i*13)%56,74+(i*17)%22,1,1)}}}
@@ -265,7 +266,7 @@ function draw(){
   ms.forEach(([k,v,c],i)=>{const x=8+(i%3)*78,y=31+Math.floor(i/3)*17;icon(k,x,y,2);g.fillStyle='#2d2436';g.fillRect(x+18,y+4,52,7);g.fillStyle=(k==='ice'||k==='fire'||k==='magic')?(v>80?(k==='magic'?'#ff5d9e':'#c58bff'):c):(v<30?'#ff5d5d':c);g.fillRect(x+18,y+4,52*v/100,7)})}
  // sprite
  let row,fr,x=24;
- if(anim&&anim.scene){drawScene(anim.n-anim.left);row=-1}else if(anim){row=anim.row;fr=frame%anim.n}else{const b=baseRow();row=b.row;fr=b.frames?b.frames[frame%2]:frame%4;if(b.walk){x=24+walkX}}
+ if(anim&&anim.scene){drawScene(anim.n-anim.left);row=-1}else if(anim){row=anim.row;fr=frame%anim.n}else{const b=baseRow();row=b.row;fr=b.frames?b.frames[frame%b.frames.length]:frame%4;if(b.walk){x=24+walkX}}
  if(W.active==='rinya'?imgRErr:imgErr){txt(NM()+' 的圖片沒有載入',56,170,14,'#efe6f3',700)}
  if(row!==-1&&imgOK()){{g.fillStyle='#0000002e';for(let yy=-3;yy<=3;yy++){const w=Math.round(62*Math.sqrt(1-yy*yy/12.25));g.fillRect(x+96-w,251+yy,w*2,1)}}spr(row,fr,x,77+(YO[row]||0)*3,3)}
  if(S.phase==='live'&&S.clean<30&&!anim){g.strokeStyle='#9c8a63';g.lineWidth=3;for(let i=0;i<3;i++){const sx=58+i*62,o=(frame%2)*3;g.beginPath();g.moveTo(sx,150+o);g.quadraticCurveTo(sx+8,140+o,sx,130+o);g.quadraticCurveTo(sx-8,120+o,sx,110+o);g.stroke()}}
@@ -400,7 +401,7 @@ function loop(now){
  if(mode==='game')gameStep(dt/1000);pomoCheck();
  ft=Math.min(ft+dt,660);while(ft>=220){ft-=220;frameStep()}
  draw();
- }catch(e){console.error(e)}
+ }catch(e){console.error(e);try{g.globalAlpha=1;g.setTransform(1,0,0,1,0,0)}catch(_){}}
  requestAnimationFrame(loop);
 }
 function flushSave(){lastWall=Date.now();save()}
