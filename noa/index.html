@@ -64,7 +64,7 @@ const RN={idle:0,blink:1,walk:2,sleep:3,eat:4,jump:5,angry:6,love:7,ice:8,fire:9
 const RIF=[0,0,0,0,0,0,0,0,0,1,2,3];
 const RR={idle:0,sleep:1,walk:2,blink:3,eat:4,jump:5,angry:6,love:7,hungry:8,sick:9,bath:10,pet:11,ball:12,chase:13,roll:14,spin:15,yawn:16,sneeze:17,stretch:18,sneezeLie:19,cast:20,over:21,miss:22,hatch:5,hoard:7,fly:5,icesc:15,smoke:15,ice:15,fire:15,rinya:-9,note:2030,walkL:1002,idleL:1000,blinkL:1003};
 let R=RN;
-const YN={29:-2,21:-2,22:-2,23:-2,24:-2,25:-2,26:-2,27:1,28:-2};const LN=new Set(['walkL','blinkL','idleL','chase','roll','fly']),LR=new Set(['walkL','blinkL','idleL']);let LEFT=LN,YO=YN;
+const YN={0:3,1:3,2:2,3:1,4:3,6:2,7:3,8:3,9:3,13:1,14:2,15:2,16:2,17:2,18:1,19:2,20:3,21:1,22:1,23:1,24:1,25:1,26:1,27:1,28:1,29:1};const LN=new Set(['walkL','blinkL','idleL','chase','roll','fly']),LR=new Set(['walkL','blinkL','idleL']);let LEFT=LN,YO=YN;
 const PN=[['ball',3,'玩球'],['chase',3,'追光點'],['hoard',3,'囤寶物'],['roll',3,'打滾'],['fly',2,'練習飛行'],['icesc',3,'做冰雕'],['smoke',3,'吐煙圈']];let lastPlay='';
 const PR=[['ball',3,'玩球'],['chase',3,'追光點'],['roll',2,'打滾'],['spin',2,'轉圈']];
 const MN=[["feed","餵食"],["pet","摸頭"],["ball","玩耍"],["bath","洗澡"],["ice","藍色吐息"],["fire","噴火"],["sleep","睡覺"],["more","更多"]],MR=[["feed","餵食"],["pet","摸頭"],["ball","玩耍"],["bath","洗澡"],["rune","施放符文"],["sleep","睡覺"],["more","更多"]];let MENU=MN;
