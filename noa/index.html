@@ -117,12 +117,12 @@ function visitEvent(){const st=snap();S.lastVisit=S.t;S.missAfter=0;S.mood=100;s
   if(W.unlocked&&Ry&&Ry.phase==='live'&&imgR.complete&&imgR.naturalWidth&&Math.random()<.4){Ry.bond=Math.min(100,Ry.bond+3);Ry.mem=Ry.mem||[];Ry.mem.unshift({t:S.t,s:'Rinya 去找 Noa 玩'});if(Ry.mem.length>30)Ry.mem.length=30;addMem('龍形的 Rinya 來找 Noa 玩');gain(st);sfx('rinya');anim={scene:'visit',row:-1,n:46,loops:1,left:46,missAfter:1};frame=0;ft=0;say('Rinya 變成龍的樣子來找 Noa 玩了！');toastLater='Rinya 回家後也很開心（Rinya 羈絆 +3）';return}
   addMem('Rinya 來看 Noa');gain(st);sfx('rinya');const first=!W.unlocked;W.unlocked=true;if(first)addMem('Rinya 留下了一個約定');play('rinya',5,'Rinya 來看 Noa 了！',first?['love',1,'解鎖 Rinya！到「更多」切換角色']:null)}
  else{addMem('Noa 來找 Rinya 玩');const N=W.pets.noa;if(N){N.bond=Math.min(100,N.bond+3);N.lastVisit=S.t;N.missAfter=0;N.mem=N.mem||[];N.mem.unshift({t:S.t,s:'Noa 去找 Rinya 玩'});if(N.mem.length>30)N.mem.length=30}gain(st);sfx('rinya');anim={scene:'visit',row:-1,n:46,loops:1,left:46};frame=0;ft=0;say('Noa 來找 Rinya 玩了！');toastLater='Noa 回家後也很開心（Noa 羈絆 +3）'}}
-function drawScene(f){const by=232-114;const rr=f<14?R.idle:f<22?R.jump:f<34?R.love:R.idle;
- g.fillStyle='#0000002e';g.fillRect(30,233,88,3);spr(rr,f%4,8,by,2);
+function drawScene(f){const by=252-114;const rr=f<14?R.idle:f<22?R.jump:f<34?R.love:R.idle;
+ g.fillStyle='#0000002e';g.fillRect(30,252,88,3);spr(rr,f%4,8,by,2);
  let nx,nr;if(W.active==='noa'){if(f<14){nx=250-f*9;nr=4002}else if(f<34){nx=124;nr=(f>=26&&f<28)?4003:4000}else{nx=124+(f-34)*11;nr=3002}
-  g.fillStyle='#0000002e';g.fillRect(nx+26,233,80,3);spr(nr,f%4,nx,by,2);return}
+  g.fillStyle='#0000002e';g.fillRect(nx+26,252,80,3);spr(nr,f%4,nx,by,2);return}
  if(f<14){nx=250-f*9;nr=19}else if(f<34){nx=124;nr=(f>=26&&f<28)?20:24}else{nx=124+(f-34)*11;nr=2}
- g.fillStyle='#0000002e';g.fillRect(nx+30,233,72,3);spr(nr+2000,f%4,nx,by+(YN[nr]||0)*2,2)}
+ g.fillStyle='#0000002e';g.fillRect(nx+30,252,72,3);spr(nr+2000,f%4,nx,by+(YN[nr]||0)*2,2)}
 function decayOther(st){const O=W.pets[W.active==='noa'?'rinya':'noa'];if(!O)return;O.t=S.t;if(O.phase!=='live')return;const h=st/H*0.25,dn=(k,r)=>{if(O[k]>20)O[k]=Math.max(20,O[k]-r*h)};dn('food',6);dn('clean',4);dn('mood',5);O.over=false;O.asleep=false;O.neglect=0;O.manualSleep=false}
 function snap(){return{food:S.food,clean:S.clean,mood:S.mood,ice:S.ice,fire:S.fire,rune:S.rune||0}}
 function gain(st){const ks=[['food','#ffb347'],['clean','#cdb98b'],['mood','#ff8fa3'],['ice','#6fb7ff'],['fire','#ff8a3d'],['rune','#c58bff']];const L=[];for(const[k,c]of ks){const dd=Math.round(S[k]-st[k]);if(Math.abs(dd)>=1)L.push({k,s:(dd>0?'+':'')+dd,c})}L.forEach((f,i)=>{f.i=i;f.n=L.length;f.t0=performance.now()});floats=L}
@@ -255,7 +255,7 @@ function draw(){g.globalAlpha=1;g.setTransform(1,0,0,1,0,0);
  if(S.phase!=='gone')drawWeather();
  if(S.asleep&&S.phase==='live'){g.fillStyle='#0a0814aa';g.fillRect(0,62,240,200)}
  g.textBaseline='alphabetic';
- if(S.phase==='gone'){if(img.complete&&!imgErr)spr(R.note,frame%4,24,77,3);
+ if(S.phase==='gone'){if(img.complete&&!imgErr)spr(R.note,frame%4,24,81,3);
   g.font='700 15px "Noto Sans TC"';const m1=NM()+' 去找 '+OTHER()+' 了';const w1=g.measureText(m1).width+28;g.fillStyle='#f3ead9';g.fillRect(120-w1/2,92,w1,58);g.fillStyle='#d8cbb2';g.fillRect(120-w1/2,146,w1,4);
   txt(m1,134-w1/2,116,15,'#3b2c22',700);txt('……好好照顧自己喔',134-w1/2,139,12,'#5a4636');(W.active==='rinya'?txt('按 OK 等 Rinya 回來',58,295,14,'#efe6f3',700):txt('按 OK 重新孵蛋',74,295,14,'#efe6f3',700));return}
  // status bar
@@ -270,7 +270,7 @@ function draw(){g.globalAlpha=1;g.setTransform(1,0,0,1,0,0);
  let row,fr,x=24;
  if(anim&&anim.scene){drawScene(anim.n-anim.left);row=-1}else if(anim){row=anim.row;fr=frame%anim.n;x=24+walkX}else{const b=baseRow();row=b.row;fr=b.frames?b.frames[frame%b.frames.length]:frame%4;if(b.walk){x=24+walkX}}
  if(W.active==='rinya'?imgRErr:imgErr){txt(NM()+' 的圖片沒有載入',56,170,14,'#efe6f3',700)}
- if(row!==-1&&imgOK()){{g.fillStyle='#0000002e';for(let yy=-3;yy<=3;yy++){const w=Math.round(62*Math.sqrt(1-yy*yy/12.25));g.fillRect(x+96-w,251+yy,w*2,1)}}spr(row,fr,x,77+(YO[row]||0)*3,3)}
+ if(row!==-1&&imgOK()){{g.fillStyle='#0000002e';for(let yy=-3;yy<=3;yy++){const w=Math.round(62*Math.sqrt(1-yy*yy/12.25));g.fillRect(x+96-w,254+yy,w*2,1)}}spr(row,fr,x,81+(YO[row]||0)*3,3)}
  if(S.phase==='live'&&S.clean<30&&!anim){g.strokeStyle='#9c8a63';g.lineWidth=3;for(let i=0;i<3;i++){const sx=58+i*62,o=(frame%2)*3;g.beginPath();g.moveTo(sx,150+o);g.quadraticCurveTo(sx+8,140+o,sx,130+o);g.quadraticCurveTo(sx-8,120+o,sx,110+o);g.stroke()}}
  {const now=performance.now();floats=floats.filter(f=>now-f.t0<1400);for(const f of floats){const p=(now-f.t0)/1400,x=120+(f.i-(f.n-1)/2)*54-20,y=124-p*16;g.globalAlpha=p<.7?1:Math.max(0,1-(p-.7)/.3);icon(f.k,x,y-12,2);g.font='700 15px "Noto Sans TC"';g.lineWidth=4;g.lineJoin='round';g.strokeStyle='#1c1424';g.strokeText(f.s,x+18,y);g.fillStyle=f.c;g.fillText(f.s,x+18,y);g.globalAlpha=1}}
  // menu or prompts
