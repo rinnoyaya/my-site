@@ -59,7 +59,7 @@ small{display:block;margin-top:14px;color:var(--mute);font-size:13px}
 // Noa 素材表（R2）；換新素材表時只要改這一行
 // Rinya 素材表（R2）；換新素材表時只要改這一行
 const SHEET_R="https://img.obsidianfirelight.com/commissions/img-7484-20261127-195215.png";
-const SHEET="https://img.obsidianfirelight.com/commissions/img-7489-20261127-200505.png";
+const SHEET="https://img.obsidianfirelight.com/commissions/img-7489-20261127-201447.png";
 const RN={idle:0,blink:1,walk:2,sleep:3,eat:4,jump:5,angry:6,love:7,ice:8,fire:9,hatch:10,hungry:11,sick:12,bath:13,pet:14,over:15,miss:16,rinya:17,ball:18,walkL:19,blinkL:20,stretch:21,smoke:22,icesc:23,idleL:24,hoard:25,chase:26,roll:27,fly:28,yawn:29,note:30,read:31,hour:32,sneeze:33,belly:34,sneezeL:35};
 const RIF=[0,0,0,0,0,0,0,0,0,1,2,3];
 const RR={idle:0,sleep:1,walk:2,blink:3,eat:4,jump:5,angry:6,love:7,hungry:8,sick:9,bath:10,pet:11,ball:12,chase:13,roll:14,spin:15,yawn:16,sneeze:17,stretch:18,sneezeLie:19,cast:20,over:21,miss:22,scroll:23,doze:24,hatch:5,hoard:7,fly:5,icesc:15,smoke:15,ice:15,fire:15,rinya:-9,note:2030,walkL:1002,idleL:1000,blinkL:1003};
@@ -69,8 +69,8 @@ const PN=[['ball',3,'玩球'],['chase',3,'追光點'],['hoard',3,'囤寶物'],['
 const PR=[['ball',3,'玩球'],['chase',3,'追光點'],['roll',2,'打滾'],['spin',2,'轉圈']];
 const MN=[["feed","餵食"],["pet","摸頭"],["ball","玩耍"],["bath","洗澡"],["ice","藍色吐息"],["fire","噴火"],["sleep","睡覺"],["more","更多"]],MR=[["feed","餵食"],["pet","摸頭"],["ball","玩耍"],["bath","洗澡"],["rune","施放符文"],["sleep","睡覺"],["more","更多"]];let MENU=MN;
 const cv=document.getElementById('scr'),g=cv.getContext('2d');g.imageSmoothingEnabled=false;
-const img=new Image();let imgErr=false;img.onerror=()=>{imgErr=true};img.src=SHEET;
-const imgR=new Image();let imgRErr=false;imgR.onerror=()=>{imgRErr=true};imgR.src=SHEET_R;
+const img=new Image();let imgErr=false,imgBad='';img.onerror=()=>{imgErr=true};img.onload=()=>{if(img.naturalWidth!==256||img.naturalHeight<36*64){imgErr=true;imgBad=img.naturalWidth+'×'+img.naturalHeight;console.error('Noa sheet size wrong',imgBad)}};img.src=SHEET;
+const imgR=new Image();let imgRErr=false,imgRBad='';imgR.onerror=()=>{imgRErr=true};imgR.onload=()=>{if(imgR.naturalWidth!==256||imgR.naturalHeight<25*64){imgRErr=true;imgRBad=imgR.naturalWidth+'×'+imgR.naturalHeight;console.error('Rinya sheet size wrong',imgRBad)}};imgR.src=SHEET_R;
 const H=3600e3,DAY=24*H,KEY='noa-proto-v1';
 let missReal=0,floats=[],AC=null,muted=false,breathWarn={},catching=false,S,speed=60,sel=0,anim=null,frame=0,ft=0,statusOpen=false,toast=null,walkX=0,walkDir=1,facing='R',idleMode='idle',idleT=0,idleD=20,tx=0,curNeed='',last=performance.now();
 function fresh(){return{t:Date.now(),phase:'egg',food:80,clean:90,mood:70,health:100,ice:20,fire:20,bond:0,neglect:0,lastVisit:Date.now(),born:Date.now(),runs:0,petCalm:0,over:false,asleep:false,manualSleep:false,wakeUntil:0,mem:[],rune:20}}
@@ -82,8 +82,8 @@ function save(){try{W.pets[W.active]=S;localStorage.setItem(WKEY,JSON.stringify(
 function CHK(){return W.active}function NM(){return W.active==='noa'?'Noa':'Rinya'}function OTHER(){return W.active==='noa'?'Rinya':'Noa'}
 function applyChar(){const r=W.active==='rinya';R=r?RR:RN;YO=r?{}:YN;LEFT=r?LR:LN;MENU=r?MR:MN;if(sel>=MENU.length)sel=0}
 function curPlays(){return W.active==='rinya'?PR:PN}
-function curImg(){return W.active==='rinya'?imgR:img}function imgOK(){const im=curImg();return im.complete&&im.naturalWidth>0}
-function spr(row,fr,x,y,sc,sh=64){let im=curImg(),r=row,fl=false;if(r>=4000){im=imgR;r-=4000;fl=true}else if(r>=3000){im=imgR;r-=3000}else if(r>=2000){im=img;r-=2000}else if(r>=1000){fl=true;r-=1000}if(!im.complete||!im.naturalWidth)return;g.save();if(fl){g.translate(x*2+64*sc,0);g.scale(-1,1)}g.drawImage(im,fr*64,r*64,64,sh,x,y,64*sc,sh*sc);g.restore()}
+function curImg(){return W.active==='rinya'?imgR:img}function imgOK(){const im=curImg();return im.complete&&im.naturalWidth>0&&!(W.active==='rinya'?imgRErr:imgErr)}
+function spr(row,fr,x,y,sc,sh=64){let im=curImg(),r=row,fl=false;if(r>=4000){im=imgR;r-=4000;fl=true}else if(r>=3000){im=imgR;r-=3000}else if(r>=2000){im=img;r-=2000}else if(r>=1000){fl=true;r-=1000}if(!im.complete||!im.naturalWidth||(im===img&&imgErr)||(im===imgR&&imgRErr))return;g.save();if(fl){g.translate(x*2+64*sc,0);g.scale(-1,1)}g.drawImage(im,fr*64,r*64,64,sh,x,y,64*sc,sh*sc);g.restore()}
 function calmMagic(){if(W.active==='noa'){S.ice=30;S.fire=30}else S.rune=30}
 S=load();applyChar();
 const cl=v=>Math.max(0,Math.min(100,v));
@@ -273,7 +273,7 @@ function draw(){g.globalAlpha=1;g.setTransform(1,0,0,1,0,0);
  // sprite
  let row,fr,x=24;
  if(anim&&anim.scene){drawScene(anim.n-anim.left);row=-1}else if(anim){row=anim.row;fr=frame%anim.n;x=24+walkX}else{const b=baseRow();row=b.row;fr=b.frames?b.frames[frame%b.frames.length]:frame%4;if(b.walk){x=24+walkX}}
- if(W.active==='rinya'?imgRErr:imgErr){txt(NM()+' 的圖片沒有載入',56,170,14,'#efe6f3',700)}
+ if(W.active==='rinya'?imgRErr:imgErr){const bad=W.active==='rinya'?imgRBad:imgBad;txt(bad?NM()+' 的圖片檔不對':NM()+' 的圖片沒有載入',bad?66:56,170,14,'#efe6f3',700);if(bad)txt('（收到 '+bad+'，應為 256 寬）',40,190,12,'#a897b3',400)}
  if(row!==-1&&imgOK()){{g.fillStyle='#0000002e';for(let yy=-3;yy<=3;yy++){const w=Math.round(62*Math.sqrt(1-yy*yy/12.25));g.fillRect(x+96-w,254+yy,w*2,1)}}spr(row,fr,x,81+(YO[row]||0)*3,3)}
  if(S.phase==='live'&&S.clean<30&&!anim){g.strokeStyle='#9c8a63';g.lineWidth=3;for(let i=0;i<3;i++){const sx=58+i*62,o=(frame%2)*3;g.beginPath();g.moveTo(sx,150+o);g.quadraticCurveTo(sx+8,140+o,sx,130+o);g.quadraticCurveTo(sx-8,120+o,sx,110+o);g.stroke()}}
  {const now=performance.now();floats=floats.filter(f=>now-f.t0<1400);for(const f of floats){const p=(now-f.t0)/1400,x=120+(f.i-(f.n-1)/2)*54-20,y=124-p*16;g.globalAlpha=p<.7?1:Math.max(0,1-(p-.7)/.3);icon(f.k,x,y-12,2);g.font='700 15px "Noto Sans TC"';g.lineWidth=4;g.lineJoin='round';g.strokeStyle='#1c1424';g.strokeText(f.s,x+18,y);g.fillStyle=f.c;g.fillText(f.s,x+18,y);g.globalAlpha=1}}
