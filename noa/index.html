@@ -112,8 +112,8 @@ function tick(ms){
 }
 let toastLater='';
 function visitEvent(){const st=snap();S.lastVisit=S.t;S.missAfter=0;S.mood=100;statusOpen=false;
- if(W.active==='noa'){addMem('Rinya 來看 Noa');gain(st);sfx('rinya');const first=!W.unlocked;W.unlocked=true;if(first)addMem('Rinya 留下了一個約定');play('rinya',5,'Rinya 來看 Noa 了！',first?['love',1,'解鎖 Rinya！到「更多」切換角色']:null)}
- else{addMem('Noa 來找 Rinya 玩');const N=W.pets.noa;if(N){N.bond=Math.min(100,N.bond+3);N.mem=N.mem||[];N.mem.unshift({t:S.t,s:'Noa 去找 Rinya 玩'});if(N.mem.length>30)N.mem.length=30}gain(st);sfx('rinya');anim={scene:'visit',row:-1,n:46,loops:1,left:46};frame=0;ft=0;say('Noa 來找 Rinya 玩了！');toastLater='Noa 回家後也很開心（Noa 羈絆 +3）'}}
+ if(W.active==='noa'){const Ry=W.pets.rinya;if(Ry){Ry.lastVisit=S.t;Ry.missAfter=0}addMem('Rinya 來看 Noa');gain(st);sfx('rinya');const first=!W.unlocked;W.unlocked=true;if(first)addMem('Rinya 留下了一個約定');play('rinya',5,'Rinya 來看 Noa 了！',first?['love',1,'解鎖 Rinya！到「更多」切換角色']:null)}
+ else{addMem('Noa 來找 Rinya 玩');const N=W.pets.noa;if(N){N.bond=Math.min(100,N.bond+3);N.lastVisit=S.t;N.missAfter=0;N.mem=N.mem||[];N.mem.unshift({t:S.t,s:'Noa 去找 Rinya 玩'});if(N.mem.length>30)N.mem.length=30}gain(st);sfx('rinya');anim={scene:'visit',row:-1,n:46,loops:1,left:46};frame=0;ft=0;say('Noa 來找 Rinya 玩了！');toastLater='Noa 回家後也很開心（Noa 羈絆 +3）'}}
 function drawScene(f){const by=232-114;const rr=f<14?R.idle:f<22?R.jump:f<34?R.love:R.idle;
  g.fillStyle='#0000002e';g.fillRect(30,233,88,3);spr(rr,f%4,8,by,2);
  let nx,nr;if(f<14){nx=250-f*9;nr=19}else if(f<34){nx=124;nr=(f>=26&&f<28)?20:24}else{nx=124+(f-34)*11;nr=2}
@@ -130,7 +130,7 @@ function say(m){toast={m,until:performance.now()+2600}}
 function play(name,loops,msg,then){facing=LEFT.has(name)?'L':'R';anim={row:R[name],loops,n:4,left:loops*4,then};frame=0;ft=0;if(msg)say(msg)}
 function act(){
  if(S.phase==='egg'){S.phase='hatching';play('hatch',1);return}
- if(S.phase==='gone'){const runs=S.runs,bond=S.bond,mem=S.mem||[],best=S.best;S=fresh();S.runs=runs;S.bond=Math.floor(bond/2);S.mem=mem;S.best=best;if(W.active==='rinya'){Object.assign(S,{phase:'live',born:S.t,lastVisit:S.t,giftDay:gday(S.t),ms:[]});play('jump',2,'Rinya 回來了！');addMem('Rinya 回來了')}save();return}
+ if(S.phase==='gone'){const runs=S.runs,bond=S.bond,mem=S.mem||[],best=S.best,t0=Math.max(S.t,Date.now());S=fresh();S.t=t0;S.runs=runs;S.bond=Math.floor(bond/2);S.mem=mem;S.best=best;if(W.active==='rinya'){Object.assign(S,{phase:'live',born:S.t,lastVisit:S.t,giftDay:gday(S.t),ms:[]});play('jump',2,'Rinya 回來了！');addMem('Rinya 回來了')}save();return}
  if(S.phase!=='live')return;if(anim&&MENU[sel][0]!=='more')return;
  const id=MENU[sel][0];
  if(S.over&&id!=='pet'){say(NM()+' 太激動了，先摸摸頭');return}
@@ -145,7 +145,7 @@ function act(){
   case'bath':S.clean=100;play('bath',3,'洗得乾乾淨淨');break;
   case'ice':if(S.ice<15){say('冰魔力不夠');return}if(S.fire-Math.max(0,S.ice-40)>60&&!(breathWarn.id==='ice'&&performance.now()<breathWarn.until)){breathWarn={id:'ice',until:performance.now()+4000};say('冰火會失衡！再按一次確定');return}breathWarn={};S.ice=Math.max(0,S.ice-40);play('ice',1);break;
   case'fire':if(S.fire<15){say('火魔力不夠');return}if(S.ice-Math.max(0,S.fire-40)>60&&!(breathWarn.id==='fire'&&performance.now()<breathWarn.until)){breathWarn={id:'fire',until:performance.now()+4000};say('冰火會失衡！再按一次確定');return}breathWarn={};S.fire=Math.max(0,S.fire-40);S.clean=cl(S.clean-5);play('fire',1);break;
-  case'rune':if((S.rune||0)<15){say('符文能量不夠');return}{const st=snap();S.rune=Math.max(0,S.rune-40);S.mood=cl(S.mood+5);play('cast',1,'Rinya 施放了符文');}break;
+  case'rune':if((S.rune||0)<15){say('符文能量不夠');return}{const st=snap();S.rune=Math.max(0,S.rune-40);S.mood=cl(S.mood+5);play('cast',2,'Rinya 施放了符文');}break;
   case'more':mode='more';moreSel=0;break;
   case'sleep':if(S.asleep){S.manualSleep=false;S.asleep=false;if(night(S.t)){S.wakeUntil=S.t+H;S.mood=cl(S.mood-5);play('angry',1,NM()+' 被吵醒，有點不高興')}else{say(NM()+' 醒來了');if(S.health>=40)play('stretch',1)}}else{S.manualSleep=true;S.sleepStart=S.t;S.asleep=true;S.wakeUntil=0;play('yawn',2,'晚安，'+NM())}break;
  }
@@ -254,7 +254,7 @@ function draw(){
  g.textBaseline='alphabetic';
  if(S.phase==='gone'){if(img.complete&&!imgErr)spr(R.note,frame%4,24,77,3);
   g.font='700 15px "Noto Sans TC"';const m1=NM()+' 去找 '+OTHER()+' 了';const w1=g.measureText(m1).width+28;g.fillStyle='#f3ead9';g.fillRect(120-w1/2,92,w1,58);g.fillStyle='#d8cbb2';g.fillRect(120-w1/2,146,w1,4);
-  txt(m1,134-w1/2,116,15,'#3b2c22',700);txt('……好好照顧自己喔',134-w1/2,139,12,'#5a4636');txt('按 OK 重新孵蛋',74,295,14,'#efe6f3',700);return}
+  txt(m1,134-w1/2,116,15,'#3b2c22',700);txt('……好好照顧自己喔',134-w1/2,139,12,'#5a4636');(W.active==='rinya'?txt('按 OK 等 Rinya 回來',58,295,14,'#efe6f3',700):txt('按 OK 重新孵蛋',74,295,14,'#efe6f3',700));return}
  // status bar
  const d=new Date(S.t);txt(`${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`,10,20,14,'#efe6f3',700);
  if(S.phase==='live'){const hb=Math.round(S.bond/20);for(let i=0;i<5;i++)icon(i<hb?'heart':'heart0',58+i*13,9,2);const wi={sun:'sun',cloud:'cloud',rain:'rain',snow:'ice'}[weatherOf(S.t)];icon(wi,128,8,2)}
@@ -321,7 +321,7 @@ function drawGame(){
  for(const o of G.snk)icon(o.k,o.x,130,3);
  for(const o of G.obs)icon(o.k,o.x,211,3);
  g.fillStyle='#0000002e';const sw=Math.max(14,34-G.y/3);g.fillRect(6+66-sw,233,sw*2,3);
- if(imgOK()){const air=G.y>0,row=air?R.jump:R.walk,fr=air?2:Math.floor(G.t*12)%4;const sh=air?55:59;spr(row,fr,6,232-114-G.y,2,sh)}
+ if(imgOK()){const air=G.y>0,row=air?R.jump:R.walk,fr=air?2:Math.floor(G.t*12)%4;const sh=air?(W.active==='noa'?55:56):59;spr(row,fr,6,232-114-G.y,2,sh)}
  box(0,0,240,30);txt('分數 '+gameScore(),10,21,15,'#efe6f3',700);const b='最高 '+(S.best||0);g.font='400 13px "Noto Sans TC"';txt(b,230-g.measureText(b).width,21,13,'#a897b3');
  g.fillStyle='#14111a';g.fillRect(0,262,240,58);txt(G.over?'按 OK 結算':'按任何鍵跳躍・按住 OK 結束',G.over?84:22,296,14,'#efe6f3',700);
  if(G.over){box(40,96,160,74);txt('撞到了！',86,126,18,'#ff8fa3',700);const s2=gameScore()+' 分';g.font='700 15px "Noto Sans TC"';txt(s2,120-g.measureText(s2).width/2,154,15,'#efe6f3',700)}
@@ -426,7 +426,7 @@ function idleAct(){if(W.active==='rinya')return idleActR();const hr=hourOf(S.t),
  play(pick,2,mode==='pomo'&&pick==='love'?NM()+' 在幫你加油':'');return true}
 function calm(){return S.phase==='live'&&!S.asleep&&!S.over&&S.health>=40&&S.food>=30&&S.mood>=20}
 function frameStep(){frame++;
-  if(anim){anim.left--;if(anim.left<=0){if(S.phase==='hatching'){S.phase='live';S.t=Date.now();S.born=S.t;S.lastVisit=S.t;save();anim=null;play('jump',2,'Noa 誕生了！');addMem('Noa 誕生了');S.giftDay=gday(S.t);S.ms=[]}else{if(anim.scene&&toastLater){say(toastLater);toastLater=''}if(anim.row===R.rinya){S.missAfter=S.t+0.6*H;missReal=performance.now()+8000;facing='R';idleMode='idle'}const nx=anim.then;anim=null;if(nx)play(nx[0],nx[1],nx[2])}}}
+  if(anim){anim.left--;if(anim.left<=0){if(S.phase==='hatching'){S.phase='live';S.t=Math.max(S.t,Date.now());S.born=S.t;S.lastVisit=S.t;save();anim=null;play('jump',2,'Noa 誕生了！');addMem('Noa 誕生了');S.giftDay=gday(S.t);S.ms=[]}else{if(anim.scene&&toastLater){say(toastLater);toastLater=''}if(anim.row===R.rinya){S.missAfter=S.t+0.6*H;missReal=performance.now()+8000;facing='R';idleMode='idle'}const nx=anim.then;anim=null;if(nx)play(nx[0],nx[1],nx[2])}}}
   else if(calm()&&mode==='pet'&&!catching&&specialEvent()){idleT=0}
   else if(calm()&&(mode==='pet'||mode==='pomo')){idleT++;
    if(idleMode==='idle'&&idleT>18&&Math.random()<.12){const hr=hourOf(S.t),since=(S.t-S.lastVisit)/DAY;const pc=Math.min(.15,(hr>=18&&hr<23?.08:.03)+since*.03);const r=Math.random();const sleepy=(hr>=21&&hr<23)||night(S.t);if(W.active==='rinya'&&(S.rune||0)>80&&Math.random()<.5){play('sneeze',1,'Rinya 打了個噴嚏，符文在發燙');idleT=0}else if(W.active==='noa'&&S.ice>80&&S.ice>=S.fire){S.ice-=20;play('ice',1,'Noa 忍不住吐了一口冰息');idleT=0}else if(W.active==='noa'&&S.fire>80){S.fire-=20;S.clean=cl(S.clean-3);play('fire',1,'Noa 忍不住噴了一小口火');idleT=0}else if(sleepy&&Math.random()<.3){play('yawn',1);idleT=0}else if(Math.random()<(mode==='pomo'?.25:.3)&&idleAct()){idleT=0}else{const pcc=W.active==='noa'?pc:0;idleMode=r<pcc?'crystal':r<pcc+.55?'blink':'walk';if(idleMode==='crystal')facing='R';idleT=0}}
@@ -464,7 +464,7 @@ function setSpd(v){speed=v;try{localStorage.setItem(KEY+'-spd',v)}catch(e){}for(
 spd.addEventListener('click',e=>{const b=e.target.closest('button');if(b)setSpd(+b.dataset.s)});{let v=60;try{v=+localStorage.getItem(KEY+'-spd')||60}catch(e){}setSpd([1,60,600].includes(v)?v:60)}
 document.getElementById('rst').addEventListener('click',()=>{mode='pet';G=null;W=newWorld();S=W.pets.noa;applyChar();anim=null;statusOpen=false;sel=0;save()});
 // catch up time passed while page was closed (real time)
-if(S.phase==='live'){const gap=Date.now()-S.t;if(gap>0){catching=true;tick(Math.min(gap,7*DAY));catching=false}}else S.t=Date.now();
+if(S.phase==='live'){const gap=Date.now()-S.t;if(gap>0){catching=true;tick(Math.min(gap,7*DAY));catching=false}}else S.t=Math.max(S.t||0,Date.now());
 
 const stat=document.getElementById('stat');
 function panel(){const tt=document.getElementById('stTitle');if(tt)tt.textContent='即時數值・'+(W.active==='noa'?'Noa':'Rinya')+'（照顧中）';const live=S.phase==='live';const sinceV=(S.t-S.lastVisit)/H;
