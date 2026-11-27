@@ -114,7 +114,7 @@ function tick(ms){
 let toastLater='';
 function visitEvent(){const st=snap();S.lastVisit=S.t;S.missAfter=0;S.mood=100;statusOpen=false;
  if(W.active==='noa'){const Ry=W.pets.rinya;if(Ry){Ry.lastVisit=S.t;Ry.missAfter=0}
-  if(W.unlocked&&Ry&&Ry.phase==='live'&&imgR.complete&&imgR.naturalWidth&&Math.random()<.4){Ry.bond=Math.min(100,Ry.bond+3);Ry.mem=Ry.mem||[];Ry.mem.unshift({t:S.t,s:'Rinya 去找 Noa 玩'});if(Ry.mem.length>30)Ry.mem.length=30;addMem('龍形的 Rinya 來找 Noa 玩');gain(st);sfx('rinya');anim={scene:'visit',row:-1,n:46,loops:1,left:46,missAfter:1};frame=0;ft=0;say('Rinya 變成龍的樣子來找 Noa 玩了！');toastLater='Rinya 回家後也很開心（Rinya 羈絆 +3）';return}
+  if(W.unlocked&&Ry&&Ry.phase==='live'&&imgR.complete&&imgR.naturalWidth&&Math.random()<.4){Ry.bond=Math.min(100,Ry.bond+3);Ry.mem=Ry.mem||[];Ry.mem.unshift({t:S.t,s:'Rinya 去找 Noa 玩'});if(Ry.mem.length>30)Ry.mem.length=30;addMem('奇美拉型態的 Rinya 來找 Noa 玩');gain(st);sfx('rinya');anim={scene:'visit',row:-1,n:46,loops:1,left:46,missAfter:1};frame=0;ft=0;say('Rinya 變成奇美拉來找 Noa 玩了！');toastLater='Rinya 回家後也很開心（Rinya 羈絆 +3）';return}
   addMem('Rinya 來看 Noa');gain(st);sfx('rinya');const first=!W.unlocked;W.unlocked=true;if(first)addMem('Rinya 留下了一個約定');play('rinya',5,'Rinya 來看 Noa 了！',first?['love',1,'解鎖 Rinya！到「更多」切換角色']:null)}
  else{addMem('Noa 來找 Rinya 玩');const N=W.pets.noa;if(N){N.bond=Math.min(100,N.bond+3);N.lastVisit=S.t;N.missAfter=0;N.mem=N.mem||[];N.mem.unshift({t:S.t,s:'Noa 去找 Rinya 玩'});if(N.mem.length>30)N.mem.length=30}gain(st);sfx('rinya');anim={scene:'visit',row:-1,n:46,loops:1,left:46};frame=0;ft=0;say('Noa 來找 Rinya 玩了！');toastLater='Noa 回家後也很開心（Noa 羈絆 +3）'}}
 function drawScene(f){const by=252-114;const rr=f<14?R.idle:f<22?R.jump:f<34?R.love:R.idle;
