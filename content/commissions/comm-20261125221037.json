@@ -9,6 +9,6 @@
   "description": "CREPE(可麗餅)委託",
   "adult": false,
   "imageSize": "一般",
-  "hidden": false,
+  "hidden": true,
   "imageUrl": "https://img.obsidianfirelight.com/commissions/6-20261116-210932-105.png"
 }
