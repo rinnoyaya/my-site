@@ -83,7 +83,7 @@ function CHK(){return W.active}function NM(){return W.active==='noa'?'Noa':'Riny
 function applyChar(){const r=W.active==='rinya';R=r?RR:RN;YO=r?{}:YN;LEFT=r?LR:LN;MENU=r?MR:MN;if(sel>=MENU.length)sel=0}
 function curPlays(){return W.active==='rinya'?PR:PN}
 function curImg(){return W.active==='rinya'?imgR:img}function imgOK(){const im=curImg();return im.complete&&im.naturalWidth>0}
-function spr(row,fr,x,y,sc,sh=64){let im=curImg(),r=row,fl=false;if(r>=2000){im=img;r-=2000}else if(r>=1000){fl=true;r-=1000}if(!im.complete||!im.naturalWidth)return;g.save();if(fl){g.translate(x*2+64*sc,0);g.scale(-1,1)}g.drawImage(im,fr*64,r*64,64,sh,x,y,64*sc,sh*sc);g.restore()}
+function spr(row,fr,x,y,sc,sh=64){let im=curImg(),r=row,fl=false;if(r>=4000){im=imgR;r-=4000;fl=true}else if(r>=3000){im=imgR;r-=3000}else if(r>=2000){im=img;r-=2000}else if(r>=1000){fl=true;r-=1000}if(!im.complete||!im.naturalWidth)return;g.save();if(fl){g.translate(x*2+64*sc,0);g.scale(-1,1)}g.drawImage(im,fr*64,r*64,64,sh,x,y,64*sc,sh*sc);g.restore()}
 function calmMagic(){if(W.active==='noa'){S.ice=30;S.fire=30}else S.rune=30}
 S=load();applyChar();
 const cl=v=>Math.max(0,Math.min(100,v));
@@ -113,11 +113,15 @@ function tick(ms){
 }
 let toastLater='';
 function visitEvent(){const st=snap();S.lastVisit=S.t;S.missAfter=0;S.mood=100;statusOpen=false;
- if(W.active==='noa'){const Ry=W.pets.rinya;if(Ry){Ry.lastVisit=S.t;Ry.missAfter=0}addMem('Rinya 來看 Noa');gain(st);sfx('rinya');const first=!W.unlocked;W.unlocked=true;if(first)addMem('Rinya 留下了一個約定');play('rinya',5,'Rinya 來看 Noa 了！',first?['love',1,'解鎖 Rinya！到「更多」切換角色']:null)}
+ if(W.active==='noa'){const Ry=W.pets.rinya;if(Ry){Ry.lastVisit=S.t;Ry.missAfter=0}
+  if(W.unlocked&&Ry&&Ry.phase==='live'&&imgR.complete&&imgR.naturalWidth&&Math.random()<.4){Ry.bond=Math.min(100,Ry.bond+3);Ry.mem=Ry.mem||[];Ry.mem.unshift({t:S.t,s:'Rinya 去找 Noa 玩'});if(Ry.mem.length>30)Ry.mem.length=30;addMem('龍形的 Rinya 來找 Noa 玩');gain(st);sfx('rinya');anim={scene:'visit',row:-1,n:46,loops:1,left:46,missAfter:1};frame=0;ft=0;say('Rinya 變成龍的樣子來找 Noa 玩了！');toastLater='Rinya 回家後也很開心（Rinya 羈絆 +3）';return}
+  addMem('Rinya 來看 Noa');gain(st);sfx('rinya');const first=!W.unlocked;W.unlocked=true;if(first)addMem('Rinya 留下了一個約定');play('rinya',5,'Rinya 來看 Noa 了！',first?['love',1,'解鎖 Rinya！到「更多」切換角色']:null)}
  else{addMem('Noa 來找 Rinya 玩');const N=W.pets.noa;if(N){N.bond=Math.min(100,N.bond+3);N.lastVisit=S.t;N.missAfter=0;N.mem=N.mem||[];N.mem.unshift({t:S.t,s:'Noa 去找 Rinya 玩'});if(N.mem.length>30)N.mem.length=30}gain(st);sfx('rinya');anim={scene:'visit',row:-1,n:46,loops:1,left:46};frame=0;ft=0;say('Noa 來找 Rinya 玩了！');toastLater='Noa 回家後也很開心（Noa 羈絆 +3）'}}
 function drawScene(f){const by=232-114;const rr=f<14?R.idle:f<22?R.jump:f<34?R.love:R.idle;
  g.fillStyle='#0000002e';g.fillRect(30,233,88,3);spr(rr,f%4,8,by,2);
- let nx,nr;if(f<14){nx=250-f*9;nr=19}else if(f<34){nx=124;nr=(f>=26&&f<28)?20:24}else{nx=124+(f-34)*11;nr=2}
+ let nx,nr;if(W.active==='noa'){if(f<14){nx=250-f*9;nr=4002}else if(f<34){nx=124;nr=(f>=26&&f<28)?4003:4000}else{nx=124+(f-34)*11;nr=3002}
+  g.fillStyle='#0000002e';g.fillRect(nx+26,233,80,3);spr(nr,f%4,nx,by,2);return}
+ if(f<14){nx=250-f*9;nr=19}else if(f<34){nx=124;nr=(f>=26&&f<28)?20:24}else{nx=124+(f-34)*11;nr=2}
  g.fillStyle='#0000002e';g.fillRect(nx+30,233,72,3);spr(nr+2000,f%4,nx,by+(YN[nr]||0)*2,2)}
 function decayOther(st){const O=W.pets[W.active==='noa'?'rinya':'noa'];if(!O)return;O.t=S.t;if(O.phase!=='live')return;const h=st/H*0.25,dn=(k,r)=>{if(O[k]>20)O[k]=Math.max(20,O[k]-r*h)};dn('food',6);dn('clean',4);dn('mood',5);O.over=false;O.asleep=false;O.neglect=0;O.manualSleep=false}
 function snap(){return{food:S.food,clean:S.clean,mood:S.mood,ice:S.ice,fire:S.fire,rune:S.rune||0}}
@@ -447,7 +451,7 @@ function brain(){const nd=needNow();
  if(q<st)setB('idle',rn(10,22));else if(q<st+2)setB('blink',4);else if(q<st+2+ws)startWalk();else{facing=facing==='L'?'R':'L';setB('idle',rn(10,18))}}
 function calm(){return S.phase==='live'&&!S.asleep&&!S.over&&S.health>=40&&S.food>=30&&S.mood>=20}
 function frameStep(){frame++;
-  if(anim){anim.left--;if(anim.left<=0){if(S.phase==='hatching'){S.phase='live';S.t=Math.max(S.t,Date.now());S.born=S.t;S.lastVisit=S.t;save();anim=null;play('jump',2,'Noa 誕生了！');addMem('Noa 誕生了');S.giftDay=gday(S.t);S.ms=[]}else{if(anim.scene&&toastLater){say(toastLater);toastLater=''}if(anim.row===R.rinya){S.missAfter=S.t+0.6*H;missReal=performance.now()+8000;facing='R';setB('idle',20)}const nx=anim.then;anim=null;if(nx)play(nx[0],nx[1],nx[2])}}}
+  if(anim){anim.left--;if(anim.left<=0){if(S.phase==='hatching'){S.phase='live';S.t=Math.max(S.t,Date.now());S.born=S.t;S.lastVisit=S.t;save();anim=null;play('jump',2,'Noa 誕生了！');addMem('Noa 誕生了');S.giftDay=gday(S.t);S.ms=[]}else{if(anim.scene&&toastLater){say(toastLater);toastLater=''}if(anim.row===R.rinya||anim.missAfter){S.missAfter=S.t+0.6*H;missReal=performance.now()+8000;facing='R';setB('idle',20)}const nx=anim.then;anim=null;if(nx)play(nx[0],nx[1],nx[2])}}}
   else if(calm()&&mode==='pet'&&!catching&&specialEvent()){idleT=0}
   else if(awake()&&(mode==='pet'||mode==='pomo')&&!catching)brain();
 }
